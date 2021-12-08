@@ -11,57 +11,54 @@
               max-width="550px"
               max-height="900px"
             >
-              <v-spacer></v-spacer>
-              <v-card-title class="justify-center" dark>
-                <v-img
-                  src="../../assets/police3.png"
-                  max-width="200px"
-                  max-height="200px"
-                ></v-img>
-              </v-card-title>
-              <v-card-text>
-                <v-form>
-                  <v-text-field
-                    id="username"
-                    prepend-icon="mdi-face-agent"
-                    name="login"
-                    label="Login"
-                    type="text"
-                    autofocus
-                  ></v-text-field>
-                  <v-text-field
-                    id="password"
-                    prepend-icon="mdi-lock"
-                    name="password"
-                    label="Password"
-                    type="password"
-                  ></v-text-field>
-                  <v-spacer></v-spacer>
-                  <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
-                    >forget passwords</v-btn
-                  >
-                  <v-btn text dark color="rgb(131,49,51)" to="/register"
-                    >Register</v-btn
-                  >
-                  <v-spacer></v-spacer>
-                </v-form>
-              </v-card-text>
-              <v-card-actions justify-center>
-                <v-row no-gutters>
-                  <v-col cols="12" xl="12">
-                    <v-btn
-                      block
-                      dark
-                      color="rgba(22, 222, 105, 0.51)"
-                      to="/overview"
+              <div class="style-card">
+                <!-- <v-spacer></v-spacer> -->
+                <v-card-title class="justify-center" dark>
+                  <v-img
+                    src="../../assets/police3.png"
+                    max-width="200px"
+                    max-height="200px"
+                  ></v-img>
+                </v-card-title>
+                <v-card-text :style="{ padding: 0 }">
+                  <v-form>
+                    <v-text-field
+                      id="username"
+                      prepend-icon="mdi-face-agent"
+                      name="login"
+                      label="Username"
+                      type="text"
+                      autofocus
+                    ></v-text-field>
+                    <v-text-field
+                      id="password"
+                      prepend-icon="mdi-lock"
+                      name="password"
+                      label="Password"
+                      type="password"
+                      :rules="rules.Password_Format"
+                    ></v-text-field>
+                    <v-spacer></v-spacer>
+                    <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
+                      >forget passwords</v-btn
                     >
-                      <v-icon>mdi-login</v-icon>Login
-                    </v-btn>
-                  </v-col>
-                  <v-col cols="12" sm="5" md="5" lg="5"> </v-col>
-                  <br /><br />
-                </v-row>
-              </v-card-actions>
+                    <v-btn text dark color="rgb(131,49,51)" to="/register"
+                      >Register</v-btn
+                    >
+                    <v-spacer></v-spacer>
+                  </v-form>
+                </v-card-text>
+                <v-card-actions class="row-btn">
+                  <v-row>
+                    <v-col>
+                        <v-btn block color="rgba(22, 222, 105, 0.51)" to="/overview">
+                    <v-icon>mdi-login</v-icon>Login
+                  </v-btn>
+                    </v-col>
+                  </v-row>
+                
+                </v-card-actions>
+              </div>
             </v-card>
           </v-flex>
         </v-layout>
@@ -76,6 +73,13 @@ export default {
   props: {
     source: String,
   },
+  data: () => ({
+    rules: {
+       Password_Format: [
+        (val) => (val || "").length >= 6 || "กรุณาใส่รหัสผ่านอย่างน้อย 6 ตัวหรือมากกว่า",
+      ],
+    }
+  })
 };
 </script>
 
@@ -83,5 +87,14 @@ export default {
 .rounded-card {
   border-radius: 15px;
   border-color: black;
+}
+
+.style-card {
+  padding: 30px;
+}
+
+.row-btn {
+  padding: 0;
+  margin-top:10px
 }
 </style>
