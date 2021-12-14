@@ -6,7 +6,7 @@
     </div>
     <router-view/>
   </div> -->
-  <v-app id="app">
+  <v-app id="main" :style="{background: $vuetify.theme.themes[theme].background}" >
     <template v-if="$route.path.includes('login')">
       <v-content class="ma-4">
         <router-view></router-view>
@@ -47,7 +47,7 @@
 import Navbar from "../src/components/navbar/Navbar.vue"
 import Footer from "../src/components/footer/Footer.vue"
 export default {
-  name: "Login",
+  name: 'App',
   props: {
     source: String,
   },
@@ -55,13 +55,19 @@ export default {
         Navbar,
         Footer,
     },
+    computed:{
+    theme(){
+      return (this.$vuetify.theme.light) ? 'dark' : 'light'
+    }
+  }
 
 };
 </script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@700&display=swap');
+  font-family: 'Sarabun', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -85,5 +91,10 @@ export default {
 .rounded-card {
   border-radius: 15px;
   border-color: black;
+}
+</style>
+<style>
+#app {
+    background-color: var(--v-background-base);
 }
 </style>

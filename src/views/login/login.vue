@@ -1,15 +1,15 @@
 <template>
   <v-app id="app">
-    <v-content>
-      <v-container fluid fill-height>
+    
+      <v-container  fill-height fill-width>
         <v-layout align-center justify-center>
-          <v-flex class="text-xs-center" xs12 sm12 md4>
+
             <v-card
               color="#F4ffff"
               elevation="6"
-              class="rounded-card"
-              max-width="550px"
-              max-height="900px"
+              class="mx-auto"
+             width="550px"
+             height="500px"
             >
               <div class="style-card">
                 <!-- <v-spacer></v-spacer> -->
@@ -26,7 +26,7 @@
                       id="username"
                       prepend-icon="mdi-face-agent"
                       name="login"
-                      label="Username"
+                      label="ชื่อผู้ใช้งาน"
                       type="text"
                       autofocus
                     ></v-text-field>
@@ -34,16 +34,16 @@
                       id="password"
                       prepend-icon="mdi-lock"
                       name="password"
-                      label="Password"
+                      label="รหัสผ่าน"
                       type="password"
                       :rules="rules.Password_Format"
                     ></v-text-field>
                     <v-spacer></v-spacer>
                     <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
-                      >forget passwords</v-btn
+                      >ลืมรหัสผ่าน</v-btn
                     >
                     <v-btn text dark color="rgb(131,49,51)" to="/register"
-                      >Register</v-btn
+                      >ลงทะเบียน</v-btn
                     >
                     <v-spacer></v-spacer>
                   </v-form>
@@ -52,7 +52,7 @@
                   <v-row>
                     <v-col>
                         <v-btn block color="rgba(22, 222, 105, 0.51)" to="/overview">
-                    <v-icon>mdi-login</v-icon>Login
+                    <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
                   </v-btn>
                     </v-col>
                   </v-row>
@@ -60,10 +60,11 @@
                 </v-card-actions>
               </div>
             </v-card>
-          </v-flex>
+      
+          
         </v-layout>
       </v-container>
-    </v-content>
+   
   </v-app>
 </template>
 
@@ -87,6 +88,7 @@ export default {
 .rounded-card {
   border-radius: 15px;
   border-color: black;
+  
 }
 
 .style-card {
