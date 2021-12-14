@@ -51,7 +51,7 @@
                 <v-card-actions class="row-btn">
                   <v-row>
                     <v-col>
-                        <v-btn block color="rgba(22, 222, 105, 0.51)" to="/overview">
+                        <v-btn block color="rgba(131, 49, 51, 0.74)" to="/overview">
                     <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
                   </v-btn>
                     </v-col>
