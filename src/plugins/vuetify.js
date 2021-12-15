@@ -14,9 +14,10 @@ export default new Vuetify({
     theme: {
         themes: {
             light: {
-                primary: '#3f51b5',
+                primary: '#FFAB97',
                 secondary: '#b0bec5',
                 accent: '#8c9eff',
+                warning: '#F9F071',
                 error: '#b71c1c',
                 background: 'rgba(215, 215, 215, 0.4)',
             },

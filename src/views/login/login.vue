@@ -4,7 +4,7 @@
       <v-layout align-center justify-center>
         <v-card
           color="#F4ffff"
-          elevation="6"
+          elevation="10"
           class="mx-auto"
           width="550px"
           height="500px"
