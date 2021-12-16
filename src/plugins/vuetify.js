@@ -7,20 +7,26 @@ export default new Vuetify({
     lang: {
         locales: { th },
         current: 'th',
-      },
-      icons: {
+    },
+    icons: {
         iconfont: 'md',
-      },
+    },
     theme: {
         themes: {
             light: {
-                primary: '#FFAB97',
-                secondary: '#b0bec5',
-                accent: '#8c9eff',
-                warning: '#F9F071',
-                error: '#b71c1c',
-                background: 'rgba(215, 215, 215, 0.4)',
-                ready:'#32FFA3',
+                // primary: '#FFAB97',
+                // secondary: '#b0bec5',
+                // accent: '#8c9eff',
+                // warning: '#F9F071',
+                // error: '#b71c1c',
+                // background: 'rgba(215, 215, 215, 0.4)',
+                // agree: '#32FFA3',
+                primary: '#A23333',
+                secondary: '#C98888',
+                error: '#B72F2F',
+                agree: '#5AE118',
+                cancel: '#F7E742',
+                background: '#9F9F9F',
             },
             options: {
                 customProperties: true
