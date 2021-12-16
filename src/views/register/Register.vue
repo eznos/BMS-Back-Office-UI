@@ -1,134 +1,122 @@
 <template>
-  <v-app>
-    <h1>
-      &ensp; &ensp; ลงทะเบียน
-    </h1>
-    <v-row>
-      <v-col col12 lg="12" xl="12">
-        <v-card class="mx-auto" color="#F4ffff" elevation="6" width="95%">
+  <v-app id="app">
+    <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
+    <v-container fill-height fill-width>
+      <v-layout align-center justify-center>
+        <v-card class="mx-auto" color="#F4ffff" elevation="10" width="80%">
           <v-card-title>
-            <h1>
-              ข้อมูลส่วนตัว
-            </h1>
+            <!-- <h1 class="h1c">ลงทะเบียน</h1> -->
           </v-card-title>
           <v-card-text>
             <v-form ref="form" @submit.prevent="submit">
               <v-row>
                 <v-col col="12" l>
-                  
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" md="6" lg="6">
-                         
+                  <v-container>
+                    <v-row>
+                      <v-col cols="12" md="6" lg="6">
+                        <v-text-field
+                          v-model="firstname"
+                          :rules="nameRules"
+                          label="ชื่อ"
+                          required
+                          autofocus
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="lastname"
+                          :rules="nameRules"
+                          label="นามสกุล"
+                          required
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="email"
+                          :rules="emailRules"
+                          label="อีเมล"
+                          required
+                        ></v-text-field>
+                        <validation-provider
+                          v-slot="{ errors }"
+                          name="phoneNumber"
+                          :rules="{
+                            required: true,
+                            digits: 10,
+                            regex: '^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})',
+                          }"
+                        >
+                          <!-- ^0[6,8,9][0-9]{8}$ -->
+                          <v-text-field
+                            :rules="rules.phoneNumber"
+                            v-model="phoneNumber"
+                            :counter="10"
+                            :error-messages="errors"
+                            label="เบอร์โทร"
+                            required
+                          ></v-text-field>
+                        </validation-provider>
+                        <v-container class="px-0" fluid>
+                          <v-radio-group v-model="sex" row>
                             <template v-slot:label>
-                              <h3>เพศss</h3>
+                              <h3>เพศ</h3>
                             </template>
-                            <v-text-field
-                              v-model="firstname"
-                              :rules="nameRules"
-                              label="First name"
-                              required
-                              autofocus
-                            ></v-text-field>
-                            <v-text-field
-                              v-model="lastname"
-                              :rules="nameRules"
-                              label="Last name"
-                              required
-                            ></v-text-field>
-                            <v-text-field
-                              v-model="email"
-                              :rules="emailRules"
-                              label="E-mail"
-                              required
-                            ></v-text-field>
-                            <validation-provider
-                              v-slot="{ errors }"
-                              name="phoneNumber"
-                              :rules="{
-                                required: true,
-                                digits: 10,
-                                regex:
-                                  '^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})',
-                              }"
-                            >
-                              <!-- ^0[6,8,9][0-9]{8}$ -->
-                              <v-text-field
-                                :rules="rules.phoneNumber"
-                                v-model="phoneNumber"
-                                :counter="10"
-                                :error-messages="errors"
-                                label="เบอร์โทร"
-                                required
-                              ></v-text-field>
-                            </validation-provider>
-                            <v-container class="px-0" fluid>
-                              <v-radio-group v-model="sex" row>
-                                <template v-slot:label>
-                                  <h3>เพศ</h3>
-                                </template>
-                                <v-radio
-                                  color="blue darken-1"
-                                  label="ชาย"
-                                  value="male"
-                                ></v-radio>
-                                <v-radio
-                                  color="pink darken-1"
-                                  label="หญิง"
-                                  value="female"
-                                ></v-radio>
-                                <v-radio
-                                  color="purple darken-2"
-                                  label="เพศทางเลือก"
-                                  value="lgbt"
-                                ></v-radio>
-                              </v-radio-group>
-                            </v-container>
-                         
-                        </v-col>
-                        <v-col cols="12" md="6" lg="6">
-                          <v-select
-                            v-model="rank"
-                            :items="Rank"
-                            label="Rank"
-                            required
-                          ></v-select>
-                          <v-select
-                            v-model="affiliation"
-                            :items="Affiliation"
-                            label="Affiliation"
-                            required
-                          ></v-select>
-                          <v-text-field
-                            :rules="rules.username"
-                            v-model="username"
-                            label="Username"
-                            required
-                          ></v-text-field>
-                          <v-text-field
-                            v-model="password"
-                            :append-icon="
-                              showpassword ? 'mdi-eye' : 'mdi-eye-off'
-                            "
-                            :type="showpassword ? 'text' : 'password'"
-                            required
-                            name="input-10-1"
-                            :rules="rules.password"
-                            label="รหัสผ่านใหม่"
-                            @click:append="showpassword = !showpassword"
-                          ></v-text-field>
-                          <v-file-input
-                            :rules="rules.Avatar"
-                            accept="image/png, image/jpeg, image/bmp"
-                            placeholder="เลือกรูปประจำตัว"
-                            label="รูปประจำตัว"
-                            show-size
-                            counter
-                          ></v-file-input>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  
+                            <v-radio
+                              color="blue darken-1"
+                              label="ชาย"
+                              value="male"
+                            ></v-radio>
+                            <v-radio
+                              color="pink darken-1"
+                              label="หญิง"
+                              value="female"
+                            ></v-radio>
+                            <v-radio
+                              color="purple darken-2"
+                              label="เพศทางเลือก"
+                              value="lgbt"
+                            ></v-radio>
+                          </v-radio-group>
+                        </v-container>
+                      </v-col>
+                      <v-col cols="12" md="6" lg="6">
+                        <v-select
+                          v-model="rank"
+                          :items="Rank"
+                          label="ยศ"
+                          required
+                        ></v-select>
+                        <v-select
+                          v-model="affiliation"
+                          :items="Affiliation"
+                          label="สังกัด"
+                          required
+                        ></v-select>
+                        <v-text-field
+                          :rules="rules.username"
+                          v-model="username"
+                          label="ชื่อผู้ใช้งาน"
+                          required
+                        ></v-text-field>
+                        <v-text-field
+                          v-model="password"
+                          :append-icon="
+                            showpassword ? 'mdi-eye' : 'mdi-eye-off'
+                          "
+                          :type="showpassword ? 'text' : 'password'"
+                          required
+                          name="input-10-1"
+                          :rules="rules.password"
+                          label="รหัสผ่านใหม่"
+                          @click:append="showpassword = !showpassword"
+                        ></v-text-field>
+                        <v-file-input
+                          :rules="rules.Avatar"
+                          accept="image/png, image/jpeg, image/bmp"
+                          placeholder="เลือกรูปประจำตัว"
+                          label="รูปประจำตัว"
+                          show-size
+                          counter
+                        ></v-file-input>
+                      </v-col>
+                    </v-row>
+                  </v-container>
                 </v-col>
               </v-row>
             </v-form>
@@ -147,7 +135,6 @@
               >
                 ยืนยันการลงทะเบียน
               </v-btn>
-
               <v-btn
                 class="mr-4"
                 @click="clear"
@@ -155,15 +142,15 @@
                 dark
                 width="200px"
                 large
-                color="red"
+                color="error"
               >
                 ยกเลิกการลงทะเบียน
               </v-btn>
             </div>
           </v-card-actions>
         </v-card>
-      </v-col>
-    </v-row>
+      </v-layout>
+    </v-container>
   </v-app>
 </template>
 <script>
@@ -251,10 +238,7 @@ export default {
 
   computed: {
     formIsValid() {
-      return (
-        
-        this.lastname 
-      );
+      return this.lastname;
     },
   },
   methods: {
@@ -265,6 +249,9 @@ export default {
 };
 </script>
 <style scoped>
+.h1c {
+  font-size: 30px;
+}
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

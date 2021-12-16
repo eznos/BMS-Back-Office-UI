@@ -36,14 +36,13 @@
                   type="password"
                   :rules="rules.Password_Format"
                 ></v-text-field>
-                <v-spacer></v-spacer>
+
                 <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
                   >ลืมรหัสผ่าน</v-btn
                 >
                 <v-btn text dark color="rgb(131,49,51)" to="/register"
                   >ลงทะเบียน</v-btn
                 >
-                <v-spacer></v-spacer>
               </v-form>
             </v-card-text>
             <v-card-actions class="row-btn">
