@@ -16,7 +16,7 @@
                 <h2>ลืมรหัสผ่าน</h2>
               </v-card-title>
               <v-card-subtitle>
-                กรอกอีเมลเพื่อรับ Recovery Code ที่ใช้ในการยืนยันการลืมรหัส
+                กรอกรหัส Recovery Code เพื่อใช้ในการยืนยันตัวตน
               </v-card-subtitle>
               <v-card-text>
                 <v-form>
@@ -24,10 +24,8 @@
                     <v-row>
                       <v-col cols="12" xl="12">
                         <v-text-field
-                          prepend-icon="email"
-                          v-model="email"
-                          :rules="[rules.required, rules.email]"
-                          label="E-mail"
+                          prepend-icon="lock"
+                          label="Recovery code"
                           autofocus
                         ></v-text-field>
                       </v-col>
@@ -37,12 +35,25 @@
               </v-card-text>
               <v-card-actions class="justify-center">
                 <v-row>
+                  <v-col cols="12" md="12" lg="12">
+                    <div v-if="timerCount == 0">
+                      <v-btn block color="ready" @click="reloadPage">
+                        <v-icon>mdi-power-cycle</v-icon>
+                        ส่ง Recovery Code อีกรอบ
+                      </v-btn>
+                    </div>
+                    <div v-else>
+                      <v-btn disabled block color="ready">
+                        รอ {{ timerCount }} วินาที เพื่อส่ง Recovery Code อีกรอบ
+                      </v-btn>
+                    </div>
+                  </v-col>
                   <v-col cols="12" md="6" lg="6">
                     <v-btn
                       width="100%"
                       dark
-                      color="rgba(22, 222, 105, 0.51)"
-                      to="/recovery"
+                      color="rgba(22, 222, 105, 0.91)"
+                      to="/newpassword"
                       elevation="3"
                     >
                       <v-icon>mdi-page-next</v-icon>ถัดไป
@@ -52,7 +63,7 @@
                     <v-btn
                       width="100%"
                       dark
-                      color="rgba(245, 173, 15, 0.7)"
+                      color="rgba(245, 173, 15, 0.9)"
                       to="/login"
                       elevation="3"
                     >
@@ -73,14 +84,26 @@
 export default {
   data() {
     return {
-      email: "",
-      rules: {
-        email: (value) => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return pattern.test(value) || "รูปแบบอีเมลไม่ถูกต้อง";
-        },
-      },
+      timerCount: 20,
+    
     };
+  },
+  watch: {
+    timerCount: {
+      handler(value) {
+        if (value > 0) {
+          setTimeout(() => {
+            this.timerCount--;
+          }, 1000);
+        }
+      },
+      immediate: true, // This ensures the watcher is triggered upon creation
+    },
+  },
+  methods: {
+    reloadPage() {
+      window.location.reload();
+    },
   },
 };
 </script>

@@ -20,6 +20,7 @@ export default new Vuetify({
                 warning: '#F9F071',
                 error: '#b71c1c',
                 background: 'rgba(215, 215, 215, 0.4)',
+                ready:'#32FFA3',
             },
             options: {
                 customProperties: true
