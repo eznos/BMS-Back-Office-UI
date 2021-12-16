@@ -2,18 +2,11 @@
   <nav>
     <v-app-bar color="rgb(131,49,51)" dark app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title class="text-uppercase ">
+      <v-toolbar-title class="text-uppercase">
         <span class="font-weight-light">ระบบจัดการค่าน้ำ ค่าไฟฟ้า</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu offset-y>
-        <!-- <template v-slot:activator="{ on }">
-                <v-btn text v-on="on">
-            <v-icon left>expand_more</v-icon>
-            <span>Menu</span>
-          </v-btn>
-                <v-spacer />
-            </template> -->
         <v-list flat>
           <v-list-item
             v-for="link in links"
@@ -61,7 +54,7 @@
           </v-avatar>
           <!-- <p class="white--text subheading mt-1 text-center">Username</p> -->
         </v-flex>
-        <v-flex class="mt-3 ">
+        <v-flex class="mt-3">
           <p class="white--text subheading mt-1 text-center">ผู้เข้าใช้งาน</p>
           <p class="white--text subheading mt-1 text-center">
             {{ rank }} {{ Name }} {{ lname }}
@@ -102,7 +95,7 @@ export default {
   data: () => ({
     drawer: true,
     dialog: false,
-    Username: "พ.ต.ต. ทดสอบชื่อ ทดสอบนามสกุล",
+
     Name: "พิชญ์พิสิฐฏ์เสฏ ",
     lname: "สกธินชารินทร์พธา",
     rank: "พล.ต.อ.",
