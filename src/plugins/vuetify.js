@@ -26,7 +26,7 @@ export default new Vuetify({
                 error: '#B72F2F',
                 agree: '#5AE118',
                 cancel: '#F7E742',
-                background: '#9F9F9F',
+                background: '#D1D1D1 ',
             },
             options: {
                 customProperties: true
