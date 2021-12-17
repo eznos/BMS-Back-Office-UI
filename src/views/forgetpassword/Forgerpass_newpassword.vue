@@ -9,7 +9,7 @@
               elevation="6"
               class="rounded-card"
               max-width="700px"
-              max-height="900px"
+              max-height="700px"
             >
               <v-spacer></v-spacer>
               <v-card-title class="justify-center" dark>
@@ -40,7 +40,6 @@
                             class="form__input"
                             v-model.trim="$v.password.$model"
                             @click:append="showpassword = !showpassword"
-                            
                             autofocus
                           ></v-text-field>
                         </div>
@@ -194,5 +193,20 @@ export default {
 .rounded-card {
   border-radius: 15px;
   border-color: black;
+}
+.style-card {
+  padding: 30px;
+}
+
+.row-btn {
+  padding: 0;
+  margin-top: 10px;
+}
+.row {
+  margin: 0px;
+  padding: 10px;
+}
+.style-card-title {
+  padding: 30px;
 }
 </style>

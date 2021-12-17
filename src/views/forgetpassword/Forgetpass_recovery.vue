@@ -12,13 +12,13 @@
               max-height="900px"
             >
               <v-spacer></v-spacer>
-              <v-card-title class="justify-center" dark>
-                <h2>ลืมรหัสผ่าน</h2>
+              <v-card-title class="style-card-title" dark>
+                <h2 class="mx-auto">ลืมรหัสผ่าน</h2>
               </v-card-title>
               <v-card-subtitle>
                 กรอกรหัส Recovery Code เพื่อใช้ในการยืนยันตัวตน
               </v-card-subtitle>
-              <v-card-text>
+              <v-card-text :style="{ padding: 0 }">
                 <v-form>
                   <v-container>
                     <v-row>
@@ -37,13 +37,13 @@
                 <v-row>
                   <v-col cols="12" md="12" lg="12">
                     <div v-if="timerCount == 0">
-                      <v-btn block color="ready" @click="reloadPage">
+                      <v-btn block color="agree" @click="reloadPage">
                         <v-icon>mdi-power-cycle</v-icon>
                         ส่ง Recovery Code อีกรอบ
                       </v-btn>
                     </div>
                     <div v-else>
-                      <v-btn disabled block color="ready">
+                      <v-btn disabled block color="agree">
                         รอ {{ timerCount }} วินาที เพื่อส่ง Recovery Code อีกรอบ
                       </v-btn>
                     </div>
@@ -85,7 +85,6 @@ export default {
   data() {
     return {
       timerCount: 20,
-    
     };
   },
   watch: {
@@ -112,5 +111,20 @@ export default {
 .rounded-card {
   border-radius: 15px;
   border-color: black;
+}
+.style-card {
+  padding: 30px;
+}
+
+.row-btn {
+  padding: 0;
+  margin-top: 10px;
+}
+.row {
+  margin: 0px;
+  padding: 10px;
+}
+.style-card-title {
+  padding: 30px;
 }
 </style>
