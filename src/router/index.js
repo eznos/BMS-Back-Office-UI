@@ -5,6 +5,7 @@ import Login from '../views/login/login.vue'
 import Register from '../views/register/Register.vue'
 import Forgetpassword from '../views/forgetpassword/Forgetpass.vue'
 import Forgetpassword_recoverycode from '../views/forgetpassword/Forgetpass_recovery.vue'
+import Forgetpassword_newpassword from '../views/forgetpassword/Forgerpass_newpassword.vue'
 
 Vue.use(VueRouter)
 
@@ -41,6 +42,11 @@ const routes = [
     path: '/recovery',
     name: 'Forgetpassword_recoverycode',
     component: Forgetpassword_recoverycode
+  },
+  {
+    path: '/newpassword',
+    name: 'Forgetpassword_newpassword',
+    component: Forgetpassword_newpassword
   }
 ]
 
