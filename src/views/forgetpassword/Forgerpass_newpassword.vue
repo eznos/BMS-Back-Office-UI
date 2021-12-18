@@ -43,7 +43,7 @@
                             autofocus
                           ></v-text-field>
                         </div>
-                        <v-alert
+                        <!-- <v-alert
                           dense
                           type="warning"
                           class="error"
@@ -52,6 +52,10 @@
                           dark
                         >
                           กรุณากรอกรหัสผ่าน
+                        </v-alert> -->
+                        <v-alert dense text type="error"  v-if="!$v.password.required">
+                          
+                          <strong>กรุณากรอกรหัสผ่าน</strong> 
                         </v-alert>
                         <v-alert
                           dense

@@ -64,7 +64,7 @@
                       width="100%"
                       dark
                       color="rgba(245, 173, 15, 0.9)"
-                      to="/login"
+                      to="/forgetpass"
                       elevation="3"
                     >
                       <v-icon>mdi-backspace</v-icon>ยกเลิก

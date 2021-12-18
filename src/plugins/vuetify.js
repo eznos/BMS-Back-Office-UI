@@ -24,8 +24,9 @@ export default new Vuetify({
                 primary: '#A23333',
                 secondary: '#C98888',
                 error: '#B72F2F',
+                warning: '#FFB14F',
                 agree: '#5AE118',
-                cancel: '#F7E742',
+                // cancel: '#F7E742',
                 background: '#D1D1D1 ',
             },
             options: {
