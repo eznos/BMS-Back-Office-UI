@@ -1,81 +1,183 @@
 <template>
-  <v-app>
-   
-      <v-card class="justify-center" :style="{ padding: 10 }">
-        <v-card-title>
+  <div id="app">
+     <v-card>
           <p class="title">Chart.jS Vue</p>
-        </v-card-title>
-        <v-card-text  :style="{ margin: 10 }">
-             <canvas id="graph" width="400" height="400"></canvas>
-        
-        </v-card-text>
+      <canvas id="ctx" width="600"></canvas>
+     </v-card>
+     <v-card>
          
-      </v-card>
-    
-  </v-app>
+          <v-responsive>
+               <p class="title">Chart.jS Vue</p>
+                <canvas id="ctxs" width="600"></canvas>
+          </v-responsive>
+     
+     </v-card>
+   
+  </div>
 </template>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 <script>
-import Chart from "chart.js";
+import Chart from 'chart.js'
 export default {
-  components: {},
+  components: {
+  },
   mounted: function () {
-    var ctx = document.getElementById("graph").getContext("2d");
-    var bar = new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: ["1", "2", "3"],
-        datasets: [
+  
+    var chart = new Chart(ctx, {
+   type: 'bar',
+   data: {
+      labels: ['Standing costs', 'Running costs'], // responsible for how many bars are gonna show on the chart
+      // create 12 datasets, since we have 12 items
+      // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+      // put 0, if there is no data for the particular bar
+      datasets: [
           {
-            label: "# of Vote",
-            data: [12, 45, 67],
-            backgroundColor: [
-              "rgba(255, 99, 132, 0.2)",
-              "rgba(255, 159, 64, 0.2)",
-              "rgba(54, 162, 235, 0.2)",
-            ],
-            borderColor: [
-              "rgb(255, 99, 132)",
-              "rgb(255, 159, 64)",
-              "rgb(255, 205, 86)",
-            ],
-            borderWidth: 1,
-          },
-        ],
+         label: 'Washing and cleaning',
+         data: [0, 8],
+         backgroundColor: '#22aa99'
+      }, {
+         label: 'Traffic tickets',
+         data: [0, 2],
+         backgroundColor: '#994499'
+      }, {
+         label: 'Tolls',
+         data: [0, 1],
+         backgroundColor: '#316395'
+      }, {
+         label: 'Parking',
+         data: [5, 2],
+         backgroundColor: '#b82e2e'
+      }, {
+         label: 'Car tax',
+         data: [0, 1],
+         backgroundColor: '#66aa00'
+      }, {
+         label: 'Repairs and improvements',
+         data: [0, 2],
+         backgroundColor: '#dd4477'
+      }, {
+         label: 'Maintenance',
+         data: [6, 1],
+         backgroundColor: '#0099c6'
+      }, {
+         label: 'Inspection',
+         data: [0, 2],
+         backgroundColor: '#990099'
+      }, {
+         label: 'Loan interest',
+         data: [0, 3],
+         backgroundColor: '#109618'
+      }, {
+         label: 'Depreciation of the vehicle',
+         data: [0, 2],
+         backgroundColor: '#109618'
+      }, {
+         label: 'Fuel',
+         data: [0, 1],
+         backgroundColor: '#dc3912'
+      }, {
+         label: 'Insurance and Breakdown cover',
+         data: [4, 0],
+         backgroundColor: '#3366cc'
+      }]
+   },
+   options: {
+      responsive: false,
+      legend: {
+         position: 'right' // place legend on the right side of chart
       },
-    });
-    console.log(bar);
+      scales: {
+         xAxes: [{
+            stacked: true // this should be set to make the bars stacked
+         }],
+         yAxes: [{
+            stacked: true // this also..
+         }]
+      }
+   }
+});
+       var chart = new Chart(ctxs, {
+   type: 'bar',
+   data: {
+      labels: ['Standing costs', 'Running costs'], // responsible for how many bars are gonna show on the chart
+      // create 12 datasets, since we have 12 items
+      // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+      // put 0, if there is no data for the particular bar
+      datasets: [
+          {
+         label: 'Washing and cleaning',
+         data: [0, 8],
+         backgroundColor: '#22aa99'
+      }, {
+         label: 'Traffic tickets',
+         data: [0, 2],
+         backgroundColor: '#994499'
+      }, {
+         label: 'Tolls',
+         data: [0, 1],
+         backgroundColor: '#316395'
+      }, {
+         label: 'Parking',
+         data: [5, 2],
+         backgroundColor: '#b82e2e'
+      }, {
+         label: 'Car tax',
+         data: [0, 1],
+         backgroundColor: '#66aa00'
+      }, {
+         label: 'Repairs and improvements',
+         data: [0, 2],
+         backgroundColor: '#dd4477'
+      }, {
+         label: 'Maintenance',
+         data: [6, 1],
+         backgroundColor: '#0099c6'
+      }, {
+         label: 'Inspection',
+         data: [0, 2],
+         backgroundColor: '#990099'
+      }, {
+         label: 'Loan interest',
+         data: [0, 3],
+         backgroundColor: '#109618'
+      }, {
+         label: 'Depreciation of the vehicle',
+         data: [0, 2],
+         backgroundColor: '#109618'
+      }, {
+         label: 'Fuel',
+         data: [0, 1],
+         backgroundColor: '#dc3912'
+      }, {
+         label: 'Insurance and Breakdown cover',
+         data: [4, 0],
+         backgroundColor: '#3366cc'
+      }]
+   },
+   options: {
+      responsive: false,
+      legend: {
+         position: 'right' // place legend on the right side of chart
+      },
+      scales: {
+         xAxes: [{
+            stacked: true // this should be set to make the bars stacked
+         }],
+         yAxes: [{
+            stacked: true // this also..
+         }]
+      }
+   }
+});
   },
-  data() {
-    return {};
-  },
-};
+  data () {
+    return {
+    }
+  }
+}
 </script>
 
-<style scoped>
-html {
-  height: 100%;
-}
+<style>
 
-#app {
- 
-
-  max-width: 400px;
-
-  text-align: center;
-}
-
-#app a {
-  color: #42b983;
-  text-decoration: none;
-}
-.logo {
-  width: 100px;
-  height: 100px;
-}
-.title {
-  color: #72;
-  font-size: 50px;
-}
 
 </style>
