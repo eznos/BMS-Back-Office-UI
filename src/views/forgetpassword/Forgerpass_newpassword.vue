@@ -16,7 +16,7 @@
                 <h2>ลืมรหัสผ่าน</h2>
               </v-card-title>
               <v-card-subtitle> กรอกรหัสผ่านใหม่ </v-card-subtitle>
-              <v-card-text>
+              <v-card-text :style="{ padding: 0 }">
                 <v-form>
                   <v-container>
                     <v-row>
@@ -53,16 +53,20 @@
                         >
                           กรุณากรอกรหัสผ่าน
                         </v-alert> -->
-                        <v-alert dense text type="error"  v-if="!$v.password.required">
-                          
-                          <strong>กรุณากรอกรหัสผ่าน</strong> 
+                        <v-alert
+                          dense
+                          text
+                          type="error"
+                          v-if="!$v.password.required"
+                        >
+                          <strong>กรุณากรอกรหัสผ่าน</strong>
                         </v-alert>
                         <v-alert
                           dense
-                          type="warning"
-                          class="error"
+                          text
+                          type="error"
                           v-if="!$v.password.minLength"
-                          border="top"
+                          
                           dark
                         >
                           กรุณากรอกรหัสผ่านใหม่ให้มีมากกว่า
@@ -92,11 +96,11 @@
                           ></v-text-field>
                         </div>
                         <v-alert
-                          dense
-                          type="warning"
-                          class="error"
+                        dense
+                          text
+                          type="error"
                           v-if="!$v.repeatPassword.sameAsPassword"
-                          border="top"
+                        
                           dark
                         >
                           รหัสผ่านไม่ตรงกัน
@@ -190,6 +194,7 @@ export default {
       window.location.reload();
     },
   },
+  computed: {},
 };
 </script>
 
@@ -213,4 +218,10 @@ export default {
 .style-card-title {
   padding: 30px;
 }
+.container{
+  margin-bottom: -10px;
+}
+
+
+
 </style>

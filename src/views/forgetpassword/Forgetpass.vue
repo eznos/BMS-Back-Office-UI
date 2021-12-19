@@ -28,7 +28,7 @@
                             prepend-icon="email"
                             v-model="email"
                             :rules="[rules.required, rules.email]"
-                            label="E-mail"
+                            label="อีเมล"
                             autofocus
                           ></v-text-field>
                         </v-col>
