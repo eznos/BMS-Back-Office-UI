@@ -1,183 +1,294 @@
 <template>
   <div id="app">
-     <v-card>
-          <p class="title">Chart.jS Vue</p>
-      <canvas id="ctx" width="600"></canvas>
-     </v-card>
-     <v-card>
-         
-          <v-responsive>
-               <p class="title">Chart.jS Vue</p>
-                <canvas id="ctxs" width="600"></canvas>
-          </v-responsive>
-     
-     </v-card>
-   
+    <v-container>
+      <v-row>
+        <v-col>
+          <v-card>
+            <v-card-title>
+              <div class="mx-auto">
+                <v-icon size="35px" color="#29DEFF">mdi-water-circle</v-icon>
+                ค่าน้ำประปา
+              </div>
+            </v-card-title>
+            <v-card-actions>
+              <div class="chart-responsive" :style="{ padding: 10 }">
+                <canvas id="water" width="1500" height="350"></canvas>
+              </div>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+        <v-col>
+          <v-card>
+            <v-card-title>
+              <div class="mx-auto">
+                <v-icon size="35px" color="#FDFC15"
+                  >mdi-lightning-bolt-circle</v-icon
+                >
+                ค่าไฟฟ้า
+              </div>
+            </v-card-title>
+            <v-card-actions>
+              <div class="chart-responsive" :style="{ padding: 10 }">
+                <canvas id="electric" width="1500" height="350"></canvas>
+              </div>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-import Chart from 'chart.js'
+import Chart from "chart.js";
 export default {
-  components: {
-  },
+  components: {},
   mounted: function () {
-  
-    var chart = new Chart(ctx, {
-   type: 'bar',
-   data: {
-      labels: ['Standing costs', 'Running costs'], // responsible for how many bars are gonna show on the chart
-      // create 12 datasets, since we have 12 items
-      // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-      // put 0, if there is no data for the particular bar
-      datasets: [
+    var chart = new Chart(water, {
+      responsive: true,
+      type: "bar",
+      data: {
+        labels: [
+          "มกราคม",
+          "กุมภาพันธ์",
+          "มีนาคม",
+          "มีนาคม",
+          "เมษายน",
+          "พฤษภาคม ",
+          "มิถุนายน ",
+          "กรกฎาคม",
+          "สิงหาคม",
+          "กันยายน",
+          "ตุลาคม",
+          "พฤศจิกายน",
+          "ธันวาคม",
+        ], // responsible for how many bars are gonna show on the chart
+        // create 12 datasets, since we have 12 items
+        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+        // put 0, if there is no data for the particular bar
+        datasets: [
           {
-         label: 'Washing and cleaning',
-         data: [0, 8],
-         backgroundColor: '#22aa99'
-      }, {
-         label: 'Traffic tickets',
-         data: [0, 2],
-         backgroundColor: '#994499'
-      }, {
-         label: 'Tolls',
-         data: [0, 1],
-         backgroundColor: '#316395'
-      }, {
-         label: 'Parking',
-         data: [5, 2],
-         backgroundColor: '#b82e2e'
-      }, {
-         label: 'Car tax',
-         data: [0, 1],
-         backgroundColor: '#66aa00'
-      }, {
-         label: 'Repairs and improvements',
-         data: [0, 2],
-         backgroundColor: '#dd4477'
-      }, {
-         label: 'Maintenance',
-         data: [6, 1],
-         backgroundColor: '#0099c6'
-      }, {
-         label: 'Inspection',
-         data: [0, 2],
-         backgroundColor: '#990099'
-      }, {
-         label: 'Loan interest',
-         data: [0, 3],
-         backgroundColor: '#109618'
-      }, {
-         label: 'Depreciation of the vehicle',
-         data: [0, 2],
-         backgroundColor: '#109618'
-      }, {
-         label: 'Fuel',
-         data: [0, 1],
-         backgroundColor: '#dc3912'
-      }, {
-         label: 'Insurance and Breakdown cover',
-         data: [4, 0],
-         backgroundColor: '#3366cc'
-      }]
-   },
-   options: {
-      responsive: false,
-      legend: {
-         position: 'right' // place legend on the right side of chart
-      },
-      scales: {
-         xAxes: [{
-            stacked: true // this should be set to make the bars stacked
-         }],
-         yAxes: [{
-            stacked: true // this also..
-         }]
-      }
-   }
-});
-       var chart = new Chart(ctxs, {
-   type: 'bar',
-   data: {
-      labels: ['Standing costs', 'Running costs'], // responsible for how many bars are gonna show on the chart
-      // create 12 datasets, since we have 12 items
-      // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-      // put 0, if there is no data for the particular bar
-      datasets: [
+            label: "ส่วนกลาง",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#8CFFD5",
+            borderWidth: 1,
+          },
           {
-         label: 'Washing and cleaning',
-         data: [0, 8],
-         backgroundColor: '#22aa99'
-      }, {
-         label: 'Traffic tickets',
-         data: [0, 2],
-         backgroundColor: '#994499'
-      }, {
-         label: 'Tolls',
-         data: [0, 1],
-         backgroundColor: '#316395'
-      }, {
-         label: 'Parking',
-         data: [5, 2],
-         backgroundColor: '#b82e2e'
-      }, {
-         label: 'Car tax',
-         data: [0, 1],
-         backgroundColor: '#66aa00'
-      }, {
-         label: 'Repairs and improvements',
-         data: [0, 2],
-         backgroundColor: '#dd4477'
-      }, {
-         label: 'Maintenance',
-         data: [6, 1],
-         backgroundColor: '#0099c6'
-      }, {
-         label: 'Inspection',
-         data: [0, 2],
-         backgroundColor: '#990099'
-      }, {
-         label: 'Loan interest',
-         data: [0, 3],
-         backgroundColor: '#109618'
-      }, {
-         label: 'Depreciation of the vehicle',
-         data: [0, 2],
-         backgroundColor: '#109618'
-      }, {
-         label: 'Fuel',
-         data: [0, 1],
-         backgroundColor: '#dc3912'
-      }, {
-         label: 'Insurance and Breakdown cover',
-         data: [4, 0],
-         backgroundColor: '#3366cc'
-      }]
-   },
-   options: {
-      responsive: false,
-      legend: {
-         position: 'right' // place legend on the right side of chart
+            label: "มหาชัย",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#F86D6D",
+          },
+          {
+            label: "อัษฎางค์",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#2E36F0",
+          },
+        ],
       },
-      scales: {
-         xAxes: [{
-            stacked: true // this should be set to make the bars stacked
-         }],
-         yAxes: [{
-            stacked: true // this also..
-         }]
-      }
-   }
-});
+      options: {
+        layout: {
+          padding: 15,
+        },
+        legend: {
+          locale: "th-TH",
+          position: "top", // place legend on the right side of chart
+          plugins: {
+            labels: {
+              font: {
+                size: 20,
+                family: "Sarabun",
+              },
+            },
+          },
+        },
+        scales: {
+          xAxes: [
+            {
+              stacked: true, // this should be set to make the bars stacked
+            },
+          ],
+          yAxes: [
+            {
+              stacked: true, // this also..
+            },
+          ],
+        },
+      },
+    });
+    var chart = new Chart(electric, {
+      responsive: true,
+      type: "bar",
+      data: {
+        labels: [
+          "มกราคม",
+          "กุมภาพันธ์",
+          "มีนาคม",
+          "มีนาคม",
+          "เมษายน",
+          "พฤษภาคม ",
+          "มิถุนายน ",
+          "กรกฎาคม",
+          "สิงหาคม",
+          "กันยายน",
+          "ตุลาคม",
+          "พฤศจิกายน",
+          "ธันวาคม",
+        ], // header chart
+
+        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+        // put 0, if there is no data for the particular bar
+        datasets: [
+          {
+            label: "ส่วนกลาง",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#8CFFD5",
+            borderWidth: 1,
+          },
+          {
+            label: "มหาชัย",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#F86D6D",
+          },
+          {
+            label: "อัษฎางค์",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: "#2E36F0",
+          },
+        ],
+      },
+      options: {
+        locale: "th-TH",
+        layout: {
+          padding: 15,
+        },
+        legend: {
+          position: "top", // place legend on the right side of chart
+          plugins: {
+            labels: {
+              font: {
+                size: 20,
+                family: "Sarabun",
+              },
+            },
+          },
+        },
+        scales: {
+          xAxes: [
+            {
+              stacked: true, // this should be set to make the bars stacked
+            },
+          ],
+          yAxes: [
+            {
+              stacked: true, // this also..
+            },
+          ],
+        },
+      },
+    });
   },
-  data () {
-    return {
-    }
-  }
-}
+  data() {
+    return {};
+  },
+  methods: {
+    //ramdom number in dataset
+    getRandomInt() {
+      return Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+    },
+  },
+};
 </script>
 
-<style>
-
-
+<style scoped>
+.chart-responsive {
+  width: 100%;
+  margin: 20px auto;
+}
+.mx-auto {
+  font-size: 30px;
+}
 </style>
