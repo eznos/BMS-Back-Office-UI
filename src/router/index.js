@@ -7,6 +7,7 @@ import Forgetpassword from '../views/forgetpassword/Forgetpass.vue'
 import Forgetpassword_recoverycode from '../views/forgetpassword/Forgetpass_recovery.vue'
 import Forgetpassword_newpassword from '../views/forgetpassword/Forgerpass_newpassword.vue'
 import Overviews from '../views/overview/Overviews.vue'
+import Table from '../views/table/Table.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -48,11 +49,16 @@ const routes = [
     name: 'Forgetpassword_newpassword',
     component: Forgetpassword_newpassword
   },
-{
-  path: '/overview',
-  name: 'overview',
-  component: Overviews
-}
+  {
+    path: '/overview',
+    name: 'overview',
+    component: Overviews
+  },
+  {
+    path: '/table',
+    name: 'table',
+    component: Table
+  }
 ]
 
 const router = new VueRouter({
