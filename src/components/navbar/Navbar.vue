@@ -69,6 +69,7 @@
       <v-list flat>
         <v-list-item
           v-for="link in links"
+          color="#FF695D"
           :key="link.text"
           router
           :to="link.route"
@@ -110,9 +111,14 @@ export default {
         route: "/overview",
       },
       {
-        icon: "mdi-table",
-        text: "ตารางค่าน้ำ ค่าไฟ",
-        route: "/table",
+        icon: "mdi-water",
+        text: "ตารางค่าน้ำประปา",
+        route: "/waterbill",
+      },
+      {
+        icon: "mdi-lightning-bolt",
+        text: "ตารางค่าไฟฟ้า",
+        route: "/electricbill",
       },
       {
         icon: "person",
@@ -130,11 +136,10 @@ export default {
         route: "/report",
       },
       {
-        icon: " mdi-test-tube",
-        text: "Playground",
-        route: "/playground",
+        icon: " mdi-google-maps",
+        text: "แผนที่",
+        route: "/map",
       },
-
       {
         icon: " mdi-heart-broken",
         text: "Lab หน้าผู้ใช้",
