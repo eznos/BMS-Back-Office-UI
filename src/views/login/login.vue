@@ -23,7 +23,7 @@
                 <v-form>
                   <v-text-field
                     id="username"
-                    prepend-icon="mdi-face-agent"
+                    prepend-icon="mdi-face-man"
                     name="login"
                     label="ชื่อผู้ใช้งาน"
                     type="text"

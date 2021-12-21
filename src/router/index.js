@@ -7,7 +7,9 @@ import Forgetpassword from '../views/forgetpassword/Forgetpass.vue'
 import Forgetpassword_recoverycode from '../views/forgetpassword/Forgetpass_recovery.vue'
 import Forgetpassword_newpassword from '../views/forgetpassword/Forgerpass_newpassword.vue'
 import Overviews from '../views/overview/Overviews.vue'
-import Table from '../views/table/Table.vue'
+import Resident from '../views/table/Resident.vue'
+import Electric from '../views/table/Electric.vue'
+import Water from '../views/table/Water.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -55,9 +57,19 @@ const routes = [
     component: Overviews
   },
   {
-    path: '/table',
-    name: 'table',
-    component: Table
+    path: '/residents',
+    name: 'resident',
+    component:Resident
+  },
+  {
+    path: '/electricbill',
+    name: 'Electrics',
+    component: Electric
+  },
+  {
+    path: '/waterbill',
+    name: 'Water',
+    component: Water
   }
 ]
 
