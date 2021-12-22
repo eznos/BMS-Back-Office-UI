@@ -1,12 +1,6 @@
 <template>
-  <!-- <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
-  </div> -->
-  <v-app id="main" :style="{background: $vuetify.theme.themes[theme].background}" >
+
+  <v-app id="main" :style="{background: $vuetify.theme.themes[theme].background}" class="myFont" >
     <template v-if="$route.path.includes('login')">
       <v-content class="ma-4">
         <router-view></router-view>
@@ -96,5 +90,8 @@ export default {
 <style>
 #app {
     background-color: var(--v-background-base);
+}
+.myFont {
+  font-family: 'Sarabun', sans-serif; 
 }
 </style>

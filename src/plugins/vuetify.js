@@ -34,4 +34,7 @@ export default new Vuetify({
             },
         },
     },
+    font: {
+        family: 'Sarabun',
+      }
 });
