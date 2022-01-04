@@ -1,5 +1,6 @@
 <template>
   <v-app id="app">
+    <!-- start data-table -->
     <v-data-table
       :headers="headers"
       :items="electric"
@@ -92,7 +93,7 @@
                   </v-dialog>
                 </v-row>
               </v-col>
-             
+
               <!-- add new user -->
               <v-col cols="1">
                 <v-row class="pa-6">
@@ -244,7 +245,7 @@
                   </v-dialog>
                 </v-row>
               </v-col>
-               <!-- delete as selected -->
+              <!-- delete as selected -->
               <v-col cols="1">
                 <v-row class="pa-6">
                   <v-tooltip top color="red">
@@ -286,11 +287,14 @@
           </v-form>
         </v-toolbar>
       </template>
+      <!-- data -->
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
         <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
     </v-data-table>
+    <!-- end data-table -->
+ 
   </v-app>
 </template>
 

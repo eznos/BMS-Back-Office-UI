@@ -140,21 +140,21 @@ export default {
         text: "แผนที่",
         route: "/map",
       },
-      {
-        icon: " mdi-heart-broken",
-        text: "Lab หน้าผู้ใช้",
-        route: "/lab",
-      },
-      {
-        icon: " mdi-heart-broken",
-        text: "ดูสถานะหอพัก",
-        route: "/lab2",
-      },
-      {
-        icon: " mdi-heart-broken",
-        text: "lab3",
-        route: "/testtable",
-      },
+      // {
+      //   icon: " mdi-heart-broken",
+      //   text: "Lab หน้าผู้ใช้",
+      //   route: "/lab",
+      // },
+      // {
+      //   icon: " mdi-heart-broken",
+      //   text: "ดูสถานะหอพัก",
+      //   route: "/lab2",
+      // },
+      // {
+      //   icon: " mdi-heart-broken",
+      //   text: "lab3",
+      //   route: "/testtable",
+      // },
     ],
     items: [
       {
