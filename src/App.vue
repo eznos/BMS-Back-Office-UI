@@ -80,6 +80,7 @@ export default {
     }
   }
 }
+
 </style>
 <style scoped>
 .rounded-card {
