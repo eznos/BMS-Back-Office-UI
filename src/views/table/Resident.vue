@@ -1,110 +1,82 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="desserts"
-    item-key="name"
-    :items-per-page="5"
-    class="elevation-1 pa-6"
-    :search="search"
-  >
-    <template v-slot:top>
-      <!-- v-container, v-col and v-row are just for decoration purposes. -->
-      <v-toolbar flat>
-        <v-toolbar-title>
-          <div class="title-table">ตารางค่าน้ำค่าไฟ</div>
-        </v-toolbar-title>
-        <from>
-          <v-row>
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <!-- Filter for dessert name-->
-                <!-- <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  type="text"
-                  label="ค้นหา"
-                ></v-text-field> -->
-              </v-row>
-            </v-col>
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <!-- Filter for dessert name-->
-                <v-text-field
-                  v-model="dessertFilterValue"
-                  type="text"
-                  label="กรองด้วยชื่อ"
-                ></v-text-field>
-              </v-row>
-            </v-col>
-
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <!-- Filter for dessert name-->
-                <v-text-field
-                  v-model="roomFilterValue"
-                  type="text"
-                  label="กรองด้วยเลขห้อง"
-                ></v-text-field>
-              </v-row>
-            </v-col>
-
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <v-dialog
-                  ref="dialog"
-                  v-model="modal"
-                  :return-value.sync="date"
-                  persistent
-                  width="290px"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-text-field
-                      v-model="date"
-                      label="กรองด้วยเดือน"
-                      prepend-icon="mdi-calendar"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                    ></v-text-field>
-                  </template>
-                  <v-date-picker
-                    v-model="dateFilterValue"
-                    type="month"
-                    locale="th-TH"
-                  >
-                    <v-spacer></v-spacer>
-                    <v-btn text color="primary" @click="modal = false">
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      text
-                      color="primary"
-                      @click="$refs.dialog.save(dateFilterValue)"
-                    >
-                      OK
-                    </v-btn>
-                  </v-date-picker>
-                </v-dialog>
-              </v-row>
-            </v-col>
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <div class="mx-auto">
-                  <v-dialog v-model="dialog" max-width="500px">
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-btn
-                        color="primary"
-                        dark
-                        v-bind="attrs"
-                        v-on="on"
-                        block
-                      >
-                        New Item
-                      </v-btn>
+  <v-app id="app">
+    <!-- start data-table -->
+    <v-data-table
+      :headers="headers"
+      :items="residents"
+      item-key="name"
+      :items-per-page="5"
+      class="elevation-1 pa-6"
+      :search="search"
+      loading
+      loading-text="กำลังโหลด... โปรดรอสักครู่"
+      show-select
+    >
+      <template v-slot:top>
+        <!-- v-container, v-col and v-row are just for decoration purposes. -->
+        <v-toolbar flat>
+          <v-toolbar-title>
+            <div class="title-table">ตารางผู้อยู่อาศัย</div>
+          </v-toolbar-title>
+          <v-form v-model="valid">
+            <v-row>
+              <v-col cols="3">
+                <v-row class="pa-6">
+                  <!-- Filter for  name-->
+                  <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    type="text"
+                    label="ค้นหา"
+                  ></v-text-field>
+                </v-row>
+              </v-col>
+              <!-- Filter for  zone-->
+              <v-col cols="3">
+                <v-row class="pa-6">
+                  <v-text-field
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-map-marker-radius"
+                    type="text"
+                    label="กรองด้วยพื้นที่"
+                  ></v-text-field>
+                </v-row>
+              </v-col>
+              <!-- Filter for  zone-->
+              <v-col cols="3">
+                <v-row class="pa-6">
+                  <v-text-field
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-office-building-marker"
+                    type="text"
+                    label="กรองด้วยอาคาร"
+                  ></v-text-field>
+                </v-row>
+              </v-col>
+              <!-- add new user -->
+              <v-col cols="1">
+                <v-row class="pa-6">
+                  <v-dialog v-model="dialog" persistent max-width="500px">
+                    <template v-slot:activator="{ on: attrs }">
+                      <v-tooltip top color="agree">
+                        <template v-slot:activator="{ on: tooltip }">
+                          <v-btn
+                            color="agree"
+                            dark
+                            v-on="{ ...tooltip, ...attrs }"
+                          >
+                            <v-icon> mdi-account-plus </v-icon>
+                          </v-btn>
+                        </template>
+                        <span>เพิ่มข้อมูลผู้อยู่อาศัย</span>
+                      </v-tooltip>
                     </template>
+
                     <v-card>
                       <v-card-title>
-                        <span class="text-h5">{{ formTitle }}</span>
+                        <div class="myFont">
+                          <span>{{ formTitle }}</span>
+                        </div>
                       </v-card-title>
                       <v-card-text>
                         <v-container>
@@ -112,164 +84,233 @@
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
                                 v-model="editedItem.name"
-                                label="Dessert name"
+                                label="ชื่อ-นามสกุล"
                               ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
-                                v-model="editedItem.calories"
-                                label="Calories"
+                                v-model="editedItem.room_no"
+                                label="เลขห้องพัก"
+                              ></v-text-field>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                              <v-select
+                                v-model="editedItem.building"
+                                :items="building"
+                                label="อาคาร"
+                              >
+                              </v-select>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                              <v-select
+                                v-model="editedItem.zone"
+                                :items="zone"
+                                label="พื้นที่"
+                              >
+                              </v-select>
+                            </v-col>
+                            <v-col cols="12" sm="6" md="4">
+                              <v-text-field
+                                v-model="editedItem.water_no"
+                                label="เลขผู้ใช้น้ำ"
                               ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
-                                v-model="editedItem.fat"
-                                label="Fat (g)"
+                                v-model="editedItem.water_meter_no"
+                                label="เลขมิเตอร์น้ำ"
                               ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
-                                v-model="editedItem.carbs"
-                                label="Carbs (g)"
+                                v-model="editedItem.electric_no"
+                                label="เลขผู้ใช้ไฟฟ้า"
                               ></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
-                                v-model="editedItem.protein"
-                                label="Protein (g)"
+                                v-model="editedItem.electric_meter_no"
+                                label="เลขมิเตอร์ไฟฟา้"
                               ></v-text-field>
                             </v-col>
                           </v-row>
                         </v-container>
                       </v-card-text>
-
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="close">
-                          Cancel
+                          ยกเลิก
                         </v-btn>
                         <v-btn color="blue darken-1" text @click="save">
-                          Save
+                          ยืนยัน
                         </v-btn>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
+                  <!-- delete water user -->
                   <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
                       <v-card-title class="text-h5"
-                        >Are you sure you want to delete this
-                        item?</v-card-title
+                        >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
                       >
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="closeDelete"
-                          >Cancel</v-btn
+                          >ยกเลิก</v-btn
                         >
                         <v-btn
                           color="blue darken-1"
                           text
                           @click="deleteItemConfirm"
-                          >OK</v-btn
+                          >ยืนยัน</v-btn
                         >
                         <v-spacer></v-spacer>
                       </v-card-actions>
                     </v-card>
                   </v-dialog>
-                </div>
-              </v-row>
-            </v-col>
-            <v-col cols="2">
-              <v-row class="pa-6">
-                <v-btn dark block color="petrol" @click="clear"> clear </v-btn>
-              </v-row>
-            </v-col>
-          </v-row>
-        </from>
-      </v-toolbar>
-    </template>
-    <template v-slot:[`item.actions`]="{ item }">
-      <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-      <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-    </template>
-    <!-- <template v-slot:no-data>
-      <v-btn color="primary" @click="initialize">
-        Reset
-      </v-btn>
-    </template> -->
-  </v-data-table>
+                </v-row>
+              </v-col>
+              <!-- delete as selected -->
+              <v-col cols="1">
+                <v-row class="pa-6">
+                  <v-tooltip top color="red">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        dark
+                        color="red"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="clear"
+                      >
+                        <v-icon>mdi-delete-sweep</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>ลบข้อมูลตามที่เลือก</span>
+                  </v-tooltip>
+                </v-row>
+              </v-col>
+              <!-- delete data filter -->
+              <v-col cols="1">
+                <v-row class="pa-6">
+                  <v-tooltip top color="warning">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn
+                        dark
+                        color="warning"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click="clear"
+                      >
+                        <v-icon>mdi-delete</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>ลบการกรองข้อมูล</span>
+                  </v-tooltip>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-toolbar>
+      </template>
+      <!-- data -->
+      <template v-slot:[`item.actions`]="{ item }">
+        <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+      </template>
+    </v-data-table>
+    <!-- end data-table -->
+  </v-app>
 </template>
 
 <script>
 export default {
   data: () => ({
+    el: "#app",
+    valid: false,
     modal: false,
     dialog: false,
     menu: false,
+    zone: ["1", "2", "3", "4", "5"],
+    building: ["อาคาร1", "อาคาร2", "อาคาร3", "อาคาร4", "อาคาร5", "อาคาร6"],
     search: "",
+    direction: "bottom",
     dialogDelete: false,
-
     // Filter models.
-    dessertFilterValue: "",
-    roomFilterValue: "",
-    dateFilterValue: "",
-
-    desserts: [],
+    NamefilterValue: "",
+    zoneFilterValue: "",
+    residents: [],
     editedIndex: -1,
     editedItem: {
       name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      room_no: "",
+      water_no: "",
+      water_meter_no: "",
+      status: "ว่าง",
     },
     defaultItem: {
       name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      room_no: "",
+      water_no: "",
+      water_meter_no: "",
+      status: "ว่าง",
     },
   }),
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Item" : "Edit Item";
+      return this.editedIndex === -1
+        ? "เพิ่มผู้อยู่อาศัย"
+        : "แก้ไขผู้อยู่อาศัย";
     },
     headers() {
       return [
         {
-          text: "Dessert (100g serving)",
+          text: "ID",
           align: "left",
-
+          value: "user_id",
+        },
+        {
+          text: "ชื่อ-นามสกุล",
           value: "name",
-          filter: this.nameFilter,
+          // filter: this.nameFilter,
         },
         {
-          text: "Calories",
-          value: "calories",
-          filter: this.caloriesFilter,
+          text: "เลขห้องพัก",
+          value: "room_no",
         },
         {
-          text: "Fat (g)",
-          value: "fat",
-          align: "left",
+          text: "พื้นที่",
+          value: "zone",
           filter: this.roomFilter,
         },
         {
-          text: "Carbs (g)",
-          value: "carbs",
-          filter: this.dateFilter,
+          text: "อาคาร",
+          value: "building",
+          // filter: this.roomFilter,
         },
         {
-          text: "Protein (g)",
-          value: "protein",
+          text: "เลขผู้ใช้ไฟฟ้า",
+          value: "electric_no",
+          // filter: this.roomFilter,
         },
         {
-          text: "Iron (%)",
-          value: "iron",
+          text: "เลขผู้ใช้น้ำ",
+          value: "water_no",
+          // filter: this.roomFilter,
         },
         {
-          text: "Actions",
+          text: "เลขมิเตอร์ไฟฟ้า",
+          value: "electric_meter_no",
+          // filter: this.roomFilter,
+        },
+        {
+          text: "เลขมิเตอร์น้ำประปา",
+          value: "water_meter_no",
+          // filter: this.roomFilter,
+        },
+
+        {
+          text: "การจัดการ",
           value: "actions",
           sortable: false,
         },
@@ -287,7 +328,6 @@ export default {
   },
 
   methods: {
-
     /**
      * Filter for dessert names column.
      * @param value Value to be tested.
@@ -295,49 +335,41 @@ export default {
      */
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
-      if (!this.dessertFilterValue) {
+      if (!this.NamefilterValue) {
         return true;
       }
       // Check if the current loop value (The dessert name)
       // partially contains the searched word.
-      return value
-        .toLowerCase()
-        .includes(this.dessertFilterValue.toLowerCase());
+      return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
 
     roomFilter(value) {
-      if (!this.roomFilterValue) {
+      if (!this.zoneFilterValue) {
         return true;
       }
-      return value == this.roomFilterValue;
-    },
-    dateFilter(value) {
-      if (!this.dateFilterValue) {
-        return true;
-      }
-      return value == this.dateFilterValue;
+      return value === this.zoneFilterValue;
     },
 
     /**
-     * Filter for calories column.
+     * Filter for เลขห้องพัก column.
      * @param value Value to be tested.
      * @returns {boolean}
      */
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.residents.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.residents.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.residents.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -359,15 +391,23 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        Object.assign(this.residents[this.editedIndex], this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
+        this.residents.push(this.editedItem);
+      }
+      this.close();
+    },
+    savea() {
+      if (this.editedIndex > -1) {
+        Object.assign(this.residents[this.editedIndex], this.editedItem);
+      } else {
+        this.residents.push(this.editedItem);
       }
       this.close();
     },
     clear() {
-      (this.dessertFilterValue = ""),
-        (this.roomFilterValue = ""),
+      (this.NamefilterValue = ""),
+        (this.zoneFilterValue = ""),
         (this.dateFilterValue = "");
       this.date = "";
       this.search = "";
@@ -386,7 +426,8 @@ export default {
 
 <style scoped>
 .title-table {
-  font-size: 30px;
+  font-size: 25px;
+  padding: 20px;
   font-family: Sarabun;
 }
 </style>
