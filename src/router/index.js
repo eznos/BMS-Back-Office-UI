@@ -10,6 +10,7 @@ import Overviews from '../views/overview/Overviews.vue'
 import Resident from '../views/table/Resident.vue'
 import Electric from '../views/table/Electric.vue'
 import Water from '../views/table/Water.vue'
+import Edit_user from '../views/edituser/Edituser.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -70,6 +71,11 @@ const routes = [
     path: '/waterbill',
     name: 'Water',
     component: Water
+  },
+  {
+    path: '/edit',
+    name: 'Edituser',
+    component: Edit_user
   }
 ]
 
