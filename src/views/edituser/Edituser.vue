@@ -1,7 +1,6 @@
 <template>
   <v-app id="app">
     <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
-
     <v-card class="mx-auto" elevation="10" width="100%">
       <v-card-title>
         <v-icon>mdi-account-edit</v-icon>
@@ -144,7 +143,7 @@
                       prepend-icon="mdi-google-maps"
                     ></v-text-field>
                   </v-col>
-                       <v-col cols="2">
+                  <v-col cols="2">
                     <v-text-field
                       v-model="zone"
                       label="อาคาร"
@@ -153,7 +152,7 @@
                       prepend-icon="mdi-office-building-marker-outline"
                     ></v-text-field>
                   </v-col>
-                      <v-col cols="2">
+                  <v-col cols="2">
                     <v-text-field
                       v-model="zone"
                       label="เลขห้องพัก"
