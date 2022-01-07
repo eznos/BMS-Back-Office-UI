@@ -1,6 +1,5 @@
 <template>
   <v-app id="app">
-    <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
     <v-card class="mx-auto" elevation="10" width="100%">
       <v-card-title>
         <v-icon class="icon">mdi-account-edit</v-icon>
@@ -92,7 +91,6 @@
                       ></v-text-field>
                     </validation-provider>
                   </v-col>
-               
                   <!-- sex -->
                   <v-col cols="12" sm="4" md="4" lg="2">
                     <v-select
@@ -184,27 +182,22 @@ import { required, digits, email, max, regex } from "vee-validate/dist/rules";
 import { extend, ValidationProvider, setInteractionMode } from "vee-validate";
 
 setInteractionMode("eager");
-
 extend("digits", {
   ...digits,
   message: "{_field_} needs to be {length} digits. ({_value_})",
 });
-
 extend("required", {
   ...required,
   message: "{_field_} จำเป็รต้องกรอก",
 });
-
 extend("max", {
   ...max,
   message: "{_field_} may not be greater than {length} characters",
 });
-
 extend("regex", {
   ...regex,
   message: "เบอร์โทรศัพท์ไม่ตรงกับรูปแบบที่กำหนด",
 });
-
 extend("email", {
   ...email,
   message: "Email ไม่สามารถว่างได้",
@@ -228,7 +221,6 @@ export default {
     tel: "",
     Rank: ["พล.ต.อ. ", "พล.ต.ท.", "พล.ต.ต.", "พ.ต.อ"],
     Affiliation: ["สยศ.ตร.", "สกบ.", "สกพ.", "สงป"],
-
     rules: {
       username: [
         (val) => (val || "").length >= 6 || "รหัสผ่านต้องมีมากกว่า 6 ตัวอักษร",
@@ -247,25 +239,13 @@ export default {
       (v) =>
         v.length >= 2 || "ชื่อต้องมีจำนวนตัวอักษรมากกว่าหรือเท่ากับ 2 ตัวอักษร",
     ],
-
     emailRules: [
       (v) => !!v || "กรุณากรอกอีเมล",
       (v) => /[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,4}/.test(v) || "อีเมลไม่ผิดรูปแบบ",
     ],
   }),
-
   setup() {},
-  watch: {
-    loader() {
-      const l = this.loader;
-      this[l] = !this[l];
-
-      setTimeout(() => (this[l] = false), 2000);
-
-      this.loader = null;
-    },
-  },
-
+  watch: {},
   computed: {
     formIsValid() {
       return this.lastname;
