@@ -257,11 +257,12 @@
     </v-container>
   </v-app>
 </template>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 import Chart from "chart.js";
 export default {
-      mounted: function () {
+  mounted: function () {
     var chart = new Chart(water, {
       responsive: true,
       type: "bar",
@@ -375,7 +376,6 @@ export default {
         },
       },
     });
-
   },
   data: () => ({
     el: "#app",
@@ -408,7 +408,6 @@ export default {
       status: "ว่าง",
     },
   }),
-
   computed: {
     formTitle() {
       return this.editedIndex === -1
@@ -470,7 +469,6 @@ export default {
       ];
     },
   },
-
   watch: {
     dialog(val) {
       val || this.close();
@@ -479,7 +477,6 @@ export default {
       val || this.closeDelete();
     },
   },
-
   methods: {
     /**
      * Filter for dessert names column.
@@ -495,37 +492,31 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-
     roomFilter(value) {
       if (!this.zoneFilterValue) {
         return true;
       }
       return value === this.zoneFilterValue;
     },
-
     /**
      * Filter for เลขห้องพัก column.
      * @param value Value to be tested.
      * @returns {boolean}
      */
-
     editItem(item) {
       this.editedIndex = this.building.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-
     deleteItem(item) {
       this.editedIndex = this.building.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
-
     deleteItemConfirm() {
       this.building.splice(this.editedIndex, 1);
       this.closeDelete();
     },
-
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -533,7 +524,6 @@ export default {
         this.editedIndex = -1;
       });
     },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
@@ -541,7 +531,6 @@ export default {
         this.editedIndex = -1;
       });
     },
-
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.building[this.editedIndex], this.editedItem);
@@ -573,7 +562,7 @@ export default {
         value.toString().toLocaleUpperCase().indexOf(search) !== -1
       );
     },
-        getRandomInt() {
+    getRandomInt() {
       return Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
     },
   },
@@ -586,10 +575,12 @@ export default {
   padding: 20px;
   font-family: Sarabun;
 }
+
 .chart-responsive {
   width: 100%;
   margin: 20px auto;
 }
+
 .mx-auto {
   font-size: 30px;
 }
