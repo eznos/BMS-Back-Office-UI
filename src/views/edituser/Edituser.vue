@@ -3,28 +3,29 @@
     <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
     <v-card class="mx-auto" elevation="10" width="100%">
       <v-card-title>
-        <v-icon>mdi-account-edit</v-icon>
+        <v-icon class="icon">mdi-account-edit</v-icon>
         แก้ไขข้อมูลส่วนตัว
       </v-card-title>
       <v-card-text>
         <v-form ref="form" @submit.prevent="submit">
           <v-row>
-            <v-col col="12">
+            <v-col col="12" class="form">
               <v-container>
                 <v-row>
                   <!-- rank -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="6" md="4" lg="2">
                     <v-select
                       v-model="rank"
                       :items="Rank"
                       label="ยศ"
                       required
+                      autofocus
                       clearable
                       prepend-icon="mdi-chevron-triple-up"
                     ></v-select>
                   </v-col>
                   <!-- affi -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="6" md="4" lg="2">
                     <v-select
                       v-model="affiliation"
                       :items="Affiliation"
@@ -35,7 +36,7 @@
                     ></v-select>
                   </v-col>
                   <!-- name -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
                       v-model="firstname"
                       :rules="nameRules"
@@ -43,11 +44,10 @@
                       prepend-icon="mdi-form-textbox"
                       required
                       clearable
-                      autofocus
                     ></v-text-field>
                   </v-col>
                   <!-- last name -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
                       v-model="lastname"
                       :rules="nameRules"
@@ -58,10 +58,11 @@
                     ></v-text-field>
                   </v-col>
                   <!-- email -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
                       v-model="email"
                       :rules="emailRules"
+                      :error-messages="errors"
                       label="อีเมล"
                       prepend-icon="mdi-email"
                       clearable
@@ -69,7 +70,7 @@
                     ></v-text-field>
                   </v-col>
                   <!-- tel. -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <validation-provider
                       v-slot="{ errors }"
                       name="phoneNumber"
@@ -79,7 +80,6 @@
                         regex: '^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})',
                       }"
                     >
-                      <!-- ^0[6,8,9][0-9]{8}$ -->
                       <v-text-field
                         :rules="rules.phoneNumber"
                         v-model="phoneNumber"
@@ -92,49 +92,19 @@
                       ></v-text-field>
                     </validation-provider>
                   </v-col>
-                </v-row>
-                <v-row>
+               
                   <!-- sex -->
-                  <v-col cols="3">
-                    <v-container class="px-0" fluid>
-                      <v-radio-group v-model="sex" row>
-                        <template v-slot:label>
-                          <h3>
-                            <v-icon size="30px">mdi-gender-male-female </v-icon>
-                            เพศ
-                          </h3>
-                        </template>
-                        <v-radio
-                          color="blue darken-1"
-                          label="ชาย"
-                          value="male"
-                        ></v-radio>
-                        <v-radio
-                          color="pink darken-1"
-                          label="หญิง"
-                          value="female"
-                        ></v-radio>
-                        <v-radio
-                          color="purple darken-2"
-                          label="เพศทางเลือก"
-                          value="lgbt"
-                        ></v-radio>
-                      </v-radio-group>
-                    </v-container>
-                  </v-col>
-                  <!-- avatar -->
-                  <v-col cols="2">
-                    <v-file-input
-                      :rules="rules.Avatar"
-                      accept="image/png, image/jpeg, image/bmp"
-                      placeholder="เลือกรูปประจำตัว"
-                      label="รูปประจำตัว"
-                      show-size
-                      counter
-                    ></v-file-input>
+                  <v-col cols="12" sm="4" md="4" lg="2">
+                    <v-select
+                      prepend-icon="mdi-gender-male-female"
+                      item-color="red"
+                      :items="sex"
+                      label="เพศ"
+                    >
+                    </v-select>
                   </v-col>
                   <!-- zone -->
-                  <v-col cols="2">
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
                       v-model="zone"
                       label="พื้นที่"
@@ -143,23 +113,36 @@
                       prepend-icon="mdi-google-maps"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <!-- building -->
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
-                      v-model="zone"
+                      v-model="building"
                       label="อาคาร"
                       required
                       clearable
                       prepend-icon="mdi-office-building-marker-outline"
                     ></v-text-field>
                   </v-col>
-                  <v-col cols="2">
+                  <!-- roomnumber -->
+                  <v-col cols="12" sm="4" md="4" lg="2">
                     <v-text-field
-                      v-model="zone"
+                      v-model="room_no"
                       label="เลขห้องพัก"
                       required
                       clearable
                       prepend-icon="mdi-numeric"
                     ></v-text-field>
+                  </v-col>
+                  <!-- avatar -->
+                  <v-col cols="12" sm="4" md="4" lg="2">
+                    <v-file-input
+                      :rules="rules.Avatar"
+                      accept="image/png, image/jpeg, image/bmp"
+                      placeholder="เลือกรูปประจำตัว"
+                      label="รูปประจำตัว"
+                      show-size
+                      counter
+                    ></v-file-input>
                   </v-col>
                 </v-row>
               </v-container>
@@ -209,7 +192,7 @@ extend("digits", {
 
 extend("required", {
   ...required,
-  message: "{_field_} can not be empty",
+  message: "{_field_} จำเป็รต้องกรอก",
 });
 
 extend("max", {
@@ -224,7 +207,7 @@ extend("regex", {
 
 extend("email", {
   ...email,
-  message: "Email must be valid",
+  message: "Email ไม่สามารถว่างได้",
 });
 export default {
   components: {
@@ -234,8 +217,11 @@ export default {
     clicked: false,
     showpassword: false,
     loader: null,
-    firstname: "",
+    firstname: null,
     lastname: "",
+    zone: "",
+    sex: ["ชาย", "หญิง"],
+    building: "",
     loading: false,
     dialog: false,
     valid: false,
@@ -252,20 +238,19 @@ export default {
       ],
       Avatar: [
         (value) =>
-          !value ||
-          value.size < 2000000 ||
-          "Avatar size should be less than 2 MB!",
+          !value || value.size < 2000000 || "รูปภาพต้องมีขนาดเล็กกว่า 2 MB!",
       ],
       phoneNumber: [(val) => (val || "").length == 10],
     },
     nameRules: [
-      (v) => !!v || "Name is required",
-      (v) => v.length <= 10 || "Name must be less than 10 characters",
+      (v) => !!v || "กรุณากรอกชื่อ",
+      (v) =>
+        v.length >= 2 || "ชื่อต้องมีจำนวนตัวอักษรมากกว่าหรือเท่ากับ 2 ตัวอักษร",
     ],
 
     emailRules: [
-      (v) => !!v || "E-mail is required",
-      (v) => /.+@.+/.test(v) || "E-mail must be valid",
+      (v) => !!v || "กรุณากรอกอีเมล",
+      (v) => /[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,4}/.test(v) || "อีเมลไม่ผิดรูปแบบ",
     ],
   }),
 
@@ -294,12 +279,13 @@ export default {
 };
 </script>
 <style scoped>
-.h1c {
-  font-size: 30px;
-}
 .form {
-  padding: 30px;
-  margin-top: -30px;
+  padding: 25px;
+  margin-top: -15px;
+}
+.icon {
+  margin-right: 20px;
+  margin-right: 20px;
 }
 .custom-loader {
   animation: loader 1s infinite;
