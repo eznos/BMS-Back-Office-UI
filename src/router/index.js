@@ -11,6 +11,7 @@ import Resident from '../views/table/Resident.vue'
 import Electric from '../views/table/Electric.vue'
 import Water from '../views/table/Water.vue'
 import Edit_user from '../views/edituser/Edituser.vue'
+import Building from '../views/table/Building.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -76,6 +77,11 @@ const routes = [
     path: '/edit',
     name: 'Edituser',
     component: Edit_user
+  },
+  {
+    path: '/building',
+    name: 'Builing',
+    component:Building
   }
 ]
 
