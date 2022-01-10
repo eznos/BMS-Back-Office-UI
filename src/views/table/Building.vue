@@ -1,248 +1,202 @@
 <template>
   <v-app id="app">
+    <!-- title and bottom -->
+    <div class="pa-3 content background-main">
+      <v-row justify="space-between" class="px-3">
+        <div class="mb-4">
+          <v-row style="align-items: center">
+            <div class="ml-3 mt-2">
+              <h2>ตารางสถานะห้องพัก</h2>
+            </div>
+          </v-row>
+        </div>
+        <div>
+          <!-- add user -->
+          <v-dialog v-model="dialog" persistent max-width="500px">
+            <template v-slot:activator="{ on: attrs }">
+              <v-tooltip top color="#9B3499">
+                <template v-slot:activator="{ on: tooltip }">
+                  <v-btn color="#9B3499" dark v-on="{ ...tooltip, ...attrs }">
+                    <v-icon> mdi-account-plus </v-icon>
+                    เพิ่มผู้อยู่อาศัย
+                  </v-btn>
+                </template>
+                <span>เพิ่มข้อมูลผู้อยู่อาศัย</span>
+              </v-tooltip>
+            </template>
+            <v-card>
+              <v-card-title>
+                <div class="myFont">
+                  <span>{{ formTitle }}</span>
+                </div>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.name"
+                        label="ชื่อ-นามสกุล"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.room_no"
+                        label="เลขห้องพัก"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="editedItem.buildings"
+                        :items="buildings"
+                        label="อาคาร"
+                      >
+                      </v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="editedItem.zone"
+                        :items="zone"
+                        label="พื้นที่"
+                      >
+                      </v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.water_no"
+                        label="เลขผู้ใช้น้ำ"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.water_meter_no"
+                        label="เลขมิเตอร์น้ำ"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.electric_no"
+                        label="เลขผู้ใช้ไฟฟ้า"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.electric_meter_no"
+                        label="เลขมิเตอร์ไฟฟา้"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="close">
+                  ยกเลิก
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="save"> ยืนยัน </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- delete water user -->
+          <v-dialog v-model="dialogDelete" max-width="500px">
+            <v-card>
+              <v-card-title class="text-h5"
+                >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDelete"
+                  >ยกเลิก</v-btn
+                >
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  >ยืนยัน</v-btn
+                >
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- delete as selected -->
+          <v-btn
+            dark
+            color="#742872"
+            width="140"
+            v-bind="attrs"
+            v-on="on"
+            @click="clear"
+            class="ml-2"
+          >
+            <v-icon>mdi-delete-sweep</v-icon>
+            ลบข้อมูลที่เลือก
+          </v-btn>
+          <v-btn dark color="#561F55" v-bind="attrs" v-on="on" @click="clear">
+            <v-icon>mdi-delete</v-icon>
+            ลบการค้นหา
+          </v-btn>
+        </div>
+      </v-row>
+      <!-- filter -->
+      <v-row justify="space-between" class="px-3">
+        <!-- Filter for  name-->
+        <v-text-field
+          v-model="search"
+          prepend-icon="mdi-magnify"
+          type="text"
+          label="ค้นหา"
+          clearable
+        ></v-text-field>
+        <v-divider vertical color=" #707070"></v-divider>
+        <!-- Filter for  zone-->
+        <v-text-field
+          v-model="zoneFilterValue"
+          prepend-icon="mdi-map-marker-radius"
+          type="text"
+          label="กรองด้วยพื้นที่"
+          clearable
+        ></v-text-field>
+        <v-divider vertical color=" #707070"></v-divider>
+        <!-- search by status -->
+        <v-text-field
+          v-model="zoneFilterValue"
+          prepend-icon="mdi-office-building-marker"
+          type="text"
+          label="กรองด้วยอาคาร"
+          clearable
+        ></v-text-field>
+      </v-row>
+    </div>
     <v-container>
-      <v-row>
+      <v-row classs="px-3">
         <v-col cols="12">
-          <v-card>
-            <!-- start data-table -->
-            <v-data-table
-              :headers="headers"
-              :items="building"
-              item-key="name"
-              :items-per-page="5"
-              class="elevation-1 pa-6"
-              :search="search"
-              loading
-              loading-text="กำลังโหลด... โปรดรอสักครู่"
-              show-select
-            >
-              <template v-slot:top>
-                <!-- v-container, v-col and v-row are just for decoration purposes. -->
-                <v-toolbar flat>
-                  <v-toolbar-title>
-                    <div class="title-table">ตารางสถานะหอพัก</div>
-                  </v-toolbar-title>
-                  <v-form v-model="valid">
-                    <v-row>
-                      <v-col cols="3">
-                        <v-row class="pa-6">
-                          <!-- Filter for  name-->
-                          <v-text-field
-                            v-model="search"
-                            prepend-icon="mdi-magnify"
-                            type="text"
-                            label="ค้นหา"
-                          ></v-text-field>
-                        </v-row>
-                      </v-col>
-                      <!-- Filter for  zone-->
-                      <v-col cols="3">
-                        <v-row class="pa-6">
-                          <v-text-field
-                            v-model="zoneFilterValue"
-                            prepend-icon="mdi-map-marker-radius"
-                            type="text"
-                            label="กรองด้วยพื้นที่"
-                          ></v-text-field>
-                        </v-row>
-                      </v-col>
-                      <!-- Filter for  zone-->
-                      <v-col cols="3">
-                        <v-row class="pa-6">
-                          <v-text-field
-                            v-model="zoneFilterValue"
-                            prepend-icon="mdi-office-building-marker"
-                            type="text"
-                            label="กรองด้วยอาคาร"
-                          ></v-text-field>
-                        </v-row>
-                      </v-col>
-                      <!-- add new user -->
-                      <v-col cols="1">
-                        <v-row class="pa-6">
-                          <v-dialog
-                            v-model="dialog"
-                            persistent
-                            max-width="500px"
-                          >
-                            <template v-slot:activator="{ on: attrs }">
-                              <v-tooltip top color="agree">
-                                <template v-slot:activator="{ on: tooltip }">
-                                  <v-btn
-                                    color="agree"
-                                    dark
-                                    v-on="{ ...tooltip, ...attrs }"
-                                  >
-                                    <v-icon> mdi-account-plus </v-icon>
-                                  </v-btn>
-                                </template>
-                                <span>เพิ่มข้อมูลผู้อยู่อาศัย</span>
-                              </v-tooltip>
-                            </template>
-
-                            <v-card>
-                              <v-card-title>
-                                <div class="myFont">
-                                  <span>{{ formTitle }}</span>
-                                </div>
-                              </v-card-title>
-                              <v-card-text>
-                                <v-container>
-                                  <v-row>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.name"
-                                        label="ชื่อ-นามสกุล"
-                                      ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.room_no"
-                                        label="เลขห้องพัก"
-                                      ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-select
-                                        v-model="editedItem.buildings"
-                                        :items="buildings"
-                                        label="อาคาร"
-                                      >
-                                      </v-select>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-select
-                                        v-model="editedItem.zone"
-                                        :items="zone"
-                                        label="พื้นที่"
-                                      >
-                                      </v-select>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.water_no"
-                                        label="เลขผู้ใช้น้ำ"
-                                      ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.water_meter_no"
-                                        label="เลขมิเตอร์น้ำ"
-                                      ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.electric_no"
-                                        label="เลขผู้ใช้ไฟฟ้า"
-                                      ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="12" sm="6" md="4">
-                                      <v-text-field
-                                        v-model="editedItem.electric_meter_no"
-                                        label="เลขมิเตอร์ไฟฟา้"
-                                      ></v-text-field>
-                                    </v-col>
-                                  </v-row>
-                                </v-container>
-                              </v-card-text>
-                              <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                  color="blue darken-1"
-                                  text
-                                  @click="close"
-                                >
-                                  ยกเลิก
-                                </v-btn>
-                                <v-btn color="blue darken-1" text @click="save">
-                                  ยืนยัน
-                                </v-btn>
-                              </v-card-actions>
-                            </v-card>
-                          </v-dialog>
-                          <!-- delete water user -->
-                          <v-dialog v-model="dialogDelete" max-width="500px">
-                            <v-card>
-                              <v-card-title class="text-h5"
-                                >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
-                              >
-                              <v-card-actions>
-                                <v-spacer></v-spacer>
-                                <v-btn
-                                  color="blue darken-1"
-                                  text
-                                  @click="closeDelete"
-                                  >ยกเลิก</v-btn
-                                >
-                                <v-btn
-                                  color="blue darken-1"
-                                  text
-                                  @click="deleteItemConfirm"
-                                  >ยืนยัน</v-btn
-                                >
-                                <v-spacer></v-spacer>
-                              </v-card-actions>
-                            </v-card>
-                          </v-dialog>
-                        </v-row>
-                      </v-col>
-                      <!-- delete as selected -->
-                      <v-col cols="1">
-                        <v-row class="pa-6">
-                          <v-tooltip top color="red">
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-btn
-                                dark
-                                color="red"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="clear"
-                              >
-                                <v-icon>mdi-delete-sweep</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>ลบข้อมูลตามที่เลือก</span>
-                          </v-tooltip>
-                        </v-row>
-                      </v-col>
-                      <!-- delete data filter -->
-                      <v-col cols="1">
-                        <v-row class="pa-6">
-                          <v-tooltip top color="warning">
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-btn
-                                dark
-                                color="warning"
-                                v-bind="attrs"
-                                v-on="on"
-                                @click="clear"
-                              >
-                                <v-icon>mdi-delete</v-icon>
-                              </v-btn>
-                            </template>
-                            <span>ลบการกรองข้อมูล</span>
-                          </v-tooltip>
-                        </v-row>
-                      </v-col>
-                    </v-row>
-                  </v-form>
-                </v-toolbar>
-              </template>
-              <!-- data -->
-              <template v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editItem(item)">
-                  mdi-pencil
-                </v-icon>
-                <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-              </template>
-            </v-data-table>
-            <!-- end data-table -->
-          </v-card>
+          <!-- start data-table -->
+          <v-data-table
+            :headers="headers"
+            :items="building"
+            item-key="name"
+            :items-per-page="5"
+            class="elevation-1 header-table"
+            :search="search"
+            loading
+            loading-text="กำลังโหลด... โปรดรอสักครู่"
+            show-select
+          >
+            <template v-slot:top>
+              <!-- v-container, v-col and v-row are just for decoration purposes. -->
+            </template>
+            <!-- data -->
+            <template v-slot:[`item.actions`]="{ item }">
+              <v-icon small class="mr-2" @click="editItem(item)">
+                mdi-pencil
+              </v-icon>
+              <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+            </template>
+          </v-data-table>
+          <!-- end data-table -->
         </v-col>
         <v-col cols="12">
           <v-card>
             <v-card-title>
               <div class="mx-auto">
-                <v-icon size="35px" color="#F095FF">mdi-percent</v-icon>
+                <v-icon size="35px" color="#5F2324">mdi-numeric</v-icon>
                 จำนวนผู้อยู่อาศัยของแต่ล่ะพื้นที่
               </div>
             </v-card-title>
@@ -270,7 +224,6 @@ export default {
         labels: [
           "มกราคม",
           "กุมภาพันธ์",
-          "มีนาคม",
           "มีนาคม",
           "เมษายน",
           "พฤษภาคม ",
@@ -417,19 +370,16 @@ export default {
     headers() {
       return [
         {
-          text: "ID",
-          align: "left",
-          value: "user_id",
-        },
-        {
-          text: "ชื่อ-นามสกุล",
-          value: "name",
-          // filter: this.nameFilter,
-        },
-        {
           text: "เลขห้องพัก",
           value: "room_no",
         },
+        {
+          text: "ชื่อผู้อยู่อาศัย",
+          value: "name",
+          align: "left",
+          // filter: this.nameFilter,
+        },
+
         {
           text: "พื้นที่",
           value: "zone",
@@ -459,6 +409,11 @@ export default {
           text: "เลขมิเตอร์น้ำประปา",
           value: "water_meter_no",
           // filter: this.roomFilter,
+        },
+        {
+          text: "สถานะ",
+          value: "status",
+          filter: this.stateFilter,
         },
 
         {
@@ -574,6 +529,18 @@ export default {
   font-size: 25px;
   padding: 20px;
   font-family: Sarabun;
+}
+.title {
+  font-size: 25px;
+  font-family: Sarabun;
+}
+.form-table {
+  margin-top: -20px;
+  padding: -20px;
+}
+.header-table {
+  padding: 15px;
+  margin-top: 15px;
 }
 
 .chart-responsive {

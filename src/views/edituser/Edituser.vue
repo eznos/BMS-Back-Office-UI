@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <v-card class="mx-auto" elevation="10" width="100%">
+    <v-card class="mx-auto" elevation="10" width="100%" rounded-xl>
       <v-card-title>
         <v-icon class="icon">mdi-account-edit</v-icon>
         แก้ไขข้อมูลส่วนตัว
