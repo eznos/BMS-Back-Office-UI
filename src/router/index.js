@@ -12,6 +12,8 @@ import Electric from '../views/table/Electric.vue'
 import Water from '../views/table/Water.vue'
 import Edit_user from '../views/edituser/Edituser.vue'
 import Building from '../views/table/Building.vue'
+
+import Maps from '../views/map/Map.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -82,6 +84,11 @@ const routes = [
     path: '/building',
     name: 'Builing',
     component:Building
+  },
+  {
+    path: '/map',
+    name: 'Map',
+    component:Maps
   }
 ]
 
