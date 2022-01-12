@@ -32,9 +32,8 @@
                     ></v-text-field>
                   </v-col>
                   <v-col>
-                      <v-text-field append-icon="mdi-map-legend" label="ชื่อเขต">
-
-                      </v-text-field>
+                    <v-text-field append-icon="mdi-map-legend" label="ชื่อเขต">
+                    </v-text-field>
                   </v-col>
                 </v-row>
               </v-card-text>
@@ -129,18 +128,15 @@ export default {
   word-spacing: 5px;
   padding-bottom: 15px;
 }
-
 .links {
   padding-top: 15px;
 }
-
 .map-responsive {
   overflow: hidden;
   padding-bottom: 45.25%;
   position: relative;
   height: 0;
 }
-
 .map-responsive iframe {
   left: 0;
   top: 0;
