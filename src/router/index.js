@@ -12,7 +12,7 @@ import Electric from '../views/table/Electric.vue'
 import Water from '../views/table/Water.vue'
 import Edit_user from '../views/edituser/Edituser.vue'
 import Building from '../views/table/Building.vue'
-
+import Manage_user from '../views/table/Manageuser.vue'
 import Maps from '../views/map/Map.vue'
 Vue.use(VueRouter)
 
@@ -63,7 +63,7 @@ const routes = [
   {
     path: '/residents',
     name: 'resident',
-    component:Resident
+    component: Resident
   },
   {
     path: '/electricbill',
@@ -83,12 +83,17 @@ const routes = [
   {
     path: '/building',
     name: 'Builing',
-    component:Building
+    component: Building
   },
   {
     path: '/map',
     name: 'Map',
-    component:Maps
+    component: Maps
+  },
+  {
+    path: '/',
+    name: 'Manage_user',
+    component: Manage_user
   }
 ]
 
