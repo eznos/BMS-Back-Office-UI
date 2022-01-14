@@ -133,7 +133,7 @@ export default {
       {
         icon: "mdi-file-pdf-box",
         text: "แก้ไขผู้ใช้งาน",
-        route: "/report",
+        route: "/manageuser",
       },
       {
         icon: " mdi-google-maps",
