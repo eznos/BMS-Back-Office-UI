@@ -131,7 +131,7 @@ export default {
         route: "/building",
       },
       {
-        icon: "mdi-file-pdf-box",
+        icon: "mdi-account-edit",
         text: "แก้ไขผู้ใช้งาน",
         route: "/manageuser",
       },
@@ -139,6 +139,11 @@ export default {
         icon: " mdi-google-maps",
         text: "แผนที่",
         route: "/map",
+      },
+            {
+        icon: " mdi-file-pdf-box",
+        text: "รายงาน",
+        route: "/report",
       },
       // {
       //   icon: " mdi-heart-broken",
