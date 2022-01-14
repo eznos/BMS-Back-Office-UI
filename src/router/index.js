@@ -91,7 +91,7 @@ const routes = [
     component: Maps
   },
   {
-    path: '/',
+    path: '/manageuser',
     name: 'Manage_user',
     component: Manage_user
   }
