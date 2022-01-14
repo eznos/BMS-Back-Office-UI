@@ -14,15 +14,10 @@
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on: attrs }">
-              <v-tooltip top color="#9B3499">
-                <template v-slot:activator="{ on: tooltip }">
-                  <v-btn color="#9B3499" dark v-on="{ ...tooltip, ...attrs }">
-                    <v-icon> mdi-account-plus </v-icon>
-                    เพิ่มผู้อยู่อาศัย
-                  </v-btn>
-                </template>
-                <span>เพิ่มข้อมูลผู้อยู่อาศัย</span>
-              </v-tooltip>
+              <v-btn color="#9B3499" dark v-on="{ ...attrs }" class="">
+                <v-icon> mdi-account-plus </v-icon>
+                เพิ่มผู้อยู่อาศัย
+              </v-btn>
             </template>
             <v-card>
               <v-card-title>
@@ -143,8 +138,9 @@
           type="text"
           label="ค้นหา"
           clearable
+          class="filter"
         ></v-text-field>
-        <v-divider vertical color=" #707070"></v-divider>
+
         <!-- Filter for  zone-->
         <v-text-field
           v-model="zoneFilterValue"
@@ -152,16 +148,28 @@
           type="text"
           label="กรองด้วยพื้นที่"
           clearable
+          class="filter"
         ></v-text-field>
-        <v-divider vertical color=" #707070"></v-divider>
-        <!-- search by status -->
+
+        <!-- search by building -->
         <v-text-field
           v-model="zoneFilterValue"
           prepend-icon="mdi-office-building-marker"
           type="text"
           label="กรองด้วยอาคาร"
           clearable
+          class="filter"
         ></v-text-field>
+        <!-- search by status -->
+        <v-select
+          v-model="statusFilter"
+          prepend-icon="mdi-list-status"
+          label="กรองด้วยสถานะ"
+          :items="status"
+          clearable
+          class="filter"
+        >
+        </v-select>
       </v-row>
     </div>
     <v-container>
@@ -173,11 +181,12 @@
             :items="building"
             item-key="name"
             :items-per-page="5"
-            class="elevation-1 header-table"
+            class="table header-blue"
             :search="search"
             loading
             loading-text="กำลังโหลด... โปรดรอสักครู่"
             show-select
+            :hide-default-footer="true"
           >
             <template v-slot:top>
               <!-- v-container, v-col and v-row are just for decoration purposes. -->
@@ -338,6 +347,7 @@ export default {
     menu: false,
     zone: ["1", "2", "3", "4", "5"],
     buildings: ["อาคาร1", "อาคาร2", "อาคาร3", "อาคาร4", "อาคาร5", "อาคาร6"],
+    status: ["ว่าง", "ไม่ว่าง"],
     search: "",
     direction: "bottom",
     dialogDelete: false,
@@ -508,6 +518,7 @@ export default {
         (this.dateFilterValue = "");
       this.date = "";
       this.search = "";
+      this.statusFilter = null;
     },
     filterOnlyCapsText(value, search) {
       return (
@@ -550,5 +561,13 @@ export default {
 
 .mx-auto {
   font-size: 30px;
+}
+.header-blue .v-data-table-header {
+  background-color: #466bb2 !important;
+}
+.filter {
+  padding: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 </style>
