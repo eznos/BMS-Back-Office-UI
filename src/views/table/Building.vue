@@ -227,8 +227,39 @@ import Chart from "chart.js";
 export default {
   mounted: function () {
     var chart = new Chart(water, {
-      responsive: true,
+
       type: "bar",
+       options: {
+         responsive: true,
+         maintainAspectRatio: false,
+        layout: {
+          padding: 15,
+        },
+        legend: {
+          locale: "th-TH",
+          position: "top", // place legend on the right side of chart
+          plugins: {
+            labels: {
+              font: {
+                size: 20,
+                family: "Sarabun",
+              },
+            },
+          },
+        },
+        scales: {
+          xAxes: [
+            {
+              stacked: true, // this should be set to make the bars stacked
+            },
+          ],
+          yAxes: [
+            {
+              stacked: true, // this also..
+            },
+          ],
+        },
+      },
       data: {
         labels: [
           "มกราคม",
@@ -308,35 +339,7 @@ export default {
           },
         ],
       },
-      options: {
-        layout: {
-          padding: 15,
-        },
-        legend: {
-          locale: "th-TH",
-          position: "top", // place legend on the right side of chart
-          plugins: {
-            labels: {
-              font: {
-                size: 20,
-                family: "Sarabun",
-              },
-            },
-          },
-        },
-        scales: {
-          xAxes: [
-            {
-              stacked: true, // this should be set to make the bars stacked
-            },
-          ],
-          yAxes: [
-            {
-              stacked: true, // this also..
-            },
-          ],
-        },
-      },
+     
     });
   },
   data: () => ({
