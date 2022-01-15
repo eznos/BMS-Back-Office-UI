@@ -22,13 +22,22 @@
               <v-card-text>
                 <v-row>
                   <v-col>
-                    <v-text-field append-icon="mdi-latitude" label="ละติจูด">
+                    <v-text-field
+                      v-model="latitude"
+                      append-icon="mdi-latitude"
+                      label="ละติจูด"
+                      :rules="rules.latitude"
+                      clearable
+                    >
                     </v-text-field>
                   </v-col>
                   <v-col>
                     <v-text-field
+                      v-model="longtitude"
                       append-icon="mdi-longitude"
                       label="ลองติจูด"
+                      :rules="rules.longtitude"
+                      clearable
                     ></v-text-field>
                   </v-col>
                   <v-col>
@@ -93,7 +102,21 @@ export default {
     return {
       markers: [],
       place: null,
+      latitude: "",
+      longitude: "",
       dialog: false,
+      rules: {
+        latitude: (value) => {
+          const pattern =
+            /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/g;
+          return pattern.test(value) || "Invalid e-mail." || "อีเมลถูกต้อง";
+        },
+        longtitude: (value) => {
+          const pattern =
+            /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/g;
+          return pattern.test(value) || "Invalid e-mail." || "อีเมลถูกต้อง";
+        },
+      },
     };
   },
   description: "Autocomplete Example (#164)",
