@@ -182,7 +182,7 @@
                   multiple
                   show-size
                   :rules="rules.fotmat"
-                  type ='file'
+                  type="file"
                   accept=".xlsx, .xlsm, .xlsb, .xltx, .xltm,  .xls,  .xla,"
                 ></v-file-input>
               </v-card-text>
@@ -324,14 +324,10 @@ export default {
     },
     rules: {
       format: [
-        (value) =>
-          !value ||
-          value.size < 20000000 ||
-          "ขนาดไฟล์ไม่เกิน 20 MB",
+        (value) => !value || value.size < 20000000 || "ขนาดไฟล์ไม่เกิน 20 MB",
       ],
     },
   }),
-
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "เพิ่มผู้ใช้น้ำ" : "แก้ไขผู้ใช้น้ำ";
@@ -416,7 +412,6 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-
     roomFilter(value) {
       if (!this.roomFilterValue) {
         return true;
@@ -435,30 +430,25 @@ export default {
       }
       return value == this.dateFilterValue;
     },
-
     /**
      * Filter for เลขห้องพัก column.
      * @param value Value to be tested.
      * @returns {boolean}
      */
-
     editItem(item) {
       this.editedIndex = this.electric.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-
     deleteItem(item) {
       this.editedIndex = this.electric.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
-
     deleteItemConfirm() {
       this.electric.splice(this.editedIndex, 1);
       this.closeDelete();
     },
-
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -466,7 +456,6 @@ export default {
         this.editedIndex = -1;
       });
     },
-
     closeDelete() {
       this.dialogDelete = false;
       this.$nextTick(() => {
@@ -474,7 +463,6 @@ export default {
         this.editedIndex = -1;
       });
     },
-
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.electric[this.editedIndex], this.editedItem);
