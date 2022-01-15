@@ -45,7 +45,6 @@ export default {
   components: {},
   mounted: function () {
     var chart = new Chart(water, {
-      responsive: true,
       type: "bar",
       data: {
         labels: [
@@ -128,6 +127,8 @@ export default {
         ],
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         layout: {
           padding: 15,
         },
@@ -158,7 +159,6 @@ export default {
       },
     });
     var chart = new Chart(electric, {
-      responsive: true,
       type: "bar",
       data: {
         labels: [
@@ -241,6 +241,8 @@ export default {
         ],
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         locale: "th-TH",
         layout: {
           padding: 15,

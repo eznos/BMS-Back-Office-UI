@@ -227,11 +227,10 @@ import Chart from "chart.js";
 export default {
   mounted: function () {
     var chart = new Chart(water, {
-
       type: "bar",
-       options: {
-         responsive: true,
-         maintainAspectRatio: false,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
         layout: {
           padding: 15,
         },
@@ -339,7 +338,6 @@ export default {
           },
         ],
       },
-     
     });
   },
   data: () => ({
