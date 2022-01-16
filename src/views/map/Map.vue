@@ -21,36 +21,41 @@
               </v-card-title>
               <v-card-text>
                 <v-row>
-                  <v-col>
-                    <v-text-field
-                      v-model="latitude"
-                      append-icon="mdi-latitude"
-                      label="ละติจูด"
-                      :rules="rules.latitude"
-                      clearable
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field
-                      v-model="longtitude"
-                      append-icon="mdi-longitude"
-                      label="ลองติจูด"
-                      :rules="rules.longtitude"
-                      clearable
-                    ></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field append-icon="mdi-map-legend" label="ชื่อเขต">
-                    </v-text-field>
-                  </v-col>
+                  <v-form ref="form" v-model="valid">
+                    <v-col>
+                      <v-text-field
+                        v-model="latitude"
+                        append-icon="mdi-latitude"
+                        label="ละติจูด"
+                        :rules="[rules.latitudeRules.regex]"
+                        clearable
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        v-model="longitude"
+                        append-icon="mdi-longitude"
+                        label="ลองติจูด"
+                        :rules="[rules.longitudeRules.regex]"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        append-icon="mdi-map-legend"
+                        label="ชื่อเขต"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-form>
                 </v-row>
               </v-card-text>
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="dialog = false">
-                  I accept
+                 ยืนยันการเพิ่มพื้นที่เขต
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -100,21 +105,26 @@ export default {
   },
   data() {
     return {
+      valid: true,
       markers: [],
       place: null,
       latitude: "",
       longitude: "",
       dialog: false,
       rules: {
-        latitude: (value) => {
-          const pattern =
-            /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/g;
-          return pattern.test(value) || "Invalid e-mail." || "อีเมลถูกต้อง";
+        latitudeRules: {
+          required: (v) => !!v || "กรุณาใส่ข้อมูล",
+          regex: (v) =>
+            /^(\+|-)?(?:90(?:(?:\.0{1,6})?)|(?:[0-9]|[1-8][0-9])(?:(?:\.[0-9]{1,6})?))$/.test(
+              v
+            ) || "ละติจูดไม่ถูกต้อง",
         },
-        longtitude: (value) => {
-          const pattern =
-            /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/g;
-          return pattern.test(value) || "Invalid e-mail." || "อีเมลถูกต้อง";
+        longitudeRules: {
+          required: (v) => !!v || "กรุณาใส่ข้อมูล.",
+          regex: (v) =>
+            /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/.test(
+              v
+            ) || "ลองจิจูดไม่ถูกต้อง",
         },
       },
     };
@@ -140,6 +150,7 @@ export default {
       }
     },
   },
+  computed: {},
 };
 </script>
 
