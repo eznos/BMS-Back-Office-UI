@@ -14,7 +14,7 @@
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="#9B3499" dark v-on="{ ...attrs }" class="">
+              <v-btn color="#9B3499" dark v-on="{ ...attrs }">
                 <v-icon> mdi-account-plus </v-icon>
                 เพื่มผู้ใช้งาน
               </v-btn>
@@ -36,50 +36,11 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.room_no"
-                        label="เลขห้องพัก"
+                        v-model="editedItem.permission"
+                        label="ตำแหน่ง"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.buildings"
-                        :items="buildings"
-                        label="อาคาร"
-                      >
-                      </v-select>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.zone"
-                        :items="zone"
-                        label="พื้นที่"
-                      >
-                      </v-select>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_no"
-                        label="เลขผู้ใช้น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_meter_no"
-                        label="เลขมิเตอร์น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.electric_no"
-                        label="เลขผู้ใช้ไฟฟ้า"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.electric_meter_no"
-                        label="เลขมิเตอร์ไฟฟา้"
-                      ></v-text-field>
-                    </v-col>
+
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -118,7 +79,7 @@
             v-bind="attrs"
             v-on="on"
             @click="clear"
-            class="ml-2"
+            class="ml-2 filter"
           >
             <v-icon>mdi-delete-sweep</v-icon>
             ลบข้อมูลที่เลือก
@@ -151,6 +112,16 @@
           class="filter"
         >
         </v-select>
+                <!-- Filter for  status-->
+        <v-text-field
+          v-model="statusFilterValue"
+          prepend-icon="mdi-magnify"
+          type="text"
+          label="ค้นหาด้วยสถานะ"
+          clearable
+          class="filter"
+        ></v-text-field>
+
       </v-row>
     </div>
     <v-container>
@@ -200,7 +171,7 @@ export default {
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
-    zoneFilterValue: "",
+    statusFilterValue: "",
     building: [],
     editedIndex: -1,
     editedItem: {
@@ -230,6 +201,11 @@ export default {
           text: "ตำแหน่ง",
           value: "permission",
           filter: this.stateFilter,
+        },
+        {
+          text: "สถานะ",
+          value: "status",
+          search: "",
         },
         {
           text: "การจัดการ",
@@ -262,11 +238,11 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-    roomFilter(value) {
-      if (!this.zoneFilterValue) {
+    statusFilter(value) {
+      if (!this.statusFilterValue) {
         return true;
       }
-      return value === this.zoneFilterValue;
+      return value === this.statusFilterValue;
     },
     /**
      * Filter for เลขห้องพัก column.
@@ -319,7 +295,7 @@ export default {
     },
     clear() {
       (this.NamefilterValue = ""),
-        (this.zoneFilterValue = ""),
+        (this.statusFilterValue = ""),
         (this.dateFilterValue = "");
       this.statusFilter = "";
     },
@@ -354,10 +330,6 @@ export default {
   margin-top: 15px;
 }
 
-.chart-responsive {
-  width: 100%;
-  margin: 20px auto;
-}
 
 .mx-auto {
   font-size: 30px;
