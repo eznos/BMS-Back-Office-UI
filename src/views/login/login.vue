@@ -37,7 +37,6 @@
                     type="password"
                     :rules="rules.Password_Format"
                   ></v-text-field>
-
                   <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
                     >ลืมรหัสผ่าน</v-btn
                   >
@@ -86,11 +85,9 @@ export default {
   border-radius: 15px;
   border-color: black;
 }
-
 .style-card {
   padding: 30px;
 }
-
 .row-btn {
   padding: 0;
   margin-top: 10px;
