@@ -14,6 +14,7 @@ import Edit_user from '../views/edituser/Edituser.vue'
 import Building from '../views/table/Building.vue'
 import Manage_user from '../views/table/Manageuser.vue'
 import Maps from '../views/map/Map.vue'
+import Report from '../views/report/Report.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -94,6 +95,11 @@ const routes = [
     path: '/manageuser',
     name: 'Manage_user',
     component: Manage_user
+  },
+  {
+    path: '/report',
+    name: 'Report',
+    component: Report
   }
 ]
 
