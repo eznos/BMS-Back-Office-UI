@@ -19,7 +19,6 @@
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.1",
     "vue-router": "^3.2.0",
-    "vue-trix": "^1.2.0",
     "vue2-google-maps": "^0.10.7",
     "vuelidate": "^0.7.7",
     "vuetify": "^2.4.0"

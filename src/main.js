@@ -5,8 +5,8 @@ import router from './router'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import Vuelidate from 'vuelidate'
 import * as VueGoogleMaps from 'vue2-google-maps'
-import "vue-trix";
 
+// vue trix
 
 Vue.config.productionTip = false
 Vue.use(Vuelidate)
