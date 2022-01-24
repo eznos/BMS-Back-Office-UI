@@ -191,6 +191,46 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <!-- export excel to email -->
+          <v-dialog v-model="exportExcelwater" max-width="500px">
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn color="#1572A1" class="filter" dark v-on="{ ...attrs }">
+                <v-icon> mdi-file-export-outline </v-icon>
+                Export ข้อมูล Excel
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                ส่งออกข้อมูล Excel ของค่าน้ำประปาไปยังอีเมลที่ต้องการ
+              </v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12">
+                    <v-select
+                      label="เลือกข้อมูลที่ต้องการส่งออก"
+                      :items="exportData"
+                      prepend-icon="mdi-file-excel"
+                    >
+                    </v-select>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      label="อีเมลผู้รับ"
+                      :rules="[rules.email.regex]"
+                      v-model="emailtarget"
+                      prepend-icon="mdi-at"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-btn color="agree" @click="exportExcelwater = false">
+                  ok
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </div>
       </v-row>
       <!-- filter -->
@@ -210,15 +250,6 @@
           prepend-icon="mdi-room-service"
           type="text"
           label="กรองด้วยเลขห้อง"
-          class="filter"
-          clearable
-        ></v-text-field>
-        <!-- Filter for  name-->
-        <v-text-field
-          v-model="NamefilterValue"
-          prepend-icon="mdi-magnify"
-          type="text"
-          label="กรองด้วยชื่อ"
           class="filter"
           clearable
         ></v-text-field>
@@ -295,6 +326,7 @@ export default {
     modal: false,
     dialog: false,
     importExcel: false,
+    exportExcelwater: false,
     menu: false,
     search: "",
     direction: "bottom",
@@ -304,6 +336,7 @@ export default {
     roomFilterValue: "",
     dateFilterValue: "",
     date: "",
+    exportData: ["1", "2", "3", "4", "5"],
     stateFilterValue: "",
     state: ["Approve", "Non Approve"],
     electric: [],
@@ -320,12 +353,19 @@ export default {
       room_no: "",
       water_no: "",
       water_meter_no: "",
-      status: "",
+      status: "Non Approve",
     },
     rules: {
       format: [
         (value) => !value || value.size < 20000000 || "ขนาดไฟล์ไม่เกิน 20 MB",
       ],
+      email: {
+        required: (v) => !!v || "กรุณาใส่อีเมลของผู้รับ",
+        regex: (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            v
+          ) || "อีเมลไม่ถูกต้อง",
+      },
     },
   }),
   computed: {
