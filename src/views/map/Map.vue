@@ -55,7 +55,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" text @click="dialog = false">
-                 ยืนยันการเพิ่มพื้นที่เขต
+                  ยืนยันการเพิ่มพื้นที่เขต
                 </v-btn>
               </v-card-actions>
             </v-card>
