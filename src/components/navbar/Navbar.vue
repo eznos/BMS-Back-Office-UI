@@ -140,11 +140,6 @@ export default {
         text: "แผนที่",
         route: "/map",
       },
-            {
-        icon: " mdi-file-pdf-box",
-        text: "รายงาน",
-        route: "/report",
-      },
       // {
       //   icon: " mdi-heart-broken",
       //   text: "Lab หน้าผู้ใช้",
