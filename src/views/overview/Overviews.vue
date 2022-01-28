@@ -10,10 +10,11 @@
             </div>
           </v-row>
         </div>
+        <!-- export data -->
         <div>
-          <v-dialog v-model="dialog" max-width="600px">
-            <template v-slot:activator="{ on }">
-              <v-btn color="primary" v-on="on">
+          <v-dialog v-model="dialog" persistent width="600px">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="primary" v-bind="attrs" v-on="on">
                 <v-icon> mdi-application-export </v-icon>
                 Export ข้อมูลภาพรวม
               </v-btn>
@@ -25,109 +26,114 @@
                 </v-icon>
                 &nbsp; Export ข้อมูลภาพรวม
               </v-card-title>
-              <v-card-text></v-card-text>
-              <v-card-actions> </v-card-actions>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12">
+                    <v-select
+                      label="เลือกข้อมูลที่ต้องการส่งออก"
+                      :items="dataexport"
+                      prepend-icon="mdi-file-excel"
+                    >
+                    </v-select>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="agree" @click="dialog = false"> ตกลง </v-btn>
+                <v-btn color="warning" @click="dialog = false"> ยกเลิก </v-btn>
+              </v-card-actions>
             </v-card>
           </v-dialog>
         </div>
       </v-row>
+      <!-- info card -->
       <div class="space">
-        <!-- info card -->
         <v-row>
-          <v-col>
-            <v-card>
+          <!-- resident number -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+            <v-card elevation="6">
               <v-list-item>
-                <v-list-item-avatar rounded class="mt-n7">
-                  <v-sheet color="green" width="80" height="80" elevation="10">
-                    <v-icon dark large>store</v-icon>
+                <v-list-item-avatar>
+                  <v-sheet>
+                    <v-icon large>mdi-face-man-shimmer</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="overline text-right">Article</div>
-                  <v-list-item-title class="headline mb-1 text-right"
-                    >523614</v-list-item-title
-                  >
+                  <div class="text-right mb-3">จำนวนผู้อยู่อาศัยรวม</div>
+                  <v-list-item-title class="headline mb-3 text-right">
+                    <div class="font">{{ percennumber() }} คน</div>
+                  </v-list-item-title>
                   <div>
                     <v-divider></v-divider>
                   </div>
                 </v-list-item-content>
               </v-list-item>
-              <v-card-actions>
-                <v-icon text class="ma-2">person</v-icon>
-                <div class="overline">Iyad</div>
-              </v-card-actions>
             </v-card>
           </v-col>
-          <v-col>
-            <v-card>
+          <!-- empty room -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+            <v-card elevation="6">
               <v-list-item>
-                <v-list-item-avatar rounded class="mt-n7">
-                  <v-sheet color="green" width="80" height="80" elevation="10">
-                    <v-icon dark large>store</v-icon>
+                <v-list-item-avatar>
+                  <v-sheet>
+                    <v-icon large>mdi-room-service</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="overline text-right">Article</div>
-                  <v-list-item-title class="headline mb-1 text-right"
-                    >523614</v-list-item-title
-                  >
+                  <div class="text-right mb-3">จำนวนห้องว่าง</div>
+                  <v-list-item-title class="headline mb-3 text-right">
+                    <div class="font">{{ percennumber() }} ห้อง</div>
+                  </v-list-item-title>
                   <div>
                     <v-divider></v-divider>
                   </div>
                 </v-list-item-content>
               </v-list-item>
-              <v-card-actions>
-                <v-icon text class="ma-2">person</v-icon>
-                <div class="overline">Iyad</div>
-              </v-card-actions>
             </v-card>
           </v-col>
-          <v-col>
-            <v-card>
+          <!-- resodent enter in month -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+            <v-card elevation="6">
               <v-list-item>
-                <v-list-item-avatar rounded class="mt-n7">
-                  <v-sheet color="green" width="80" height="80" elevation="10">
-                    <v-icon dark large>store</v-icon>
+                <v-list-item-avatar>
+                  <v-sheet>
+                    <v-icon large>mdi-location-enter</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="overline text-right">Article</div>
-                  <v-list-item-title class="headline mb-1 text-right"
-                    >523614</v-list-item-title
-                  >
+                  <div class="text-right mb-3">
+                    จำนวนผู้เข้าพักอาศัยเดือนนี้
+                  </div>
+                  <v-list-item-title class="headline mb-3 text-right">
+                    <div class="font">{{ percennumber() }} คน</div>
+                  </v-list-item-title>
                   <div>
                     <v-divider></v-divider>
                   </div>
                 </v-list-item-content>
               </v-list-item>
-              <v-card-actions>
-                <v-icon text class="ma-2">person</v-icon>
-                <div class="overline">Iyad</div>
-              </v-card-actions>
             </v-card>
           </v-col>
-          <v-col>
-            <v-card>
+          <!-- resident exit -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+            <v-card elevation="6">
               <v-list-item>
-                <v-list-item-avatar rounded class="mt-n7">
-                  <v-sheet color="green" width="80" height="80" elevation="10">
-                    <v-icon dark large>store</v-icon>
+                <v-list-item-avatar>
+                  <v-sheet>
+                    <v-icon large>mdi mdi-exit-run</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="overline text-right">Article</div>
-                  <v-list-item-title class="headline mb-1 text-right"
-                    >523614</v-list-item-title
-                  >
+                  <div class="text-right mb-3">จำนวนผู้ย้ายออกในเดือนนี้</div>
+                  <v-list-item-title class="headline mb-3 text-right">
+                    <div class="font">{{ percennumber() }} คน</div>
+                  </v-list-item-title>
                   <div>
                     <v-divider></v-divider>
                   </div>
                 </v-list-item-content>
               </v-list-item>
-              <v-card-actions>
-                <v-icon text class="ma-2">person</v-icon>
-                <div class="overline">Iyad</div>
-              </v-card-actions>
             </v-card>
           </v-col>
         </v-row>
@@ -186,6 +192,7 @@ export default {
   mounted: function () {
     var chart = new Chart(water, {
       type: "bar",
+
       data: {
         labels: [
           "มกราคม",
@@ -297,7 +304,9 @@ export default {
           ],
         },
       },
+
     });
+
     var chart = new Chart(electric, {
       type: "bar",
       data: {
@@ -416,12 +425,22 @@ export default {
   data() {
     return {
       dialog: false,
+      number_people: "60",
+      dataexport: ["1", "2", "3", "4", "5"],
     };
   },
   methods: {
     //ramdom number in dataset
     getRandomInt() {
       return Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+    },
+    percennumber() {
+      return Math.floor(Math.random() * (100 - 5 + 1)) + 5;
+    },
+    getRandomIntInclusive(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
     },
   },
 };
@@ -431,6 +450,9 @@ export default {
 .chart-responsive {
   width: 100%;
   margin: 20px auto;
+}
+.font {
+  font-family: Sarabun;
 }
 .mx-auto {
   font-size: 30px;
