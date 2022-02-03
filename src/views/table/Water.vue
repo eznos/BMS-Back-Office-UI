@@ -16,7 +16,12 @@
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="agree" dark v-on="{ ...attrs }">
+              <v-btn
+                class="button-filter"
+                color="agree"
+                dark
+                v-on="{ ...attrs }"
+              >
                 <v-icon> mdi-account-plus </v-icon>
                 เพิ่มผู้ใช้น้ำ
               </v-btn>
@@ -148,7 +153,7 @@
             v-bind="attrs"
             v-on="on"
             @click="clear"
-            class="ml-2"
+            class="button-filter"
           >
             <v-icon>mdi-delete-sweep</v-icon>
             ลบข้อมูลที่เลือก
@@ -168,7 +173,12 @@
           <!-- import excel -->
           <v-dialog v-model="importExcel" max-width="500px">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="agree" dark v-on="{ ...attrs }">
+              <v-btn
+                class="button-filter"
+                color="agree"
+                dark
+                v-on="{ ...attrs }"
+              >
                 <v-icon> mdi-account-plus </v-icon>
                 import ข้อมูล Excel
               </v-btn>
@@ -544,6 +554,9 @@ export default {
   font-size: 25px;
   padding: 10px;
   font-family: Sarabun;
+}
+.button-filter {
+  margin: 10px;
 }
 .filter {
   padding: 10px;
