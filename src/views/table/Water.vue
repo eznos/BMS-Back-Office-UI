@@ -13,6 +13,78 @@
         </div>
         <!-- button -->
         <div>
+          <!-- water diff_price_cal -->
+          <v-dialog
+            v-model="difference_price_calculate"
+            persistent
+            max-width="500px"
+          >
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn
+                class="button-filter rounded-lg"
+                color="agree"
+                dark
+                v-on="{ ...attrs }"
+              >
+                <v-icon> mdi-calculator </v-icon>
+                คำนวนค่าน้ำส่วนต่าง
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <v-icon> mdi-calculator </v-icon> &nbsp;
+                คำนวนค่าน้ำส่วนต่าง</v-card-title
+              >
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12">
+                    <v-select
+                      label="โซนพื้นที่ของอาคารบ้านพัก"
+                      :items="zone"
+                      prepend-icon="mdi-map-legend"
+                      multiple
+                      clearable
+                      chips
+                    >
+                    </v-select>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="zone_meter"
+                      label="ค่าน้ำจากมิเตอร์ใหญ่"
+                      prepend-icon="mdi-car-speed-limiter"
+                      clearable
+                    >
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      v-model="sum_unit"
+                      label="ค่าน้ำที่จดได้"
+                      prepend-icon="mdi-gauge"
+                      clearable
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="warning"
+                  text
+                  @click="difference_price_calculate = false"
+                  >ยกเลิก</v-btn
+                >
+                <v-btn
+                  color="agree"
+                  text
+                  @click="difference_price_calculate = false"
+                  >ยืนยันข้อมูล</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="500px">
             <template v-slot:activator="{ on: attrs }">
@@ -79,6 +151,7 @@
                       >
                       </v-select>
                     </v-col>
+                    <!-- bill pay -->
                     <v-col cols="12" sm="6" md="4">
                       <v-dialog
                         ref="dialog"
@@ -89,7 +162,7 @@
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="editedItem.date_pay"
-                            label="กรองด้วยเดือน"
+                            label="รอบบิล"
                             prepend-icon="mdi-calendar"
                             readonly
                             v-bind="attrs"
@@ -113,8 +186,8 @@
                             ยืนยัน
                           </v-btn>
                         </v-date-picker>
-                      </v-dialog></v-col
-                    >
+                      </v-dialog>
+                    </v-col>
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -335,9 +408,11 @@ export default {
     valid: false,
     modal: false,
     dialog: false,
+    difference_price_calculate: false,
     importExcel: false,
     exportExcelwater: false,
     menu: false,
+    zone: ["1", "2", "3", "4", "5"],
     search: "",
     direction: "bottom",
     dialogDelete: false,
