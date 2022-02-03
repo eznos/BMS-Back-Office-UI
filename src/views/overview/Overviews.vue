@@ -24,7 +24,7 @@
                 <v-icon size="30px" color="red">
                   mdi-application-export
                 </v-icon>
-                &nbsp; Export ข้อมูลภาพรวม
+                &nbsp; Export ข้อมูลภาพรวมเป็นไฟล์ Excel
               </v-card-title>
               <v-card-text>
                 <v-row>
@@ -33,6 +33,7 @@
                       label="เลือกข้อมูลที่ต้องการส่งออก"
                       :items="dataexport"
                       prepend-icon="mdi-file-excel"
+                      clearable
                     >
                     </v-select>
                   </v-col>
@@ -52,7 +53,7 @@
         <v-row>
           <!-- resident number -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6">
+            <v-card elevation="6" class="rounded-xl">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -73,7 +74,7 @@
           </v-col>
           <!-- empty room -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6">
+            <v-card elevation="6" class="rounded-xl">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -94,7 +95,7 @@
           </v-col>
           <!-- resodent enter in month -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6">
+            <v-card elevation="6" class="rounded-xl">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -117,7 +118,7 @@
           </v-col>
           <!-- resident exit -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6">
+            <v-card elevation="6" class="rounded-xl">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -145,7 +146,7 @@
         <v-col cols="12" xs="12" sm="12" md="6" lg="6">
           <div>
             <!-- water -->
-            <v-card>
+            <v-card class="card-chart rounded-lg" >
               <v-card-title>
                 <div class="mx-auto">
                   <v-icon size="35px" color="#29DEFF">mdi-water-circle</v-icon>
@@ -163,9 +164,9 @@
         <v-col cols="12" xs="12" sm="12" md="6" lg="6">
           <div>
             <!-- electric -->
-            <v-card>
+            <v-card  class="card-chart rounded-lg" >
               <v-card-title>
-                <div class="mx-auto">
+                <div class="mx-auto ">
                   <v-icon size="35px" color="#FDFC15"
                     >mdi-lightning-bolt-circle</v-icon
                   >
@@ -187,12 +188,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 import Chart from "chart.js";
+
 export default {
-  components: {},
   mounted: function () {
     var chart = new Chart(water, {
       type: "bar",
-
       data: {
         labels: [
           "มกราคม",
@@ -304,9 +304,7 @@ export default {
           ],
         },
       },
-
     });
-
     var chart = new Chart(electric, {
       type: "bar",
       data: {
@@ -437,11 +435,6 @@ export default {
     percennumber() {
       return Math.floor(Math.random() * (100 - 5 + 1)) + 5;
     },
-    getRandomIntInclusive(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
-    },
   },
 };
 </script>
@@ -462,4 +455,10 @@ export default {
   margin-top: 30px;
   margin-bottom: 10px;
 }
+/* canvas{
+  background:#D1D1D1;
+}
+.card-chart{
+   background:#D1D1D1;
+} */
 </style>
