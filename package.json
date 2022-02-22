@@ -13,6 +13,7 @@
     "@vuelidate/core": "^2.0.0-alpha.32",
     "@vuelidate/validators": "^2.0.0-alpha.25",
     "chart.js": "^2.9.4",
+    "chartjs-plugin-labels": "^1.1.0",
     "core-js": "^3.6.5",
     "material-design-icons-iconfont": "^6.1.1",
     "vee-validate": "^3.4.14",

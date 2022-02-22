@@ -105,6 +105,6 @@ const router = new VueRouter({
 })
 
 // set หน้าแรกที่เข้า
-router.replace('/login');
+// router.replace('/login');
 
 export default router
