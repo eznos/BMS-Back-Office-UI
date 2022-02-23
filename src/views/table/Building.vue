@@ -201,17 +201,32 @@
           </v-data-table>
           <!-- end data-table -->
         </v-col>
-        <v-col cols="12">
+        <v-col cols="12" xs="12" sm="12" md="12" lg="4" class="">
           <v-card>
-            <v-card-title>
-              <div class="mx-auto">
-                <v-icon size="35px" color="#5F2324">mdi-numeric</v-icon>
-                จำนวนผู้อยู่อาศัยของแต่ล่ะพื้นที่
-              </div>
-            </v-card-title>
+            <h2>เขตส่วนกลาง</h2>
             <v-card-actions>
               <div class="chart-responsive" :style="{ padding: 10 }">
-                <canvas id="water" width="1500" height="350"></canvas>
+                <canvas id="center" width="1500" height="350"></canvas>
+              </div>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+        <v-col cols="12" xs="12" sm="12" md="12" lg="4">
+          <v-card>
+            <h2>เขตถนนสุรนารายณ์</h2>
+            <v-card-actions>
+              <div class="chart-responsive" :style="{ padding: 10 }">
+                <canvas id="suranarai" width="1500" height="350"></canvas>
+              </div>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+        <v-col cols="12" xs="12" sm="12" md="12" lg="4">
+          <v-card>
+            <h2>อัษฎางค์</h2>
+            <v-card-actions>
+              <div class="chart-responsive" :style="{ padding: 10 }">
+                <canvas id="ashtang" width="1500" height="350"></canvas>
               </div>
             </v-card-actions>
           </v-card>
@@ -226,8 +241,49 @@
 import Chart from "chart.js";
 export default {
   mounted: function () {
-    var chart = new Chart(water, {
-      type: "bar",
+    var chart = new Chart(center, {
+      type: "doughnut",
+      data: {
+        labels: [
+          "อาคาร2/11",
+          "อาคาร2/12",
+          "อาคาร2/13",
+          "อาคาร2/14",
+          "อาคาร2/15",
+          "อาคาร2/16",
+          "อาคาร2/17",
+          "อาคาร2/18",
+        ], // responsible for how many bars are gonna show on the chart
+        // create 12 datasets, since we have 12 items
+        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+        // put 0, if there is no data for the particular bar
+        datasets: [
+          {
+            label: "ส่วนกลาง",
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: [
+              "#22EACA",
+              "#B31E6F",
+              "#EE5A5A",
+              "#FF9E74",
+              "#22EACA",
+              "#B31E6F",
+              "#EE5A5A",
+              "#FF9E74",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -246,33 +302,73 @@ export default {
             },
           },
         },
-        scales: {
-          xAxes: [
-            {
-              stacked: true, // this should be set to make the bars stacked
-            },
-          ],
-          yAxes: [
-            {
-              stacked: true, // this also..
-            },
-          ],
-        },
       },
+    });
+    var chart = new Chart(suranarai, {
+      type: "doughnut",
       data: {
         labels: [
-          "มกราคม",
-          "กุมภาพันธ์",
-          "มีนาคม",
-          "เมษายน",
-          "พฤษภาคม ",
-          "มิถุนายน ",
-          "กรกฎาคม",
-          "สิงหาคม",
-          "กันยายน",
-          "ตุลาคม",
-          "พฤศจิกายน",
-          "ธันวาคม",
+          "เรือนแถว2/31 ถึง 2/37",
+          "อาคาร 2/38",
+          "อาคาร 2/39",
+          "อาคาร 2/40",
+          "อาคารบ้านแผด2/20 ถึง 2/29",
+          "อาคารสร้างใหม่",
+        ], // responsible for how many bars are gonna show on the chart
+        // create 12 datasets, since we have 12 items
+        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
+        // put 0, if there is no data for the particular bar
+        datasets: [
+          {
+            data: [
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+              this.getRandomInt(),
+            ],
+            backgroundColor: [
+              "#1A1A40",
+              "#270082",
+              "#7A0BC0",
+              "#7897AB",
+              "#655D8A",
+              "#FA58B6",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: 15,
+        },
+        legend: {
+          locale: "th-TH",
+          position: "top", // place legend on the right side of chart
+          plugins: {
+            labels: {
+              font: {
+                size: 20,
+                family: "Sarabun",
+              },
+            },
+          },
+        },
+      },
+    });
+    var chart = new Chart(ashtang, {
+      type: "doughnut",
+      data: {
+        labels: [
+          "อาคาร2/19 ชั้น1",
+          "อาคาร2/19 ชั้น2",
+          "อาคาร2/19 ชั้น3",
+          "อาคาร2/19 ชั้น4",
+          "อาคาร2/19 ชั้น5",
         ], // responsible for how many bars are gonna show on the chart
         // create 12 datasets, since we have 12 items
         // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
@@ -286,57 +382,30 @@ export default {
               this.getRandomInt(),
               this.getRandomInt(),
               this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
             ],
-            backgroundColor: "#8CFFD5",
+            backgroundColor: ["#655D8A","#7897AB","#D885A3","#FDCEB9","#FFBBBB",],
             borderWidth: 1,
           },
-          {
-            label: "มหาชัย",
-            data: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-            backgroundColor: "#F86D6D",
-          },
-          {
-            label: "อัษฎางค์",
-            data: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-            backgroundColor: "#2E36F0",
-          },
         ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: 15,
+        },
+        legend: {
+          locale: "th-TH",
+          position: "top", // place legend on the right side of chart
+          plugins: {
+            labels: {
+              font: {
+                size: 20,
+                family: "Sarabun",
+              },
+            },
+          },
+        },
       },
     });
   },
@@ -419,6 +488,11 @@ export default {
         {
           text: "เลขมิเตอร์น้ำประปา",
           value: "water_meter_no",
+          // filter: this.roomFilter,
+        },
+        {
+          text: "ประเภทห้องพัก",
+          value: "room_type",
           // filter: this.roomFilter,
         },
         {
@@ -570,5 +644,8 @@ export default {
   padding: 10px;
   margin-left: 10px;
   margin-right: 10px;
+}
+.backgroundchart {
+  background-image: linear-gradient(135deg, #ed6ea0 20%, #ec8c69 90%);
 }
 </style>
