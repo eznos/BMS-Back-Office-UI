@@ -1,6 +1,6 @@
 <template>
   <nav>
-    <v-app-bar color="rgb(131,49,51)" dark app>
+    <v-app-bar class="background" dark app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="text-uppercase">
         <span class="font-weight-light">ระบบจัดการค่าน้ำ ค่าไฟฟ้า</span>
@@ -45,7 +45,7 @@
       </v-menu>
     </v-app-bar>
     <!-- จบ -->
-    <v-navigation-drawer v-model="drawer" dark app color="#572021">
+    <v-navigation-drawer v-model="drawer" dark app class="background2">
       <!--old color  class="red darken-4" -->
       <v-layout column align-center>
         <v-flex class="mt-5">
@@ -199,5 +199,11 @@ export default {
 <style scoped>
 .border {
   border-left: 5px solid #a50b20;
+}
+.background {
+background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
+}
+.background2 {
+  background-image: linear-gradient(180deg, #572021 13%, #833133 66%);
 }
 </style>
