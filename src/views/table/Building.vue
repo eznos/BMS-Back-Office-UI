@@ -12,7 +12,7 @@
         </div>
         <div>
           <!-- add user -->
-          <v-dialog v-model="dialog" persistent max-width="500px">
+          <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn color="#9B3499" dark v-on="{ ...attrs }" class="">
                 <v-icon> mdi-account-plus </v-icon>
@@ -93,7 +93,7 @@
             </v-card>
           </v-dialog>
           <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" max-width="75%">
             <v-card>
               <v-card-title class="text-h5"
                 >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
@@ -123,6 +123,7 @@
             <v-icon>mdi-delete-sweep</v-icon>
             ลบข้อมูลที่เลือก
           </v-btn>
+          <!-- clear search -->
           <v-btn dark color="#561F55" v-bind="attrs" v-on="on" @click="clear">
             <v-icon>mdi-delete</v-icon>
             ลบการค้นหา
@@ -140,7 +141,6 @@
           clearable
           class="filter"
         ></v-text-field>
-
         <!-- Filter for  zone-->
         <v-text-field
           v-model="zoneFilterValue"
@@ -150,7 +150,6 @@
           clearable
           class="filter"
         ></v-text-field>
-
         <!-- search by building -->
         <v-text-field
           v-model="zoneFilterValue"
@@ -186,7 +185,6 @@
             loading
             loading-text="กำลังโหลด... โปรดรอสักครู่"
             show-select
-            :hide-default-footer="true"
           >
             <template v-slot:top>
               <!-- v-container, v-col and v-row are just for decoration purposes. -->
@@ -201,6 +199,7 @@
           </v-data-table>
           <!-- end data-table -->
         </v-col>
+        <!-- chart center -->
         <v-col cols="12" xs="12" sm="12" md="12" lg="4" class="">
           <v-card>
             <h2>เขตส่วนกลาง</h2>
@@ -211,6 +210,7 @@
             </v-card-actions>
           </v-card>
         </v-col>
+        <!-- chart suranarai -->
         <v-col cols="12" xs="12" sm="12" md="12" lg="4">
           <v-card>
             <h2>เขตถนนสุรนารายณ์</h2>
@@ -221,6 +221,7 @@
             </v-card-actions>
           </v-card>
         </v-col>
+        <!-- chart ashtang -->
         <v-col cols="12" xs="12" sm="12" md="12" lg="4">
           <v-card>
             <h2>อัษฎางค์</h2>
@@ -383,7 +384,13 @@ export default {
               this.getRandomInt(),
               this.getRandomInt(),
             ],
-            backgroundColor: ["#655D8A","#7897AB","#D885A3","#FDCEB9","#FFBBBB",],
+            backgroundColor: [
+              "#655D8A",
+              "#7897AB",
+              "#D885A3",
+              "#FDCEB9",
+              "#FFBBBB",
+            ],
             borderWidth: 1,
           },
         ],
@@ -459,7 +466,6 @@ export default {
           align: "left",
           // filter: this.nameFilter,
         },
-
         {
           text: "พื้นที่",
           value: "zone",
@@ -500,7 +506,6 @@ export default {
           value: "status",
           filter: this.stateFilter,
         },
-
         {
           text: "การจัดการ",
           value: "actions",
@@ -616,14 +621,17 @@ export default {
   padding: 20px;
   font-family: Sarabun;
 }
+
 .title {
   font-size: 25px;
   font-family: Sarabun;
 }
+
 .form-table {
   margin-top: -20px;
   padding: -20px;
 }
+
 .header-table {
   padding: 15px;
   margin-top: 15px;
@@ -637,14 +645,17 @@ export default {
 .mx-auto {
   font-size: 30px;
 }
+
 .header-blue .v-data-table-header {
   background-color: #466bb2 !important;
 }
+
 .filter {
   padding: 10px;
   margin-left: 10px;
   margin-right: 10px;
 }
+
 .backgroundchart {
   background-image: linear-gradient(135deg, #ed6ea0 20%, #ec8c69 90%);
 }
