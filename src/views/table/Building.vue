@@ -35,26 +35,31 @@
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.room_no"
-                        label="เลขห้องพัก"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.buildings"
-                        :items="buildings"
-                        label="อาคาร"
-                      >
-                      </v-select>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-select
+                      <v-autocomplete
                         v-model="editedItem.zone"
-                        :items="zone"
-                        label="พื้นที่"
+                        :items="zones"
+                        label="อาคาร"
+                        clearable
                       >
-                      </v-select>
+                      </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="editedItem.building"
+                        :items="buildings"
+                        label="building"
+                        clearable
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="editedItem.room"
+                        label="เลขห้องพัก"
+                        :items="rooms"
+                        clearable
+                      >
+                      </v-autocomplete>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
@@ -422,8 +427,73 @@ export default {
     modal: false,
     dialog: false,
     menu: false,
-    zone: ["1", "2", "3", "4", "5"],
-    buildings: ["อาคาร1", "อาคาร2", "อาคาร3", "อาคาร4", "อาคาร5", "อาคาร6"],
+    zone: null,
+    building: null,
+    room: null,
+    zonesBuildings: {
+      เขตส่วนกลาง: ["2/11", "2/12"],
+      เขตสุระ: ["21/120"],
+      เขตอังฏดาง: ["2/19"],
+    },
+    buildingsRooms: {
+      "2/11": [
+        "97",
+        "99",
+        "101",
+        "103",
+        "105",
+        "107",
+        "109",
+        "111",
+        "113",
+        "115",
+        "117",
+        "119",
+      ],
+      "2/12": [
+        "73",
+        "75",
+        "77",
+        "79",
+        "81",
+        "83",
+        "85",
+        "87",
+        "89",
+        "91",
+        "93",
+        "95",
+      ],
+      "2/19": [
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "207",
+        "208",
+        "209",
+        "210",
+        "301",
+        "302",
+        "303",
+      ],
+      "21/99": ["1100", "1012", "1413"],
+      "21/120": ["101", "120", "130"],
+      "21/123": ["110", "102", "103"],
+    },
+
     status: ["ว่าง", "ไม่ว่าง"],
     search: "",
     direction: "bottom",
@@ -435,14 +505,14 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      room_no: "",
+      room: "",
       water_no: "",
       water_meter_no: "",
       status: "ว่าง",
     },
     defaultItem: {
       name: "",
-      room_no: "",
+      room: "",
       water_no: "",
       water_meter_no: "",
       status: "ว่าง",
@@ -457,10 +527,6 @@ export default {
     headers() {
       return [
         {
-          text: "เลขห้องพัก",
-          value: "room_no",
-        },
-        {
           text: "ชื่อผู้อยู่อาศัย",
           value: "name",
           align: "left",
@@ -473,8 +539,12 @@ export default {
         },
         {
           text: "อาคาร",
-          value: "buildings",
+          value: "building",
           // filter: this.roomFilter,
+        },
+        {
+          text: "เลขห้องพัก",
+          value: "room",
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
@@ -512,6 +582,24 @@ export default {
           sortable: false,
         },
       ];
+    },
+
+    zones() {
+      return Object.keys(this.zonesBuildings);
+    },
+    buildings() {
+      if (!this.editedItem.zone) {
+        return "ไม่มีข้อมูล";
+      } else {
+        return this.zonesBuildings[this.editedItem.zone];
+      }
+    },
+    rooms() {
+      if (!this.editedItem.building) {
+        return "ไม่มีข้อมูล";
+      } else {
+        return this.buildingsRooms[this.editedItem.building];
+      }
     },
   },
   watch: {
