@@ -14,7 +14,12 @@
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="#9B3499" dark v-on="{ ...attrs }" class="">
+              <v-btn
+                color="#9B3499"
+                dark
+                v-on="{ ...attrs }"
+                class="button-filter"
+              >
                 <v-icon> mdi-account-plus </v-icon>
                 เพิ่มผู้อยู่อาศัย
               </v-btn>
@@ -27,73 +32,124 @@
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="ชื่อ-นามสกุล"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="editedItem.zone"
-                        :items="zones"
-                        label="อาคาร"
-                        clearable
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="editedItem.building"
-                        :items="buildings"
-                        label="building"
-                        clearable
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="editedItem.room"
-                        label="เลขห้องพัก"
-                        :items="rooms"
-                        clearable
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_no"
-                        label="เลขผู้ใช้น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_meter_no"
-                        label="เลขมิเตอร์น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.electric_no"
-                        label="เลขผู้ใช้ไฟฟ้า"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.electric_meter_no"
-                        label="เลขมิเตอร์ไฟฟา้"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-row>
+                      <!-- name -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.name"
+                          label="ชื่อ-นามสกุล"
+                        ></v-text-field>
+                      </v-col>
+                      <!-- zone -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          v-model="editedItem.zone"
+                          :items="zones"
+                          label="พื้นที่"
+                          clearable
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <!-- building -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          v-model="editedItem.building"
+                          :items="buildings"
+                          label="อาคาร"
+                          clearable
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <!-- room -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          v-model="editedItem.room"
+                          label="เลขห้องพัก"
+                          :items="rooms"
+                          clearable
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <!-- electric_no -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.electric_no"
+                          label="เลขผู้ใช้ไฟฟ้า"
+                          @keypress="isNumber($event)"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
+                      <!-- water_no -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.water_no"
+                          label="เลขผู้ใช้น้ำ"
+                          @keypress="isNumber($event)"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
+                      <!-- electric_meter_no -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.electric_meter_no"
+                          label="เลขมิเตอร์น้ำไฟฟ้า"
+                          @keypress="isNumber($event)"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
+                      <!-- water_meter_no -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.water_meter_no"
+                          label="เลขมิเตอร์น้ำประปา"
+                          @keypress="isNumber($event)"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
+                      <!-- type -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-select
+                          v-model="editedItem.type"
+                          :items="types"
+                          label="ประเภทห้องพัก"
+                          clearable
+                        >
+                        </v-select>
+                      </v-col>
+                      <!-- status -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-select
+                          v-model="editedItem.status"
+                          :items="status"
+                          label="สถานะห้องพัก"
+                          clearable
+                        >
+                        </v-select>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
               <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  ยกเลิก
+                <v-btn large color="error" text @click="clearForm">
+                  ล้างข้อมูลที่กรอก
                 </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> ยืนยัน </v-btn>
+                <v-spacer></v-spacer>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn large color="warning" text @click="close">
+                    ยกเลิก
+                  </v-btn>
+                  <v-btn
+                    large
+                    color="agree"
+                    :disabled="!valid"
+                    text
+                    @click="save"
+                  >
+                    ยืนยัน
+                  </v-btn>
+                </v-form>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -122,14 +178,20 @@
             width="140"
             v-bind="attrs"
             v-on="on"
-            @click="clear"
-            class="ml-2"
+            class="button-filter"
           >
             <v-icon>mdi-delete-sweep</v-icon>
             ลบข้อมูลที่เลือก
           </v-btn>
           <!-- clear search -->
-          <v-btn dark color="#561F55" v-bind="attrs" v-on="on" @click="clear">
+          <v-btn
+            dark
+            class="button-filter"
+            color="#561F55"
+            v-bind="attrs"
+            v-on="on"
+            @click="clear"
+          >
             <v-icon>mdi-delete</v-icon>
             ลบการค้นหา
           </v-btn>
@@ -147,26 +209,32 @@
           class="filter"
         ></v-text-field>
         <!-- Filter for  zone-->
-        <v-text-field
+        <v-select
           v-model="zoneFilterValue"
           prepend-icon="mdi-map-marker-radius"
           type="text"
           label="กรองด้วยพื้นที่"
           clearable
           class="filter"
-        ></v-text-field>
+          :items="zones"
+        >
+        </v-select>
+
         <!-- search by building -->
-        <v-text-field
-          v-model="zoneFilterValue"
+        <v-select
+          v-model="buildFilterValue"
           prepend-icon="mdi-office-building-marker"
           type="text"
           label="กรองด้วยอาคาร"
           clearable
           class="filter"
-        ></v-text-field>
+          :items="buildings"
+        >
+        </v-select>
+
         <!-- search by status -->
         <v-select
-          v-model="statusFilter"
+          v-model="statusFilterValue"
           prepend-icon="mdi-list-status"
           label="กรองด้วยสถานะ"
           :items="status"
@@ -423,13 +491,20 @@ export default {
   },
   data: () => ({
     el: "#app",
-    valid: false,
+    valid: true,
     modal: false,
     dialog: false,
     menu: false,
+    name: null,
     zone: null,
     building: null,
     room: null,
+    electric_no: null,
+    water_no: null,
+    electric_meter_no: null,
+    water_meter_no: null,
+    type: null,
+    status: null,
     zonesBuildings: {
       เขตส่วนกลาง: ["2/11", "2/12"],
       เขตสุระ: ["21/120"],
@@ -493,7 +568,7 @@ export default {
       "21/120": ["101", "120", "130"],
       "21/123": ["110", "102", "103"],
     },
-
+    types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
     status: ["ว่าง", "ไม่ว่าง"],
     search: "",
     direction: "bottom",
@@ -501,6 +576,8 @@ export default {
     // Filter models.
     NamefilterValue: "",
     zoneFilterValue: "",
+    statusFilterValue: "",
+    buildFilterValue: null,
     building: [],
     editedIndex: -1,
     editedItem: {
@@ -535,12 +612,12 @@ export default {
         {
           text: "พื้นที่",
           value: "zone",
-          filter: this.roomFilter,
+          filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
           value: "building",
-          // filter: this.roomFilter,
+          filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
@@ -549,32 +626,27 @@ export default {
         {
           text: "เลขผู้ใช้ไฟฟ้า",
           value: "electric_no",
-          // filter: this.roomFilter,
         },
         {
           text: "เลขผู้ใช้น้ำ",
           value: "water_no",
-          // filter: this.roomFilter,
         },
         {
           text: "เลขมิเตอร์ไฟฟ้า",
           value: "electric_meter_no",
-          // filter: this.roomFilter,
         },
         {
           text: "เลขมิเตอร์น้ำประปา",
           value: "water_meter_no",
-          // filter: this.roomFilter,
         },
         {
           text: "ประเภทห้องพัก",
-          value: "room_type",
-          // filter: this.roomFilter,
+          value: "type",
         },
         {
           text: "สถานะ",
           value: "status",
-          filter: this.stateFilter,
+          filter: this.statusFilter,
         },
         {
           text: "การจัดการ",
@@ -588,6 +660,11 @@ export default {
       return Object.keys(this.zonesBuildings);
     },
     buildings() {
+      // autocomplete in filter
+      if (this.zoneFilterValue) {
+        return this.zonesBuildings[this.zoneFilterValue];
+      }
+      // autocomplete in form
       if (!this.editedItem.zone) {
         return "ไม่มีข้อมูล";
       } else {
@@ -611,6 +688,7 @@ export default {
     },
   },
   methods: {
+ 
     /**
      * Filter for dessert names column.
      * @param value Value to be tested.
@@ -625,12 +703,25 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-    roomFilter(value) {
+    zoneFilter(value) {
       if (!this.zoneFilterValue) {
         return true;
       }
       return value === this.zoneFilterValue;
     },
+    buildingFilter(value) {
+      if (!this.buildFilterValue) {
+        return true;
+      }
+      return value === this.buildFilterValue;
+    },
+    statusFilter(value) {
+      if (!this.statusFilterValue) {
+        return true;
+      }
+      return value === this.statusFilterValue;
+    },
+
     /**
      * Filter for เลขห้องพัก column.
      * @param value Value to be tested.
@@ -664,6 +755,7 @@ export default {
         this.editedIndex = -1;
       });
     },
+    // save form
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.building[this.editedIndex], this.editedItem);
@@ -671,22 +763,14 @@ export default {
         this.building.push(this.editedItem);
       }
       this.close();
-    },
-    savea() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.building[this.editedIndex], this.editedItem);
-      } else {
-        this.building.push(this.editedItem);
-      }
-      this.close();
+        
     },
     clear() {
-      (this.NamefilterValue = ""),
-        (this.zoneFilterValue = ""),
-        (this.dateFilterValue = "");
-      this.date = "";
-      this.search = "";
-      this.statusFilter = null;
+      (this.NamefilterValue = null),
+        (this.zoneFilterValue = null),
+        (this.statusFilterValue = null),
+        (this.buildFilterValue = null),
+        (this.search = null);
     },
     filterOnlyCapsText(value, search) {
       return (
@@ -699,6 +783,25 @@ export default {
     getRandomInt() {
       return Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
     },
+    // number only in text field
+    isNumber: function (evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
+    },
+    // clear form add user
+    clearForm() {
+      this.$refs.form.reset();
+    },
+    // validate form
   },
 };
 </script>
@@ -742,6 +845,9 @@ export default {
   padding: 10px;
   margin-left: 10px;
   margin-right: 10px;
+}
+.button-filter {
+  margin: 10px;
 }
 
 .backgroundchart {
