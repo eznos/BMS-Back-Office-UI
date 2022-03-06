@@ -132,7 +132,7 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
-                <v-btn large color="error" text @click="clearForm">
+                <v-btn color="error" text @click="clearForm">
                   ล้างข้อมูลที่กรอก
                 </v-btn>
                 <v-spacer></v-spacer>
@@ -174,7 +174,7 @@
           <!-- delete as selected -->
           <v-btn
             dark
-            color="#742872"
+            color="#D42C14"
             width="140"
             v-bind="attrs"
             v-on="on"
@@ -187,7 +187,7 @@
           <v-btn
             dark
             class="button-filter"
-            color="#561F55"
+            color="#F82E39"
             v-bind="attrs"
             v-on="on"
             @click="clear"
@@ -495,16 +495,16 @@ export default {
     modal: false,
     dialog: false,
     menu: false,
-    name: null,
+    name: "",
     zone: null,
     building: null,
     room: null,
-    electric_no: null,
-    water_no: null,
-    electric_meter_no: null,
-    water_meter_no: null,
-    type: null,
-    status: null,
+    electric_no: "",
+    water_no: "",
+    electric_meter_no: "",
+    water_meter_no: "",
+    type: "",
+    status: "",
     zonesBuildings: {
       เขตส่วนกลาง: ["2/11", "2/12"],
       เขตสุระ: ["21/120"],
@@ -688,12 +688,6 @@ export default {
     },
   },
   methods: {
- 
-    /**
-     * Filter for dessert names column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -722,11 +716,6 @@ export default {
       return value === this.statusFilterValue;
     },
 
-    /**
-     * Filter for เลขห้องพัก column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
     editItem(item) {
       this.editedIndex = this.building.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -755,7 +744,7 @@ export default {
         this.editedIndex = -1;
       });
     },
-    // save form
+    // add user
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.building[this.editedIndex], this.editedItem);
@@ -763,8 +752,8 @@ export default {
         this.building.push(this.editedItem);
       }
       this.close();
-        
     },
+    // clear input filter
     clear() {
       (this.NamefilterValue = null),
         (this.zoneFilterValue = null),
@@ -799,7 +788,18 @@ export default {
     },
     // clear form add user
     clearForm() {
-      this.$refs.form.reset();
+      // this.$refs.form.reset();
+      (this.editedItem.name = null),
+        (this.editedItem.electric_no = null),
+        (this.editedItem.water_no = null),
+        (this.editedItem.zone = null),
+        (this.editedItem.building = null),
+        (this.editedItem.room = null),
+        (this.editedItem.electric_meter_no = null),
+        (this.editedItem.water_meter_no = null),
+        (this.editedItem.type = null),
+        (this.editedItem.status = null);
+      // this.name = ""
     },
     // validate form
   },
