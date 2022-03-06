@@ -27,6 +27,7 @@
                         v-model="latitude"
                         append-icon="mdi-latitude"
                         label="ละติจูด"
+                        required
                         :rules="[rules.latitudeRules.regex]"
                         clearable
                       >
@@ -37,14 +38,17 @@
                         v-model="longitude"
                         append-icon="mdi-longitude"
                         label="ลองติจูด"
+                        required
                         :rules="[rules.longitudeRules.regex]"
                         clearable
                       ></v-text-field>
                     </v-col>
                     <v-col>
                       <v-text-field
+                        required
                         append-icon="mdi-map-legend"
                         label="ชื่อเขต"
+                        :rules="rules.name"
                       >
                       </v-text-field>
                     </v-col>
@@ -54,7 +58,7 @@
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" text @click="dialog = false">
+                <v-btn color="primary" :disabled="!valid" text @click="dialog = false">
                   ยืนยันการเพิ่มพื้นที่เขต
                 </v-btn>
               </v-card-actions>
@@ -74,7 +78,7 @@
         <GmapMap
           class="map-responsive"
           :zoom="15"
-          map-type-id="hybrid"
+          map-type-id="roadmap"
           settilt:45.
           :center="{ lat: 14.9799, lng: 102.097771 }"
         >
@@ -125,6 +129,9 @@ export default {
             /^(\+|-)?(?:180(?:(?:\.0{1,6})?)|(?:[0-9]|[1-9][0-9]|1[0-7][0-9])(?:(?:\.[0-9]{1,6})?))$/.test(
               v
             ) || "ลองจิจูดไม่ถูกต้อง",
+        },
+        name: {
+          required: (v) => !!v || "กรุณาใส่ชื่อเขต",
         },
       },
     };

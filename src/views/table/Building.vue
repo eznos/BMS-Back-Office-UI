@@ -1,8 +1,9 @@
 <template>
   <v-app id="app">
-    <!-- title and bottom -->
+    <!-- title and buttom -->
     <div class="pa-3 content background-main">
       <v-row justify="space-between" class="px-3">
+        <!-- title -->
         <div class="mb-4">
           <v-row style="align-items: center">
             <div class="ml-3 mt-2">
@@ -26,9 +27,7 @@
             </template>
             <v-card>
               <v-card-title>
-                <div class="myFont">
-                  <span>{{ formTitle }}</span>
-                </div>
+                <span>{{ formTitle }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
@@ -39,6 +38,9 @@
                         <v-text-field
                           v-model="editedItem.name"
                           label="ชื่อ-นามสกุล"
+                          required
+                          :rules="rules.nameRules"
+                          autofocus
                         ></v-text-field>
                       </v-col>
                       <!-- zone -->
@@ -48,6 +50,8 @@
                           :items="zones"
                           label="พื้นที่"
                           clearable
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -58,6 +62,8 @@
                           :items="buildings"
                           label="อาคาร"
                           clearable
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -68,6 +74,8 @@
                           label="เลขห้องพัก"
                           :items="rooms"
                           clearable
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -78,6 +86,9 @@
                           label="เลขผู้ใช้ไฟฟ้า"
                           @keypress="isNumber($event)"
                           clearable
+                          required
+                          counter="12"
+                          :rules="rules.electricNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- water_no -->
@@ -87,6 +98,9 @@
                           label="เลขผู้ใช้น้ำ"
                           @keypress="isNumber($event)"
                           clearable
+                          required
+                          counter="4"
+                          :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- electric_meter_no -->
@@ -96,6 +110,9 @@
                           label="เลขมิเตอร์น้ำไฟฟ้า"
                           @keypress="isNumber($event)"
                           clearable
+                          required
+                          counter="11"
+                          :rules="rules.electricMeterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- water_meter_no -->
@@ -105,6 +122,9 @@
                           label="เลขมิเตอร์น้ำประปา"
                           @keypress="isNumber($event)"
                           clearable
+                          required
+                          counter="4"
+                          :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- type -->
@@ -114,6 +134,8 @@
                           :items="types"
                           label="ประเภทห้องพัก"
                           clearable
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-select>
                       </v-col>
@@ -124,9 +146,12 @@
                           :items="status"
                           label="สถานะห้องพัก"
                           clearable
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-select>
                       </v-col>
+
                     </v-row>
                   </v-form>
                 </v-container>
@@ -219,7 +244,6 @@
           :items="zones"
         >
         </v-select>
-
         <!-- search by building -->
         <v-select
           v-model="buildFilterValue"
@@ -231,7 +255,6 @@
           :items="buildings"
         >
         </v-select>
-
         <!-- search by status -->
         <v-select
           v-model="statusFilterValue"
@@ -259,6 +282,11 @@
             loading-text="กำลังโหลด... โปรดรอสักครู่"
             show-select
           >
+            <template v-slot:item.status="{ item }">
+              <v-chip :color="getColor(item.status)" dark>
+                {{ item.status }}
+              </v-chip>
+            </template>
             <template v-slot:top>
               <!-- v-container, v-col and v-row are just for decoration purposes. -->
             </template>
@@ -594,6 +622,25 @@ export default {
       water_meter_no: "",
       status: "ว่าง",
     },
+    rules: {
+      nameRules: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length >= 2) || "กรอกชื่อให้มากกว่า 2 ตัวอักษร",
+      ],
+      zonesBuildingsRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
+      waterNumber: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length == 4) || "กรอกชื่อให้มากกว่า 2 ตัวอักษร",
+      ],
+      electricNumber: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length == 12) || "กรอกเลขผู้ใช้ไฟฟ้าไม่ครบ 12 ตัว",
+      ],
+      electricMeterNumber: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length == 11) || "กรอกเลขมิเตอร์ไฟฟ้าไม่ครบ 11 ตัว",
+      ],
+    },
   }),
   computed: {
     formTitle() {
@@ -792,16 +839,19 @@ export default {
       (this.editedItem.name = null),
         (this.editedItem.electric_no = null),
         (this.editedItem.water_no = null),
-        (this.editedItem.zone = null),
-        (this.editedItem.building = null),
-        (this.editedItem.room = null),
+        (this.editedItem.zone = ""),
+        (this.editedItem.building = ""),
+        (this.editedItem.room = ""),
         (this.editedItem.electric_meter_no = null),
         (this.editedItem.water_meter_no = null),
         (this.editedItem.type = null),
         (this.editedItem.status = null);
-      // this.name = ""
     },
-    // validate form
+    // color of status
+    getColor(status) {
+      if (status == "ไม่ว่าง") return "red";
+      else return "agree";
+    },
   },
 };
 </script>
@@ -832,15 +882,12 @@ export default {
   width: 100%;
   margin: 20px auto;
 }
-
 .mx-auto {
   font-size: 30px;
 }
-
 .header-blue .v-data-table-header {
   background-color: #466bb2 !important;
 }
-
 .filter {
   padding: 10px;
   margin-left: 10px;
@@ -849,7 +896,6 @@ export default {
 .button-filter {
   margin: 10px;
 }
-
 .backgroundchart {
   background-image: linear-gradient(135deg, #ed6ea0 20%, #ec8c69 90%);
 }
