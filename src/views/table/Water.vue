@@ -13,11 +13,11 @@
         </div>
         <!-- button -->
         <div>
-          <!-- water diff_price_cal -->
+          <!-- water diff_price_cal ยังไม่เสร็จจร้าาาา -->
           <v-dialog
-            v-model="difference_price_calculate"
+            v-model="differencePriceCalculate"
             persistent
-            max-width="500px"
+            max-width="70%"
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
@@ -37,34 +37,50 @@
               >
               <v-card-text>
                 <v-row>
-                  <v-col cols="12">
-                    <v-select
+                  <v-col cols="4">
+                    <v-autocomplete
+                      v-model="zonesCalculate"
                       label="โซนพื้นที่ของอาคารบ้านพัก"
-                      :items="zone"
+                      :items="zones"
                       prepend-icon="mdi-map-legend"
-                      multiple
                       clearable
-                      chips
+                      autofocus
+                    ></v-autocomplete>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-select
+                      v-model="buildingsCalculate"
+                      label="อาคารบ้านพัก"
+                      :items="buildings"
+                      prepend-icon="mdi-map-legend"
+                      clearable
                     >
                     </v-select>
                   </v-col>
-                  <v-col cols="12">
+                  <v-col cols="4">
                     <v-text-field
-                      v-model="zone_meter"
+                      v-model.number="editedItem.meterZone"
                       label="ค่าน้ำจากมิเตอร์ใหญ่"
                       prepend-icon="mdi-car-speed-limiter"
                       clearable
+                      @keypress="isNumber($event)"
+                    >
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field
+                      v-model.number="editedItem.meterSum"
+                      label="ค่าน้ำที่จดได้"
+                      prepend-icon="mdi-gauge"
+                      clearable
+                      @keypress="isNumber($event)"
                     >
                     </v-text-field>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field
-                      v-model="sum_unit"
-                      label="ค่าน้ำที่จดได้"
-                      prepend-icon="mdi-gauge"
-                      clearable
-                    >
-                    </v-text-field>
+                    <v-output-text label="" v-model="editedItem.total">
+                      ค่าน้ำส่วนต่าง {{ total }} บาท
+                    </v-output-text>
                   </v-col>
                 </v-row>
               </v-card-text>
@@ -73,20 +89,20 @@
                 <v-btn
                   color="warning"
                   text
-                  @click="difference_price_calculate = false"
+                  @click="differencePriceCalculate = false"
                   >ยกเลิก</v-btn
                 >
                 <v-btn
                   color="agree"
                   text
-                  @click="difference_price_calculate = false"
+                  @click="differencePriceCalculate = false"
                   >ยืนยันข้อมูล</v-btn
                 >
               </v-card-actions>
             </v-card>
           </v-dialog>
           <!-- add user -->
-          <v-dialog v-model="dialog" persistent max-width="500px">
+          <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 class="button-filter"
@@ -100,103 +116,151 @@
             </template>
             <v-card>
               <v-card-title>
-                <div class="myFont">
-                  <span>{{ formTitle }}</span>
-                </div>
+                <span>{{ formTitle }}</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="ชื่อ-นามสกุล"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.room_no"
-                        label="เลขห้องพัก"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_no"
-                        label="เลขผู้ใช้น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.water_meter_no"
-                        label="เลขมิเตอร์น้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.price"
-                        label="ค่าน้ำ"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.diff_price"
-                        label="ค่าน้ำส่วนต่าง"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.status"
-                        :items="state"
-                        label="สถานะ"
-                      >
-                      </v-select>
-                    </v-col>
-                    <!-- bill pay -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-dialog
-                        ref="dialog"
-                        v-model="modal"
-                        persistent
-                        width="290px"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="editedItem.date_pay"
-                            label="รอบบิล"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="editedItem.date_pay"
-                          type="month"
-                          locale="th-TH"
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.rank"
+                          label="ยศ"
+                          autofocus
+                          required
+                          :rules="rules.buildingRoom"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.name"
+                          label="ชื่อ-นามสกุล"
+                          required
+                          :rules="rules.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          label="พื้นที่เขต"
+                          v-model="editedItem.zone"
+                          :items="zones"
+                          :rules="rules.buildingRoom"
                         >
-                          <v-spacer></v-spacer>
-                          <v-btn text color="warning" @click="modal = false">
-                            ยกเลิก
-                          </v-btn>
-                          <v-btn
-                            text
-                            color="agree"
-                            @click="$refs.dialog.save(editedItem.date_pay)"
+                        </v-autocomplete>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          label="อาคาร"
+                          v-model="editedItem.building"
+                          :items="buildings"
+                          :rules="rules.buildingRoom"
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          label="เลขห้องพัก"
+                          v-model="editedItem.room"
+                          :items="rooms"
+                          :rules="rules.buildingRoom"
+                          @keypress="isNumber($event)"
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.water_no"
+                          label="เลขผู้ใช้น้ำ"
+                          @keypress="isNumber($event)"
+                          required
+                          :rules="rules.waterNumber"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.water_meter_no"
+                          label="เลขมิเตอร์น้ำ"
+                          @keypress="isNumber($event)"
+                          required
+                          :rules="rules.waterMeterNumber"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.price"
+                          label="ค่าน้ำ"
+                          @keypress="isNumber($event)"
+                          required
+                          :rules="rules.buildingRoom"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.total"
+                          label="ค่าน้ำส่วนต่าง"
+                          disabled
+                          value="this.place"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-select
+                          v-model="editedItem.status"
+                          :items="state"
+                          label="สถานะ"
+                          required
+                          :rules="rules.buildingRoom"
+                        >
+                        </v-select>
+                      </v-col>
+                      <!-- bill pay -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-dialog
+                          ref="dialog"
+                          v-model="modal"
+                          persistent
+                          width="290px"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-text-field
+                              v-model="editedItem.date_pay"
+                              label="รอบบิล"
+                              prepend-icon="mdi-calendar"
+                              readonly
+                              v-bind="attrs"
+                              v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            v-model="editedItem.date_pay"
+                            type="month"
+                            locale="th-TH"
                           >
-                            ยืนยัน
-                          </v-btn>
-                        </v-date-picker>
-                      </v-dialog>
-                    </v-col>
-                  </v-row>
+                            <v-spacer></v-spacer>
+                            <v-btn text color="warning" @click="modal = false">
+                              ยกเลิก
+                            </v-btn>
+                            <v-btn
+                              text
+                              color="agree"
+                              @click="$refs.dialog.save(editedItem.date_pay)"
+                            >
+                              ยืนยัน
+                            </v-btn>
+                          </v-date-picker>
+                        </v-dialog>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  ยกเลิก
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> ยืนยัน </v-btn>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
+                  <v-btn color="agree" :disabled="!valid" text @click="save">
+                    ยืนยัน
+                  </v-btn></v-form
+                >
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -405,14 +469,81 @@
 export default {
   data: () => ({
     el: "#app",
-    valid: false,
+    valid: true,
+    meterSum: "",
+    meterZone: "",
     modal: false,
+    zonesCalculate: "",
+    buildingsCalculate: "",
     dialog: false,
-    difference_price_calculate: false,
+    emailtarget: "",
+    differencePriceCalculate: false,
     importExcel: false,
     exportExcelwater: false,
     menu: false,
-    zone: ["1", "2", "3", "4", "5"],
+    zonesBuildings: {
+      เขตส่วนกลาง: ["2/11", "2/12"],
+      เขตสุระ: ["21/120"],
+      เขตอังฏดาง: ["2/19"],
+    },
+    buildingsRooms: {
+      "2/11": [
+        "97",
+        "99",
+        "101",
+        "103",
+        "105",
+        "107",
+        "109",
+        "111",
+        "113",
+        "115",
+        "117",
+        "119",
+      ],
+      "2/12": [
+        "73",
+        "75",
+        "77",
+        "79",
+        "81",
+        "83",
+        "85",
+        "87",
+        "89",
+        "91",
+        "93",
+        "95",
+      ],
+      "2/19": [
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+        "109",
+        "110",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "207",
+        "208",
+        "209",
+        "210",
+        "301",
+        "302",
+        "303",
+      ],
+      "21/99": ["1100", "1012", "1413"],
+      "21/120": ["101", "120", "130"],
+      "21/123": ["110", "102", "103"],
+    },
     search: "",
     direction: "bottom",
     dialogDelete: false,
@@ -428,14 +559,14 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-      room_no: "",
+      room: "",
       water_no: "",
       water_meter_no: "",
       status: "Non Approve",
     },
     defaultItem: {
       name: "",
-      room_no: "",
+      room: "",
       water_no: "",
       water_meter_no: "",
       status: "Non Approve",
@@ -451,12 +582,26 @@ export default {
             v
           ) || "อีเมลไม่ถูกต้อง",
       },
+      name: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length >= 2) || "กรอกชื่อให้มากกว่า 2 ตัวอักษร",
+      ],
+      waterNumber: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length == 4) || "กรอกเลขผู้ใช้น้ำประปาไม่ครบ 4 ตัว",
+      ],
+      waterMeterNumber: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length == 4) || "กรอกเลขมิเตอร์น้ำประปาไม่ครบ 4 ตัว",
+      ],
+      buildingRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "เพิ่มผู้ใช้น้ำ" : "แก้ไขผู้ใช้น้ำ";
     },
+    // header table
     headers() {
       return [
         {
@@ -470,8 +615,12 @@ export default {
           filter: this.nameFilter,
         },
         {
+          text: "อาคาร",
+          value: "building",
+        },
+        {
           text: "เลขห้องพัก",
-          value: "room_no",
+          value: "room",
           filter: this.roomFilter,
         },
         {
@@ -493,7 +642,9 @@ export default {
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value: "diff_price",
+          value:
+            parseInt(this.editedItem.meterSum) -
+            parseInt(this.editedItem.meterZone),
         },
         {
           text: "ค่าน้ำรวม",
@@ -511,6 +662,39 @@ export default {
         },
       ];
     },
+    // differencePriceCalculate
+    total: function () {
+      return (
+        parseInt(this.editedItem.meterSum) - parseInt(this.editedItem.meterZone)
+      );
+    },
+    // autocomplete
+    zones() {
+      return Object.keys(this.zonesBuildings);
+    },
+    buildings() {
+      // zonesCalculate
+      // autocomplete in filter
+      if (this.zonesCalculate) {
+        return this.zonesBuildings[this.zonesCalculate];
+      }
+      if (this.zoneFilterValue) {
+        return this.zonesBuildings[this.zoneFilterValue];
+      }
+      // autocomplete in form
+      if (!this.editedItem.zone) {
+        return "ไม่มีข้อมูล";
+      } else {
+        return this.zonesBuildings[this.editedItem.zone];
+      }
+    },
+    rooms() {
+      if (!this.editedItem.building) {
+        return "ไม่มีข้อมูล";
+      } else {
+        return this.buildingsRooms[this.editedItem.building];
+      }
+    },
   },
 
   watch: {
@@ -523,11 +707,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Filter for dessert names column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -555,11 +734,6 @@ export default {
       }
       return value == this.dateFilterValue;
     },
-    /**
-     * Filter for เลขห้องพัก column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
     editItem(item) {
       this.editedIndex = this.electric.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -619,6 +793,20 @@ export default {
         typeof value === "string" &&
         value.toString().toLocaleUpperCase().indexOf(search) !== -1
       );
+    },
+    // number only in text field
+    isNumber: function (evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
     },
   },
 };
