@@ -36,68 +36,85 @@
                 คำนวนค่าน้ำส่วนต่าง</v-card-title
               >
               <v-card-text>
-                <v-row>
-                  <v-col cols="4">
-                    <v-autocomplete
-                      v-model="zonesCalculate"
-                      label="โซนพื้นที่ของอาคารบ้านพัก"
-                      :items="zones"
-                      prepend-icon="mdi-map-legend"
-                      clearable
-                      autofocus
-                    ></v-autocomplete>
-                  </v-col>
-                  <v-col cols="4">
-                    <v-select
-                      v-model="buildingsCalculate"
-                      label="อาคารบ้านพัก"
-                      :items="buildings"
-                      prepend-icon="mdi-map-legend"
-                      clearable
-                    >
-                    </v-select>
-                  </v-col>
-                  <v-col cols="4">
-                    <v-text-field
-                      v-model.number="editedItem.meterZone"
-                      label="ค่าน้ำจากมิเตอร์ใหญ่"
-                      prepend-icon="mdi-car-speed-limiter"
-                      clearable
-                      @keypress="isNumber($event)"
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="4">
-                    <v-text-field
-                      v-model.number="editedItem.meterSum"
-                      label="ค่าน้ำที่จดได้"
-                      prepend-icon="mdi-gauge"
-                      clearable
-                      @keypress="isNumber($event)"
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-output-text label="" v-model="editedItem.total">
-                      ค่าน้ำส่วนต่าง {{ total }} บาท
-                    </v-output-text>
-                  </v-col>
-                </v-row>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-row>
+                    <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
+                    <v-col cols="4">
+                      <v-select
+                        v-model="meterGroup"
+                        label="สายของมิเตอร์น้ำ"
+                        prepend-icon="mdi-home-group"
+                        required
+                        :rules="rules.buildingRoom"
+                        autofocus
+                        :items="meterGroups"
+                      >
+                      </v-select>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-text-field
+                        v-model.number="numberOfroom"
+                        label="จำนวนห้องที่มีผู้อยู่อาศัย"
+                        prepend-icon="mdi-numeric"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-text-field
+                        v-model.number="editedItem.meterZone"
+                        label="ค่าน้ำจากมิเตอร์ใหญ่"
+                        prepend-icon="mdi-car-speed-limiter"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="4">
+                      <v-text-field
+                        v-model.number="editedItem.meterSum"
+                        label="ค่าน้ำที่จดได้"
+                        prepend-icon="mdi-gauge"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <h3>
+                        ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
+                        {{ this.meterGroup }}
+                      </h3>
+                    </v-col>
+                  </v-row>
+                </v-form>
               </v-card-text>
               <v-card-actions>
+                <v-btn color="error" text @click="clearDifferences"
+                  >ล้างข้อมูลที่กรอก</v-btn
+                >
                 <v-spacer></v-spacer>
-                <v-btn
-                  color="warning"
-                  text
-                  @click="differencePriceCalculate = false"
-                  >ยกเลิก</v-btn
-                >
-                <v-btn
-                  color="agree"
-                  text
-                  @click="differencePriceCalculate = false"
-                  >ยืนยันข้อมูล</v-btn
-                >
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn
+                    color="warning"
+                    text
+                    @click="differencePriceCalculate = false"
+                    >ยกเลิก</v-btn
+                  >
+                  <v-btn
+                    color="agree"
+                    text
+                    :disabled="!valid"
+                    @click="differencePriceCalculate = false"
+                    >ยืนยันข้อมูล</v-btn
+                  >
+                </v-form>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -173,6 +190,7 @@
                           label="เลขผู้ใช้น้ำ"
                           @keypress="isNumber($event)"
                           required
+                          counter="4"
                           :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
@@ -182,6 +200,7 @@
                           label="เลขมิเตอร์น้ำ"
                           @keypress="isNumber($event)"
                           required
+                          counter="4"
                           :rules="rules.waterMeterNumber"
                         ></v-text-field>
                       </v-col>
@@ -196,7 +215,7 @@
                       </v-col>
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.total"
+                          v-model="editedItem.difference"
                           label="ค่าน้ำส่วนต่าง"
                           disabled
                           value="this.place"
@@ -254,6 +273,9 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
+                <v-btn color="red" text @click="clearForm"
+                  >ล้างข้อมูลที่กรอก</v-btn
+                >
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
@@ -265,7 +287,7 @@
             </v-card>
           </v-dialog>
           <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" max-width="75%">
             <v-card>
               <v-card-title class="text-h5"
                 >ต้องการลบผู้ใช้น้ำคนนี้หรือไม่?</v-card-title
@@ -308,7 +330,7 @@
             ลบการค้นหา
           </v-btn>
           <!-- import excel -->
-          <v-dialog v-model="importExcel" max-width="500px">
+          <v-dialog v-model="importExcel" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 class="button-filter"
@@ -323,23 +345,39 @@
             <v-card>
               <v-card-title> นำเข้าข้อมูล Excel </v-card-title>
               <v-card-text>
-                <v-file-input
-                  label="เลือกไฟล์ Excel ที่ต้องการ"
-                  counter
-                  multiple
-                  show-size
-                  :rules="rules.fotmat"
-                  type="file"
-                  accept=".xlsx, .xlsm, .xlsb, .xltx, .xltm,  .xls,  .xla,"
-                ></v-file-input>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-file-input
+                    label="เลือกไฟล์ Excel ที่ต้องการ"
+                    counter
+                    show-size
+                    :rules="rules.fotmat"
+                    type="file"
+                    required
+                    autofocus
+                    accept=".xlsx, .xlsm, .xlsb, .xltx, .xltm,  .xls,  .xla,"
+                  ></v-file-input>
+                </v-form>
               </v-card-text>
               <v-card-actions>
-                <v-btn color="agree" @click="importExcel = false"> ok </v-btn>
+                <v-spacer></v-spacer>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="warning" text @click="importExcel = false">
+                    ยกเลิก
+                  </v-btn>
+                  <v-btn
+                    color="agree"
+                    text
+                    :disabled="!valid"
+                    @click="importExcel = false"
+                  >
+                    ยืนยัน
+                  </v-btn>
+                </v-form>
               </v-card-actions>
             </v-card>
           </v-dialog>
           <!-- export excel to email -->
-          <v-dialog v-model="exportExcelwater" max-width="500px">
+          <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn color="#1572A1" class="filter" dark v-on="{ ...attrs }">
                 <v-icon> mdi-file-export-outline </v-icon>
@@ -351,30 +389,78 @@
                 ส่งออกข้อมูล Excel ของค่าน้ำประปาไปยังอีเมลที่ต้องการ
               </v-card-title>
               <v-card-text>
-                <v-row>
-                  <v-col cols="12">
-                    <v-select
-                      label="เลือกข้อมูลที่ต้องการส่งออก"
-                      :items="exportData"
-                      prepend-icon="mdi-file-excel"
-                    >
-                    </v-select>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-text-field
-                      label="อีเมลผู้รับ"
-                      :rules="[rules.email.regex]"
-                      v-model="emailtarget"
-                      prepend-icon="mdi-at"
-                    >
-                    </v-text-field>
-                  </v-col>
-                </v-row>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-row>
+                    <!-- date -->
+                    <v-col cols="12">
+                      <v-menu
+                        ref="menu"
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="70%"
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="dateExport"
+                            label="เลือกเดือนที่ต้องการ Export"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="dateExport"
+                          type="month"
+                          no-title
+                          scrollable
+                        >
+                          <v-spacer></v-spacer>
+                          <v-btn text color="primary" @click="menu = false">
+                            Cancel
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.menu.save(date)"
+                          >
+                            OK
+                          </v-btn>
+                        </v-date-picker>
+                      </v-menu>
+                    </v-col>
+                    <!-- email target -->
+                    <v-col cols="12">
+                      <v-text-field
+                        label="อีเมลผู้รับ"
+                        :rules="[rules.email.regex]"
+                        v-model="emailtarget"
+                        prepend-icon="mdi-at"
+                        autofocus
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-form>
               </v-card-text>
               <v-card-actions>
-                <v-btn color="agree" @click="exportExcelwater = false">
-                  ok
-                </v-btn>
+                <v-spacer></v-spacer>
+                <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="warning" text @click="exportExcelwater = false">
+                    ยกเลิก
+                  </v-btn>
+                  <v-btn
+                    color="agree"
+                    :disabled="!valid"
+                    text
+                    @click="exportExcelwater = false"
+                  >
+                    ยืนยัน
+                  </v-btn>
+                </v-form>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -391,15 +477,26 @@
           class="filter"
           clearable
         ></v-text-field>
+        <!-- Filter for  building-->
+        <v-select
+          v-model="buildingFilterValue"
+          prepend-icon="mdi-room-service"
+          label="ค้นหาด้วยอาคาร"
+          class="filter"
+          :items="buildings"
+          clearable
+        >
+        </v-select>
         <!-- Filter for  roomnumber-->
-        <v-text-field
+        <v-select
           v-model="roomFilterValue"
           prepend-icon="mdi-room-service"
-          type="text"
-          label="กรองด้วยเลขห้อง"
+          label="ค้นหาด้วยห้อง"
           class="filter"
+          :items="rooms"
           clearable
-        ></v-text-field>
+        >
+        </v-select>
         <!-- filter by date -->
         <v-dialog
           ref="dialog"
@@ -473,10 +570,12 @@ export default {
     meterSum: "",
     meterZone: "",
     modal: false,
-    zonesCalculate: "",
-    buildingsCalculate: "",
+    meterGroup: "",
+    meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
+    numberOfroom: "",
     dialog: false,
     emailtarget: "",
+    dateExport: new Date().toISOString().substr(0, 7),
     differencePriceCalculate: false,
     importExcel: false,
     exportExcelwater: false,
@@ -545,10 +644,10 @@ export default {
       "21/123": ["110", "102", "103"],
     },
     search: "",
-    direction: "bottom",
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
+    buildingFilterValue: "",
     roomFilterValue: "",
     dateFilterValue: "",
     date: "",
@@ -562,6 +661,8 @@ export default {
       room: "",
       water_no: "",
       water_meter_no: "",
+      differencePrice: 999,
+      date_pay: new Date().toISOString().substr(0, 7),
       status: "Non Approve",
     },
     defaultItem: {
@@ -569,6 +670,9 @@ export default {
       room: "",
       water_no: "",
       water_meter_no: "",
+      differencePrice: "",
+      sum_price: "",
+      date_pay: new Date().toISOString().substr(0, 7),
       status: "Non Approve",
     },
     rules: {
@@ -617,6 +721,7 @@ export default {
         {
           text: "อาคาร",
           value: "building",
+          filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
@@ -642,9 +747,7 @@ export default {
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value:
-            parseInt(this.editedItem.meterSum) -
-            parseInt(this.editedItem.meterZone),
+          value: "differencePrice",
         },
         {
           text: "ค่าน้ำรวม",
@@ -663,34 +766,43 @@ export default {
       ];
     },
     // differencePriceCalculate
-    total: function () {
-      return (
-        parseInt(this.editedItem.meterSum) - parseInt(this.editedItem.meterZone)
-      );
+    difference: function () {
+      if (this.editedItem.meterSum == null) {
+        return 0;
+      } else {
+        return (
+          (parseInt(this.editedItem.meterSum) -
+            parseInt(this.editedItem.meterZone)) /
+          parseInt(this.numberOfroom)
+        );
+      }
     },
     // autocomplete
     zones() {
       return Object.keys(this.zonesBuildings);
     },
     buildings() {
-      // zonesCalculate
-      // autocomplete in filter
+      // for filter
+      if (this.buildingFilterValue) {
+        return Object.keys(this.buildingsRooms);
+      }
+      // autocomplete in calculator difference price
       if (this.zonesCalculate) {
         return this.zonesBuildings[this.zonesCalculate];
       }
-      if (this.zoneFilterValue) {
-        return this.zonesBuildings[this.zoneFilterValue];
-      }
       // autocomplete in form
       if (!this.editedItem.zone) {
-        return "ไม่มีข้อมูล";
+        return ["ไม่มีข้อมูล"];
       } else {
         return this.zonesBuildings[this.editedItem.zone];
       }
     },
     rooms() {
+      if (this.buildingFilterValue) {
+        return this.buildingsRooms[this.buildingFilterValue];
+      }
       if (!this.editedItem.building) {
-        return "ไม่มีข้อมูล";
+        return ["ไม่มีข้อมูล"];
       } else {
         return this.buildingsRooms[this.editedItem.building];
       }
@@ -715,6 +827,12 @@ export default {
       // Check if the current loop value (The dessert name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
+    },
+    buildingFilter(value) {
+      if (!this.buildingFilterValue) {
+        return true;
+      }
+      return value === this.buildingFilterValue;
     },
     roomFilter(value) {
       if (!this.roomFilterValue) {
@@ -780,6 +898,7 @@ export default {
     },
     clear() {
       (this.NamefilterValue = ""),
+        (this.buildingFilterValue = ""),
         (this.roomFilterValue = ""),
         (this.stateFilterValue = ""),
         (this.dateFilterValue = "");
@@ -807,6 +926,26 @@ export default {
       } else {
         return true;
       }
+    },
+    // clear input form
+    clearForm() {
+      // this.$refs.form.reset();
+      (this.editedItem.name = null),
+        (this.editedItem.electric_no = null),
+        (this.editedItem.water_no = null),
+        (this.editedItem.zone = ""),
+        (this.editedItem.building = ""),
+        (this.editedItem.room = ""),
+        (this.editedItem.price = null),
+        (this.editedItem.water_meter_no = null),
+        (this.editedItem.date_pay = null),
+        (this.editedItem.status = null);
+    },
+    clearDifferences() {
+      (this.numberOfroom = ""),
+        (this.meterGroup = ""),
+        (this.editedItem.meterZone = ""),
+        (this.editedItem.meterSum = "");
     },
   },
 };
