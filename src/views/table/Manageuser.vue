@@ -12,9 +12,9 @@
         </div>
         <div>
           <!-- add user -->
-          <v-dialog v-model="dialog" persistent max-width="500px">
+          <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="#9B3499" dark v-on="{ ...attrs }">
+              <v-btn color="#9B3499" class="filter" dark v-on="{ ...attrs }">
                 <v-icon> mdi-account-plus </v-icon>
                 เพื่มผู้ใช้งาน
               </v-btn>
@@ -27,34 +27,60 @@
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="ชื่อ-นามสกุล"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.permission"
-                        label="ตำแหน่ง"
-                      ></v-text-field>
-                    </v-col>
-
-                  </v-row>
+                  <v-form ref="form" v-model="valid" lazy-validation>
+                    <v-row>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.fristName"
+                          label="ชื่อ"
+                          autofocus
+                          required
+                          :rules="rules.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.lastName"
+                          label="นามสกุล"
+                          required
+                          :rules="rules.name"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.email"
+                          label="อีเมล"
+                          required
+                          :rules="[rules.email.regex]"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6" md="4">
+                        <v-select
+                          v-model="editedItem.permission"
+                          label="ตำแหน่ง"
+                          :items="permission"
+                          required
+                          :rules="rules.name"
+                        >
+                        </v-select>
+                      </v-col>
+                    </v-row>
+                  </v-form>
                 </v-container>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  ยกเลิก
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> ยืนยัน </v-btn>
+                <v-form>
+                  <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
+                  <v-btn color="agree" text :disabled="!valid" @click="save">
+                    ยืนยัน
+                  </v-btn>
+                </v-form>
               </v-card-actions>
             </v-card>
           </v-dialog>
           <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" max-width="75%">
             <v-card>
               <v-card-title class="text-h5"
                 >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
@@ -79,12 +105,20 @@
             v-bind="attrs"
             v-on="on"
             @click="clear"
-            class="ml-2 filter"
+            class="filter"
           >
             <v-icon>mdi-delete-sweep</v-icon>
             ลบข้อมูลที่เลือก
           </v-btn>
-          <v-btn dark color="#561F55" v-bind="attrs" v-on="on" @click="clear">
+          <!-- clear -->
+          <v-btn
+            dark
+            color="#561F55"
+            class="filter"
+            v-bind="attrs"
+            v-on="on"
+            @click="clear"
+          >
             <v-icon>mdi-delete</v-icon>
             ลบการค้นหา
           </v-btn>
@@ -101,10 +135,9 @@
           clearable
           class="filter"
         ></v-text-field>
-
         <!-- search by permission -->
         <v-select
-          v-model="statusFilter"
+          v-model="statusFilterValue"
           prepend-icon=""
           label="กรองตำแหน่ง"
           :items="permission"
@@ -112,16 +145,6 @@
           class="filter"
         >
         </v-select>
-                <!-- Filter for  status-->
-        <v-text-field
-          v-model="statusFilterValue"
-          prepend-icon="mdi-magnify"
-          type="text"
-          label="ค้นหาด้วยสถานะ"
-          clearable
-          class="filter"
-        ></v-text-field>
-
       </v-row>
     </div>
     <v-container>
@@ -138,7 +161,6 @@
             loading
             loading-text="กำลังโหลด... โปรดรอสักครู่"
             show-select
-            :hide-default-footer="true"
           >
             <template v-slot:top>
               <!-- v-container, v-col and v-row are just for decoration purposes. -->
@@ -166,7 +188,7 @@ export default {
     modal: false,
     dialog: false,
     menu: false,
-    permission: ["ว่าง", "ไม่ว่าง"],
+    permission: ["admin", "user"],
     search: "",
     dialogDelete: false,
     // Filter models.
@@ -176,13 +198,26 @@ export default {
     editedIndex: -1,
     editedItem: {
       name: "",
-
       permission: "",
     },
     defaultItem: {
       name: "",
-
       permission: "",
+    },
+    rules: {
+      name: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) =>
+          (v && v.length >= 2) || "กรอกชื่อหรือนามสกุลให้มากกว่า 2 ตัวอักษร",
+      ],
+
+      email: {
+        required: (v) => !!v || "กรุณาใส่อีเมลของผู้รับ",
+        regex: (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            v
+          ) || "อีเมลไม่ถูกต้อง",
+      },
     },
   }),
   computed: {
@@ -193,19 +228,26 @@ export default {
       return [
         {
           text: "ชื่อผู้ใช้งาน",
-          value: "name",
+          value: "fristName",
           align: "left",
-          // filter: this.nameFilter,
+          search: "",
+          filter: this.nameFilter,
+        },
+        {
+          text: "ชื่อนามสกุลผู้ใช้งาน",
+          value: "lastName",
+          align: "left",
+          search: "",
+        },
+        // email
+        {
+          text: "อีเมล",
+          value: "email",
         },
         {
           text: "ตำแหน่ง",
           value: "permission",
-          filter: this.stateFilter,
-        },
-        {
-          text: "สถานะ",
-          value: "status",
-          search: "",
+          filter: this.statusFilter,
         },
         {
           text: "การจัดการ",
@@ -329,7 +371,6 @@ export default {
   padding: 15px;
   margin-top: 15px;
 }
-
 
 .mx-auto {
   font-size: 30px;
