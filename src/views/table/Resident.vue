@@ -228,7 +228,7 @@
           clearable
         ></v-text-field>
         <!-- filter for zone -->
-        <v-select
+        <v-autocomplete
           class="filter"
           prepend-icon="mdi-room-service"
           v-model="zoneFilterValue"
@@ -236,33 +236,33 @@
           label="ค้นหาด้วยพื้นที่"
           clearable
         >
-        </v-select>
+        </v-autocomplete>
         <!-- filter for building -->
-        <v-select
+        <v-autocomplete
           class="filter"
           prepend-icon="mdi-room-service"
-          v-model="zoneFilterValue"
+          v-model="buildingFilterValue"
           :items="buildings"
           label="ค้นหาด้วยอาคาร"
           clearable
         >
-        </v-select>
+        </v-autocomplete>
         <!-- Filter for  roomnumber-->
-        <v-select
+        <v-autocomplete
           class="filter"
           prepend-icon="mdi-room-service"
-          v-model="zoneFilterValue"
+          v-model="roomFilterValue"
           :items="rooms"
           label="ค้นหาด้วยเลขห้อง"
           clearable
         >
-        </v-select>
+        </v-autocomplete>
       </v-row>
     </div>
     <!-- start data-table -->
     <v-data-table
       :headers="headers"
-      :items="electric"
+      :items="resident"
       item-key="name"
       :items-per-page="5"
       class="elevation-1 pa-6"
@@ -295,8 +295,11 @@ export default {
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
-    roomFilterValue: "",
+
     dateFilterValue: "",
+    zoneFilterValue: "",
+    buildingFilterValue: "",
+    roomFilterValue: "",
     zonesBuildings: {
       เขตส่วนกลาง: ["2/11", "2/12"],
       เขตสุระ: ["21/120"],
@@ -361,9 +364,7 @@ export default {
       "21/123": ["110", "102", "103"],
     },
     date: "",
-    stateFilterValue: "",
-    state: ["Approve", "Non Approve"],
-    electric: [],
+    resident: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -418,20 +419,20 @@ export default {
         {
           text: "ชื่อ",
           value: "fristName",
-          filter: this.filterOnlyCapsText,
         },
         {
           text: "นามสกุล",
           value: "lastName",
-          filter: this.filterOnlyCapsText,
         },
         {
           text: "พื้นที่",
           value: "zone",
+          filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
           value: "building",
+          filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
@@ -479,6 +480,9 @@ export default {
       }
     },
     rooms() {
+      if (this.buildingFilterValue) {
+        return this.buildingsRooms[this.buildingFilterValue];
+      }
       if (!this.editedItem.building) {
         return "ไม่มีข้อมูล";
       } else {
@@ -504,36 +508,39 @@ export default {
 
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
+    //  zone filter
+    zoneFilter(value) {
+      if (!this.zoneFilterValue) {
+        return true;
+      }
+      return value === this.zoneFilterValue;
+    },
+    // buildingFilter
+    buildingFilter(value) {
+      if (!this.buildingFilterValue) {
+        return true;
+      }
+      return value === this.buildingFilterValue;
+    },
+    // roomFilter
     roomFilter(value) {
       if (!this.roomFilterValue) {
         return true;
       }
       return value === this.roomFilterValue;
     },
-    stateFilter(value) {
-      if (!this.stateFilterValue) {
-        return true;
-      }
-      return value === this.stateFilterValue;
-    },
-    dateFilter(value) {
-      if (!this.dateFilterValue) {
-        return true;
-      }
-      return value == this.dateFilterValue;
-    },
     editItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.resident.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.resident.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      this.electric.splice(this.editedIndex, 1);
+      this.resident.splice(this.editedIndex, 1);
       this.closeDelete();
     },
     close() {
@@ -552,17 +559,17 @@ export default {
     },
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
+        Object.assign(this.resident[this.editedIndex], this.editedItem);
       } else {
-        this.electric.push(this.editedItem);
+        this.resident.push(this.editedItem);
       }
       this.close();
     },
     savea() {
       if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
+        Object.assign(this.resident[this.editedIndex], this.editedItem);
       } else {
-        this.electric.push(this.editedItem);
+        this.resident.push(this.editedItem);
       }
       this.close();
     },
