@@ -6,11 +6,11 @@ import th from 'vuetify/lib/locale/th'
 
 Vue.component('my-component', {
     methods: {
-      changeLocale() {
-        this.$vuetify.lang.current = 'th'
-      },
+        changeLocale() {
+            this.$vuetify.lang.current = 'th'
+        },
     },
-  })
+})
 export default new Vuetify({
     lang: {
         locales: { th },
@@ -35,7 +35,7 @@ export default new Vuetify({
                 warning: '#FFB14F',
                 agree: '#1AB202',
                 // cancel: '#F7E742',
-                background: '#D1D1D1 ',
+                background: '#DFDDDD',
             },
             options: {
                 customProperties: true
@@ -44,5 +44,5 @@ export default new Vuetify({
     },
     font: {
         family: 'Sarabun',
-      }
+    }
 });
