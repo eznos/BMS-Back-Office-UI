@@ -53,7 +53,7 @@
         <v-row>
           <!-- resident number -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6" class="rounded-xl">
+            <v-card elevation="6" class="rounded-lg">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -74,7 +74,7 @@
           </v-col>
           <!-- empty room -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6" class="rounded-xl">
+            <v-card elevation="6" class="rounded-lg">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -95,7 +95,7 @@
           </v-col>
           <!-- resodent enter in month -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6" class="rounded-xl">
+            <v-card elevation="6" class="rounded-lg">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -118,7 +118,7 @@
           </v-col>
           <!-- resident exit -->
           <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6" class="rounded-xl">
+            <v-card elevation="6" class="rounded-lg">
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
@@ -146,7 +146,7 @@
         <v-col cols="12" xs="12" sm="12" md="6" lg="6">
           <div>
             <!-- water -->
-            <v-card class="card-chart rounded-lg" >
+            <v-card elevation="6" class="card-chart rounded-lg">
               <v-card-title>
                 <div class="mx-auto">
                   <v-icon size="35px" color="#29DEFF">mdi-water-circle</v-icon>
@@ -164,9 +164,9 @@
         <v-col cols="12" xs="12" sm="12" md="6" lg="6">
           <div>
             <!-- electric -->
-            <v-card  class="card-chart rounded-lg" >
+            <v-card elevation="6" class="card-chart rounded-lg">
               <v-card-title>
-                <div class="mx-auto ">
+                <div class="mx-auto">
                   <v-icon size="35px" color="#FDFC15"
                     >mdi-lightning-bolt-circle</v-icon
                   >
