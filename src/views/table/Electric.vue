@@ -337,79 +337,104 @@
       <!-- filter -->
       <v-row justify="space-between" class="px-3">
         <!-- Filter for  name-->
-        <v-text-field
-          v-model="NamefilterValue"
-          prepend-icon="mdi-magnify"
-          type="text"
-          label="กรองด้วยชื่อ"
-          class="filter"
-          clearable
-        ></v-text-field>
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-text-field
+            v-model="NamefilterValue"
+            prepend-icon="mdi-magnify"
+            type="text"
+            label="กรองด้วยชื่อ"
+            class="filter"
+            clearable
+          ></v-text-field>
+        </v-col>
         <!-- Filter for  building-->
-        <v-select
-          v-model="buildingFilterValue"
-          prepend-icon="mdi-room-service"
-          label="ค้นหาด้วยอาคาร"
-          class="filter"
-          :items="buildings"
-          clearable
-        >
-        </v-select>
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-select
+            v-model="buildingFilterValue"
+            prepend-icon="mdi-room-service"
+            label="ค้นหาด้วยอาคาร"
+            class="filter"
+            :items="buildings"
+            clearable
+          >
+          </v-select>
+        </v-col>
         <!-- Filter for  roomnumber-->
-        <v-select
-          v-model="roomFilterValue"
-          prepend-icon="mdi-room-service"
-          label="ค้นหาด้วยห้อง"
-          class="filter"
-          :items="rooms"
-          clearable
-        >
-        </v-select>
-
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-select
+            v-model="roomFilterValue"
+            prepend-icon="mdi-room-service"
+            label="ค้นหาด้วยห้อง"
+            class="filter"
+            :items="rooms"
+            clearable
+          >
+          </v-select>
+        </v-col>
         <!-- filter by date -->
-        <v-dialog
-          ref="dialog"
-          v-model="modal"
-          :return-value.sync="date"
-          persistent
-          width="290px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field
-              v-model="date"
-              label="กรองด้วยเดือน"
-              prepend-icon="mdi-calendar"
-              readonly
-              v-bind="attrs"
-              v-on="on"
-              class="filter"
-              clearable
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="dateFilterValue" type="month" locale="th-TH">
-            <v-spacer></v-spacer>
-            <v-btn text color="warning" @click="modal = false"> ยกเลิก </v-btn>
-            <v-btn
-              text
-              color="agree"
-              @click="$refs.dialog.savea(dateFilterValue)"
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-dialog
+            ref="dialog"
+            v-model="modal"
+            :return-value.sync="date"
+            persistent
+            width="290px"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-text-field
+                v-model="date"
+                label="กรองด้วยเดือน"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+                class="filter"
+                clearable
+              ></v-text-field>
+            </template>
+            <v-date-picker
+              v-model="dateFilterValue"
+              type="month"
+              locale="th-TH"
             >
-              ยืนยัน
-            </v-btn>
-          </v-date-picker>
-        </v-dialog>
+              <v-spacer></v-spacer>
+              <v-btn text color="warning" @click="modal = false">
+                ยกเลิก
+              </v-btn>
+              <v-btn
+                text
+                color="agree"
+                @click="$refs.dialog.savea(dateFilterValue)"
+              >
+                ยืนยัน
+              </v-btn>
+            </v-date-picker>
+          </v-dialog>
+        </v-col>
         <!-- Filter for  status-->
-        <v-select
-          v-model="stateFilterValue"
-          :items="statuses"
-          prepend-icon="mdi-list-status"
-          label="กรองด้วยสถานะ"
-          class="filter"
-          clearable
-        ></v-select>
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-select
+            v-model="stateFilterValue"
+            :items="statuses"
+            prepend-icon="mdi-list-status"
+            label="กรองด้วยสถานะ"
+            class="filter"
+            clearable
+          ></v-select>
+        </v-col>
+        <!-- Filter for  something-->
+        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
+          <v-select
+            v-model="stateFilterValue"
+            :items="statuses"
+            prepend-icon="mdi-list-status"
+            label="กรองด้วยสถานะ"
+            class="filter"
+            clearable
+          ></v-select>
+        </v-col>
       </v-row>
     </div>
-
     <!-- start data-table -->
     <v-data-table
       :headers="headers"
@@ -443,7 +468,6 @@ export default {
     importExcel: false,
     exportExcelElectric: false,
     dateExport: new Date().toISOString().substr(0, 7),
-    exportDataelectric: ["1", "2", "3", "4", "5"],
     menu: false,
     search: "",
     building: null,
@@ -472,6 +496,42 @@ export default {
       electric_no: "",
       electirc_meter_no: "",
       status: "",
+    },
+    zonesBuildings: {
+      เขตส่วนกลาง: [
+        "2/11",
+        "2/12",
+        "2/13",
+        "2/14",
+        "2/15",
+        "2/16",
+        "2/17",
+        "2/18",
+      ],
+      เขตสุระ: [
+        "2/20",
+        "2/21",
+        "2/22",
+        "2/23",
+        "2/24",
+        "2/25",
+        "2/26",
+        "2/27",
+        "2/28",
+        "2/29",
+        "2/31",
+        "2/32",
+        "2/33",
+        "2/34",
+        "2/35",
+        "2/36",
+        "2/37",
+        "2/38",
+        "2/39",
+        "2/40",
+        "2/41",
+      ],
+      เขตอังฏดาง: ["2/19"],
     },
     buildingsRooms: {
       "2/11": [
@@ -502,6 +562,169 @@ export default {
         "93",
         "95",
       ],
+      "2/13": [
+        "108",
+        "110",
+        "112",
+        "114",
+        "116",
+        "118",
+        "120",
+        "122",
+        "124",
+        "126",
+        "128",
+        "130",
+      ],
+      "2/14": [
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "301",
+        "302",
+        "303",
+        "304",
+        "305",
+        "306",
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "501",
+        "502",
+        "503",
+        "504",
+        "505",
+        "506",
+      ],
+      "2/15": [
+        "121",
+        "123",
+        "125",
+        "127",
+        "129",
+        "131",
+        "133",
+        "135",
+        "137",
+        "139",
+        "141",
+        "143",
+        "145",
+        "147",
+        "149",
+        "151",
+        "153",
+        "155",
+        "157",
+        "159",
+        "161",
+        "163",
+        "165",
+        "167",
+        "169",
+        "171",
+        "173",
+        "175",
+      ],
+      "2/16": [
+        "177",
+        "179",
+        "181",
+        "183",
+        "185",
+        "187",
+        "189",
+        "191",
+        "193",
+        "195",
+        "197",
+        "199",
+        "201",
+        "203",
+        "205",
+        "207",
+        "209",
+        "211",
+        "213",
+        "215",
+        "217",
+        "219",
+        "221",
+        "223",
+        "225",
+      ],
+      "2/17": [
+        "132",
+        "134",
+        "136",
+        "138",
+        "140",
+        "142",
+        "144",
+        "146",
+        "148",
+        "150",
+        "152",
+        "154",
+        "156",
+        "158",
+        "160",
+        "162",
+        "164",
+        "166",
+        "168",
+        "170",
+        "172",
+        "174",
+        "176",
+        "178",
+        "180",
+        "182",
+        "184",
+        "186",
+      ],
+      "2/18": [
+        "50",
+        "52",
+        "54",
+        "56",
+        "58",
+        "60",
+        "62",
+        "64",
+        "66",
+        "68",
+        "70",
+        "72",
+        "74",
+        "76",
+        "78",
+        "80",
+        "82",
+        "84",
+        "86",
+        "88",
+        "90",
+        "92",
+        "94",
+        "96",
+        "98",
+        "100",
+        "102",
+        "104",
+      ],
       "2/19": [
         "101",
         "102",
@@ -523,13 +746,256 @@ export default {
         "208",
         "209",
         "210",
+        "211",
+        "212",
+        "213",
+        "214",
+        "215",
         "301",
         "302",
         "303",
+        "304",
+        "305",
+        "306",
+        "307",
+        "308",
+        "309",
+        "310",
+        "311",
+        "312",
+        "313",
+        "314",
+        "315",
+        "401",
+        "402",
+        "403",
+        "404",
+        "405",
+        "406",
+        "407",
+        "408",
+        "409",
+        "410",
+        "411",
+        "412",
+        "413",
+        "414",
+        "415",
+        "501",
+        "502",
+        "503",
+        "504",
+        "505",
+        "506",
+        "507",
+        "508",
+        "509",
+        "510",
+        "511",
+        "512",
+        "513",
+        "514",
+        "515",
       ],
-      "21/99": ["1100", "1012", "1413"],
-      "21/120": ["101", "120", "130"],
-      "21/123": ["110", "102", "103"],
+      "2/20": ["1", "2"],
+      "2/21": ["3", "4"],
+      "2/22": ["5", "6"],
+      "2/23": ["7", "8"],
+      "2/24": ["9", "10"],
+      "2/25": ["11", "12"],
+      "2/26": ["13", "14"],
+      "2/27": ["15", "16"],
+      "2/28": ["17", "18"],
+      "2/29": ["19", "20"],
+      "2/31": ["79", "80", "81", "82", "83", "84", "85", "86", "87", "88"],
+      "2/32": ["89", "90", "91", "92", "93", "94", "95", "96", "97", "98"],
+      "2/33": [
+        "99",
+        "100",
+        "101",
+        "102",
+        "103",
+        "104",
+        "105",
+        "106",
+        "107",
+        "108",
+      ],
+      "2/34": [
+        "109",
+        "110",
+        "111",
+        "112",
+        "113",
+        "114",
+        "115",
+        "116",
+        "117",
+        "118",
+      ],
+      "2/35": [
+        "119",
+        "120",
+        "121",
+        "122",
+        "123",
+        "124",
+        "125",
+        "126",
+        "127",
+        "128",
+      ],
+      "2/36": [
+        "129",
+        "130",
+        "131",
+        "132",
+        "133",
+        "134",
+        "135",
+        "136",
+        "137",
+        "138",
+      ],
+      "2/37": [
+        "139",
+        "140",
+        "141",
+        "142",
+        "143",
+        "144",
+        "145",
+        "146",
+        "147",
+        "148",
+      ],
+      "2/38": [
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "44",
+        "45",
+        "46",
+        "47",
+        "48",
+        "49",
+        "50",
+      ],
+      "2/39": [
+        "149",
+        "150",
+        "151",
+        "152",
+        "153",
+        "154",
+        "155",
+        "156",
+        "157",
+        "158",
+        "159",
+        "160",
+        "161",
+        "162",
+        "163",
+        "164",
+        "165",
+        "166",
+        "167",
+        "168",
+        "169",
+        "170",
+        "171",
+        "172",
+        "173",
+        "174",
+        "175",
+        "176",
+        "177",
+        "178",
+      ],
+      "2/40": [
+        "179",
+        "180",
+        "181",
+        "182",
+        "183",
+        "184",
+        "185",
+        "186",
+        "187",
+        "188",
+        "189",
+        "190",
+        "191",
+        "192",
+        "193",
+        "194",
+        "195",
+        "196",
+        "197",
+        "198",
+        "199",
+        "200",
+        "201",
+        "202",
+        "203",
+        "204",
+        "205",
+        "206",
+        "207",
+        "208",
+      ],
+      "2/41": [
+        "212",
+        "213",
+        "214",
+        "215",
+        "216",
+        "217",
+        "218",
+        "219",
+        "220",
+        "221",
+        "222",
+        "223",
+        "224",
+        "225",
+        "226",
+        "227",
+        "228",
+        "229",
+        "230",
+        "231",
+        "232",
+        "233",
+        "234",
+        "235",
+        "236",
+        "237",
+        "238",
+        "239",
+        "240",
+      ],
     },
     rules: {
       format: [
@@ -616,6 +1082,7 @@ export default {
         },
       ];
     },
+    // autocomplete
     buildings() {
       return Object.keys(this.buildingsRooms);
     },
@@ -628,6 +1095,10 @@ export default {
       } else {
         return this.buildingsRooms[this.editedItem.building];
       }
+    },
+    // sumprice not finnnn
+    sumPrice() {
+      return this.editedItem.price * 2 + this.editedItem.price * 0.07;
     },
   },
 
@@ -754,24 +1225,15 @@ export default {
         return true;
       }
     },
-    // sumprice not finnnn
-    sumPrice() {
-      return this.editedItem.price * 2 + this.editedItem.price * 0.07;
-    },
+    
   },
 };
 </script>
 
 <style scoped>
-.title-table {
-  font-size: 25px;
-  padding: 10px;
-  font-family: Sarabun;
-}
+
 .filter {
-  padding: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  padding: 5px;
 }
 .button-filter {
   margin: 10px;

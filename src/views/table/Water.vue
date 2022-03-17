@@ -13,7 +13,7 @@
         </div>
         <!-- button -->
         <div>
-          <!-- water diff_price_cal ยังไม่เสร็จจร้าาาา -->
+          <!-- water diff_price_cal -->
           <v-dialog
             v-model="differencePriceCalculate"
             persistent
@@ -21,7 +21,7 @@
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter rounded-lg"
+                class="button-filter"
                 color="agree"
                 dark
                 v-on="{ ...attrs }"
@@ -36,21 +36,25 @@
                 คำนวนค่าน้ำส่วนต่าง</v-card-title
               >
               <v-card-text>
+                <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-row>
-                    <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
+                    <!-- meter group -->
                     <v-col cols="4">
                       <v-select
                         v-model="meterGroup"
                         label="สายของมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
                         required
+                        clearable
                         :rules="rules.buildingRoom"
                         autofocus
                         :items="meterGroups"
+                        ref="input"
                       >
                       </v-select>
                     </v-col>
+                    <!-- room -->
                     <v-col cols="4">
                       <v-text-field
                         v-model.number="numberOfroom"
@@ -60,32 +64,38 @@
                         required
                         :rules="rules.buildingRoom"
                         @keypress="isNumber($event)"
+                        ref="input"
                       ></v-text-field>
                     </v-col>
+                    <!-- meter zone -->
                     <v-col cols="4">
                       <v-text-field
-                        v-model.number="editedItem.meterZone"
+                        v-model.number="meterZone"
                         label="ค่าน้ำจากมิเตอร์ใหญ่"
                         prepend-icon="mdi-car-speed-limiter"
                         clearable
                         required
                         :rules="rules.buildingRoom"
                         @keypress="isNumber($event)"
+                        ref="input"
                       >
                       </v-text-field>
                     </v-col>
+                    <!-- sum of meter -->
                     <v-col cols="4">
                       <v-text-field
-                        v-model.number="editedItem.meterSum"
+                        v-model.number="meterSum"
                         label="ค่าน้ำที่จดได้"
                         prepend-icon="mdi-gauge"
                         clearable
                         required
                         :rules="rules.buildingRoom"
                         @keypress="isNumber($event)"
+                        ref="input"
                       >
                       </v-text-field>
                     </v-col>
+                    <!-- difference price -->
                     <v-col cols="12">
                       <div v-if="difference >= 0">
                         <h3>
@@ -93,7 +103,7 @@
                           {{ this.meterGroup }}
                         </h3>
                       </div>
-                      <div v-else >
+                      <div v-else>
                         <h3 class="negative-value">
                           ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
                           {{ this.meterGroup }}
@@ -147,6 +157,7 @@
                 <v-container>
                   <v-form ref="form" v-model="valid" lazy-validation>
                     <v-row>
+                      <!-- rank -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.rank"
@@ -156,6 +167,7 @@
                           :rules="rules.buildingRoom"
                         ></v-text-field>
                       </v-col>
+                      <!-- name -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.name"
@@ -164,6 +176,19 @@
                           :rules="rules.name"
                         ></v-text-field>
                       </v-col>
+                      <!-- meter group -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          v-model="editedItem.meterGroup"
+                          :items="meterGroups"
+                          label="สายของมิเตอร์น้ำ"
+                          required
+                          clearable
+                          :rules="rules.buildingRoom"
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <!-- zone -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="พื้นที่เขต"
@@ -173,6 +198,7 @@
                         >
                         </v-autocomplete>
                       </v-col>
+                      <!-- building -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="อาคาร"
@@ -182,6 +208,7 @@
                         >
                         </v-autocomplete>
                       </v-col>
+                      <!-- room number -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="เลขห้องพัก"
@@ -192,6 +219,7 @@
                         >
                         </v-autocomplete>
                       </v-col>
+                      <!-- water No -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.water_no"
@@ -202,6 +230,7 @@
                           :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
+                      <!-- water meter -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.water_meter_no"
@@ -212,6 +241,7 @@
                           :rules="rules.waterMeterNumber"
                         ></v-text-field>
                       </v-col>
+                      <!-- water price -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.price"
@@ -221,6 +251,7 @@
                           :rules="rules.buildingRoom"
                         ></v-text-field>
                       </v-col>
+                      <!-- water price Diff -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.difference"
@@ -229,6 +260,7 @@
                           value="this.place"
                         ></v-text-field>
                       </v-col>
+                      <!-- status -->
                       <v-col cols="12" sm="6" md="4">
                         <v-select
                           v-model="editedItem.status"
@@ -315,7 +347,7 @@
           <!-- delete as selected -->
           <v-btn
             dark
-            color="#742872"
+            color="error"
             width="140"
             v-bind="attrs"
             v-on="on"
@@ -595,12 +627,12 @@ export default {
   data: () => ({
     el: "#app",
     valid: true,
-    meterSum: "",
-    meterZone: "",
-    modal: false,
-    meterGroup: "",
-    meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
+    meterSum: null,
+    meterZone: null,
     numberOfroom: "",
+    modal: false,
+    meterGroup: null,
+    meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
     dialog: false,
     emailtarget: "",
     dateExport: new Date().toISOString().substr(0, 7),
@@ -1232,8 +1264,8 @@ export default {
     },
     // differencePriceCalculate
     difference: function () {
-      const sum = this.editedItem.meterSum;
-      const zone = this.editedItem.meterZone;
+      const sum = this.meterSum;
+      const zone = this.meterZone;
       const room = this.numberOfroom;
       if (sum && zone && room) {
         return ((parseInt(sum) - parseInt(zone)) / parseInt(room)).toFixed(2);
@@ -1395,6 +1427,7 @@ export default {
     clearForm() {
       // this.$refs.form.reset();
       (this.editedItem.name = null),
+        (this.editedItem.meterGroup = null),
         (this.editedItem.electric_no = null),
         (this.editedItem.water_no = null),
         (this.editedItem.zone = ""),
@@ -1406,10 +1439,12 @@ export default {
         (this.editedItem.status = null);
     },
     clearDifferences() {
-      (this.numberOfroom = ""),
-        (this.meterGroup = ""),
-        (this.editedItem.meterZone = ""),
-        (this.editedItem.meterSum = "");
+      // this.$refs['ref'].numberOfroom();
+      // (this.numberOfroom = ""),
+      //   (this.meterGroup = null),
+      //   (this.meterZone = null),
+      //   (this.meterSum = null);
+      this.$refs.input.value = "";
     },
   },
 };
@@ -1427,7 +1462,7 @@ export default {
 .filter {
   padding: 5px;
 }
-.negative-value{
+.negative-value {
   color: red;
 }
 </style>
