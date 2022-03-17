@@ -8,7 +8,7 @@
           </h2>
         </v-col>
         <v-col>
-          <v-dialog v-model="dialog" width="500">
+          <v-dialog v-model="dialog" width="75%">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="#092C7A" dark v-bind="attrs" v-on="on">
                 <v-icon> mdi-map-marker-plus </v-icon>
@@ -20,8 +20,8 @@
                 เพิ่มเขตอาคารในแผนที่
               </v-card-title>
               <v-card-text>
-                <v-row>
-                  <v-form ref="form" v-model="valid">
+                <v-form ref="form" v-model="valid">
+                  <v-row>
                     <v-col>
                       <v-text-field
                         v-model="latitude"
@@ -52,13 +52,18 @@
                       >
                       </v-text-field>
                     </v-col>
-                  </v-form>
-                </v-row>
+                  </v-row>
+                </v-form>
               </v-card-text>
               <v-divider></v-divider>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" :disabled="!valid" text @click="dialog = false">
+                <v-btn
+                  color="primary"
+                  :disabled="!valid"
+                  text
+                  @click="dialog = false"
+                >
                   ยืนยันการเพิ่มพื้นที่เขต
                 </v-btn>
               </v-card-actions>
