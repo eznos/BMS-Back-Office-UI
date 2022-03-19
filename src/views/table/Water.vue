@@ -313,11 +313,11 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
-                <v-btn color="red" text @click="clearForm"
-                  >ล้างข้อมูลที่กรอก</v-btn
-                >
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="red" text @click="clearForm"
+                    >ล้างข้อมูลที่กรอก</v-btn
+                  >
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
                   <v-btn color="agree" :disabled="!valid" text @click="save">
                     ยืนยัน

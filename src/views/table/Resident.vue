@@ -48,7 +48,7 @@
                           clearable
                         ></v-text-field>
                       </v-col>
-                     
+
                       <!-- zone -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
@@ -135,10 +135,10 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
+                <v-spacer></v-spacer>
                 <v-btn large color="error" text @click="clearForm">
                   ล้างข้อมูลที่กรอก
                 </v-btn>
-                <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-btn color="blue darken-1" text @click="close">
                     ยกเลิก
@@ -304,7 +304,6 @@ export default {
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
-
     dateFilterValue: "",
     zoneFilterValue: "",
     buildingFilterValue: "",
@@ -1051,7 +1050,7 @@ export default {
     // clear form add user
     clearForm() {
       // this.$refs.form.reset();
-      (this.editedItem.fristName = null),
+      (this.editedItem.fristName = ""),
         (this.editedItem.lastName = null),
         (this.editedItem.electric_no = null),
         (this.editedItem.water_no = null),

@@ -158,11 +158,11 @@
                 </v-container>
               </v-card-text>
               <v-card-actions>
-                <v-btn color="error" text @click="clearForm">
-                  ล้างข้อมูลที่กรอก
-                </v-btn>
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="error" text @click="clearForm">
+                    ล้างข้อมูลที่กรอก
+                  </v-btn>
                   <v-btn large color="warning" text @click="close">
                     ยกเลิก
                   </v-btn>
@@ -1338,7 +1338,6 @@ export default {
 .filter {
   padding: 5px;
   margin-bottom: -10px;
-  
 }
 .button-filter {
   margin: 10px;

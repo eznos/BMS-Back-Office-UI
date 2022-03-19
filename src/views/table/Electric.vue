@@ -165,11 +165,11 @@
               </v-card-text>
               <!-- save and cancel buttons-->
               <v-card-actions>
-                <v-btn color="#A42523" text @click="clearForm">
-                  ล้างข้อมูลที่กรอก
-                </v-btn>
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-btn color="#A42523" text @click="clearForm">
+                    ล้างข้อมูลที่กรอก
+                  </v-btn>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
                   <v-btn color="agree" :disabled="!valid" text @click="save">
                     ยืนยัน
@@ -1225,13 +1225,11 @@ export default {
         return true;
       }
     },
-    
   },
 };
 </script>
 
 <style scoped>
-
 .filter {
   padding: 5px;
 }
