@@ -1,17 +1,184 @@
 <template>
   <v-app id="app">
-    <!-- title and button -->
-    <div class="pa-3 content background-main">
+    <!-- title and filter card -->
+    <div class="content background-main">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
           <v-row style="align-items: center">
-            <div class="ml-3 mt-2">
+            <div class="ml-3 mt-9">
               <h2>ตารางค่าน้ำประปา</h2>
             </div>
+
+            <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
+            <h2>{{ ((new Date().getMonth() + 1) % 12) - 1 }}</h2> -->
           </v-row>
         </div>
+      </v-row>
+      <!-- filter -->
+      <v-card class="card-filter px-6 py-6">
+        <!-- title -->
+        <v-card-title>
+          <v-icon size="35px" class="icon"
+            >mdi-format-list-bulleted-triangle</v-icon
+          >
+          &nbsp;&nbsp;
+          <h3>ตัวกรอง</h3>
+          <!-- button -->
+          <v-spacer></v-spacer>
+        </v-card-title>
+        <!-- filter -->
+        <v-row justify="space-between" class="px-3">
+          <!-- Filter for  name-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-text-field
+              v-model="NamefilterValue"
+              prepend-icon="mdi-magnify"
+              type="text"
+              label="กรองด้วยชื่อ"
+              class="filter"
+              clearable
+            ></v-text-field>
+          </v-col>
+          <!-- Filter for waterGroup-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              v-model="waterGroupfilterValue"
+              label="กรองด้วยสายมิเตอร์"
+              prepend-icon="mdi-home-group"
+              :items="meterGroups"
+              class="filter"
+              clearable
+            >
+            </v-autocomplete>
+          </v-col>
+          <!-- Filter for  building-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              v-model="buildingFilterValue"
+              prepend-icon="mdi-office-building"
+              label="ค้นหาด้วยอาคาร"
+              class="filter"
+              :items="buildings"
+              clearable
+            >
+            </v-autocomplete>
+          </v-col>
+          <!-- Filter for  roomnumber-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              v-model="roomFilterValue"
+              prepend-icon="mdi-room-service"
+              label="ค้นหาด้วยห้อง"
+              class="filter"
+              :items="rooms"
+              clearable
+            >
+            </v-autocomplete>
+          </v-col>
+          <!-- filter by date -->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-dialog
+              ref="dialog_filter"
+              v-model="modal"
+              :return-value.sync="date"
+              persistent
+              width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="date"
+                  label="กรองด้วยเดือน"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  class="filter"
+                  clearable
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateFilterValue"
+                type="month"
+                locale="th-TH"
+              >
+                <v-spacer></v-spacer>
+                <v-btn text color="warning" @click="modal = false">
+                  ยกเลิก
+                </v-btn>
+                <v-btn
+                  text
+                  color="agree"
+                  @click="$refs.dialog_filter.save(dateFilterValue)"
+                >
+                  ยืนยัน
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>
+          <!-- Filter for  status-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-select
+              v-model="stateFilterValue"
+              :items="state"
+              prepend-icon="mdi-list-status"
+              label="กรองด้วยสถานะ"
+              class="filter"
+              clearable
+            ></v-select>
+          </v-col>
+          <!-- btn filter -->
+          <v-col justify="space-between" class="px-3">
+            <!-- enter filter -->
+            <!-- <v-btn
+              outlined
+              color="agree"
+              class="button-filter pt-6 pb-6"
+              width="140"
+            >
+              <v-icon>mdi-magnify</v-icon>
+              ค้นหา
+            </v-btn> -->
+            <!-- reset filter -->
+            <v-btn
+              outlined
+              color="error"
+              width="140"
+              @click="clear"
+              class="button-filter pt-6 pb-6"
+            >
+              <v-icon>mdi-delete-sweep</v-icon>
+              Reset filter
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+    </div>
+    <!-- button and data table -->
+    <v-card class="card-filter px-6 py-6">
+      <!-- title and button -->
+      <v-card-title>
+        <!-- title -->
+        <v-icon size="35px" class="icon"
+          >mdi-format-list-bulleted-triangle</v-icon
+        >
+        &nbsp;&nbsp;
+        <h3>LIST</h3>
+        <!-- delete as selected -->
+        <v-btn
+          dark
+          color="error"
+          width="140"
+          v-bind="attrs"
+          v-on="on"
+          @click="clear"
+          class="button-filter pt-5 pb-5"
+        >
+          <v-icon>mdi-delete-sweep</v-icon>
+          ลบข้อมูลที่เลือก
+        </v-btn>
         <!-- button -->
+        <v-spacer></v-spacer>
         <div>
           <!-- water diff_price_cal -->
           <v-dialog
@@ -21,8 +188,8 @@
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter"
-                color="agree"
+                class="button-filter pt-5 pb-5"
+                color="#E91854"
                 dark
                 v-on="{ ...attrs }"
               >
@@ -37,12 +204,12 @@
               >
               <v-card-text>
                 <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
-                <v-form ref="form" v-model="valid" lazy-validation>
+                <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
                   <v-row>
                     <!-- meter group -->
                     <v-col cols="4">
                       <v-select
-                        v-model="meterGroup"
+                        v-model="meter_group"
                         label="สายของมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
                         required
@@ -100,13 +267,13 @@
                       <div v-if="difference >= 0">
                         <h3>
                           ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
-                          {{ this.meterGroup }}
+                          {{ this.meter_group }}
                         </h3>
                       </div>
                       <div v-else>
                         <h3 class="negative-value">
                           ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
-                          {{ this.meterGroup }}
+                          {{ this.meter_group }}
                         </h3>
                       </div>
                     </v-col>
@@ -114,6 +281,7 @@
                 </v-form>
               </v-card-text>
               <v-card-actions>
+                <v-form ref="form" v-model="valid" lazy-validation></v-form>
                 <v-btn color="error" text @click="clearDifferences"
                   >ล้างข้อมูลที่กรอก</v-btn
                 >
@@ -129,7 +297,7 @@
                     color="agree"
                     text
                     :disabled="!valid"
-                    @click="differencePriceCalculate = false"
+                    @click="validateDiffprice"
                     >ยืนยันข้อมูล</v-btn
                   >
                 </v-form>
@@ -140,7 +308,7 @@
           <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter"
+                class="button-filter pt-5 pb-5"
                 color="agree"
                 dark
                 v-on="{ ...attrs }"
@@ -155,17 +323,19 @@
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <v-form ref="form" v-model="valid" lazy-validation>
+                  <v-form ref="formAddwater" v-model="valid" lazy-validation>
                     <v-row>
                       <!-- rank -->
                       <v-col cols="12" sm="6" md="4">
-                        <v-text-field
+                        <v-autocomplete
                           v-model="editedItem.rank"
+                          :items="ranks"
                           label="ยศ"
                           autofocus
                           required
                           :rules="rules.buildingRoom"
-                        ></v-text-field>
+                        >
+                        </v-autocomplete>
                       </v-col>
                       <!-- name -->
                       <v-col cols="12" sm="6" md="4">
@@ -179,7 +349,7 @@
                       <!-- meter group -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
-                          v-model="editedItem.meterGroup"
+                          v-model="editedItem.meter_group"
                           :items="meterGroups"
                           label="สายของมิเตอร์น้ำ"
                           required
@@ -241,6 +411,37 @@
                           :rules="rules.waterMeterNumber"
                         ></v-text-field>
                       </v-col>
+                      <!-- old unit -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-mol="oldUnit"
+                          label="หน่วยค่าน้ำเดือนก่อน"
+                          @keypress="isNumber($event)"
+                          required
+                          suffix="หน่วย"
+                          :rules="rules.buildingRoom"
+                        >
+                          >
+                          <template v-slot:label>
+                            หน่ยวที่จดได้ของรอบบิลเดือนก่อน
+                          </template>
+                        </v-text-field>
+                      </v-col>
+                      <!-- current unit -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="currentUnit"
+                          @keypress="isNumber($event)"
+                          required
+                          :rules="rules.buildingRoom"
+                          suffix="หน่วย"
+                        >
+                          <template v-slot:label>
+                            หน่วยที่จดได้ของรอบบิล
+                            {{ new Date().toISOString().substr(0, 7) }}
+                          </template></v-text-field
+                        >
+                      </v-col>
                       <!-- water price -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
@@ -249,16 +450,16 @@
                           @keypress="isNumber($event)"
                           required
                           :rules="rules.buildingRoom"
+                          :value="difference"
                         ></v-text-field>
                       </v-col>
                       <!-- water price Diff -->
                       <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.difference"
-                          label="ค่าน้ำส่วนต่าง"
-                          disabled
-                          value="this.place"
-                        ></v-text-field>
+                        <v-text-field v-model="editedItem.difference" disabled>
+                          <template v-slot:label>
+                            ค่าน้ำส่วนนต่างเป็น {{ difference }}
+                          </template>
+                        </v-text-field>
                       </v-col>
                       <!-- status -->
                       <v-col cols="12" sm="6" md="4">
@@ -312,9 +513,10 @@
                   </v-form>
                 </v-container>
               </v-card-text>
+              <!-- button -->
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-form ref="form" v-model="valid" lazy-validation>
+                <v-form ref="formButton" v-model="valid" lazy-validation>
                   <v-btn color="red" text @click="clearForm"
                     >ล้างข้อมูลที่กรอก</v-btn
                   >
@@ -344,25 +546,12 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- delete as selected -->
-          <v-btn
-            dark
-            color="error"
-            width="140"
-            v-bind="attrs"
-            v-on="on"
-            @click="clear"
-            class="button-filter"
-          >
-            <v-icon>mdi-delete-sweep</v-icon>
-            ลบข้อมูลที่เลือก
-          </v-btn>
           <!-- import excel -->
           <v-dialog v-model="importExcel" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter"
-                color="agree"
+                class="button-filter pt-5 pb-5"
+                color="#3E14DF"
                 dark
                 v-on="{ ...attrs }"
               >
@@ -409,7 +598,7 @@
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#1572A1"
-                class="button-filter"
+                class="button-filter pt-5 pb-5"
                 dark
                 v-on="{ ...attrs }"
               >
@@ -498,127 +687,36 @@
             </v-card>
           </v-dialog>
         </div>
-      </v-row>
-      <!-- filter -->
-      <v-row justify="space-between" class="px-3">
-        <!-- Filter for  name-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-text-field
-            v-model="NamefilterValue"
-            prepend-icon="mdi-magnify"
-            type="text"
-            label="กรองด้วยชื่อ"
-            class="filter"
-            clearable
-          ></v-text-field>
-        </v-col>
-        <!-- Filter for  building-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="buildingFilterValue"
-            prepend-icon="mdi-room-service"
-            label="ค้นหาด้วยอาคาร"
-            class="filter"
-            :items="buildings"
-            clearable
-          >
-          </v-select>
-        </v-col>
-        <!-- Filter for  roomnumber-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="roomFilterValue"
-            prepend-icon="mdi-room-service"
-            label="ค้นหาด้วยห้อง"
-            class="filter"
-            :items="rooms"
-            clearable
-          >
-          </v-select>
-        </v-col>
-        <!-- filter by date -->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-dialog
-            ref="dialog"
-            v-model="modal"
-            :return-value.sync="date"
-            persistent
-            width="290px"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="date"
-                label="กรองด้วยเดือน"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-                class="filter"
-                clearable
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="dateFilterValue"
-              type="month"
-              locale="th-TH"
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="warning" @click="modal = false">
-                ยกเลิก
-              </v-btn>
-              <v-btn
-                text
-                color="agree"
-                @click="$refs.dialog.save(dateFilterValue)"
-              >
-                ยืนยัน
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-col>
-        <!-- Filter for  status-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="stateFilterValue"
-            :items="state"
-            prepend-icon="mdi-list-status"
-            label="กรองด้วยสถานะ"
-            class="filter"
-            clearable
-          ></v-select>
-        </v-col>
-        <!-- Filter for  something-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="stateFilterValue"
-            :items="state"
-            prepend-icon=""
-            label="กรอกด้วยอะไรสักอย่าง"
-            class="filter"
-            clearable
-          ></v-select>
-        </v-col>
-      </v-row>
-    </div>
-    <!-- start data-table -->
-    <v-data-table
-      :headers="headers"
-      :items="electric"
-      item-key="name"
-      :items-per-page="5"
-      class="elevation-1 pa-6"
-      :search="search"
-      loading
-      loading-text="กำลังโหลด... โปรดรอสักครู่"
-      show-select
-    >
-      <!-- data -->
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-      </template>
-    </v-data-table>
-    <!-- end data-table -->
+      </v-card-title>
+      <v-card-text>
+        <!-- start data-table -->
+        <v-data-table
+          :headers="headers"
+          :items="waterTable"
+          item-key="id"
+          :items-per-page="5"
+          class="elevation-1 pa-6 th-1"
+          :search="search"
+          loading
+          loading-text="กำลังโหลด... โปรดรอสักครู่"
+          show-select
+        >
+          <!-- <template v-slot:[`item&item.actions`]="{ item }">
+            <tr>
+              <td>{{ item.rank }}</td>
+              <td>{{ item.neme }}</td>
+            </tr>
+          </template> -->
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          </template>
+        </v-data-table>
+        <!-- end data-table -->
+      </v-card-text>
+    </v-card>
   </v-app>
 </template>
 
@@ -626,12 +724,35 @@
 export default {
   data: () => ({
     el: "#app",
+    oldUnit: null,
+    currentUnit: null,
+    attrs: {},
+    on: {},
+    selectedRows: [],
     valid: true,
     meterSum: null,
     meterZone: null,
     numberOfroom: "",
+    rankFilterValue: "",
+    rank: null,
+    ranks: [
+      "พล.ต.อ.",
+      "พล.ต.ท.",
+      "พล.ต.ต.",
+      "พ.ต.อ.",
+      "พ.ต.ท.",
+      "พ.ต.ต.",
+      "ร.ต.อ.",
+      "ร.ต.ท.",
+      "ร.ต.ต.",
+      "ด.ต.",
+      "จ.ส.ต.",
+      "ส.ต.อ.",
+      "ส.ต.ท.",
+      "ส.ต.ต.",
+    ],
     modal: false,
-    meterGroup: null,
+    meter_group: null,
     meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
     dialog: false,
     emailtarget: "",
@@ -1142,23 +1263,23 @@ export default {
     },
     search: "",
     dialogDelete: false,
-    // Filter models.
+    // Filter models
     NamefilterValue: "",
+    waterGroupfilterValue: "",
     buildingFilterValue: "",
     roomFilterValue: "",
     dateFilterValue: "",
     date: "",
-    exportData: ["1", "2", "3", "4", "5"],
     stateFilterValue: "",
     state: ["Approve", "Non Approve"],
-    electric: [],
+    waterTable: [],
     editedIndex: -1,
     editedItem: {
       name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
-      differencePrice: 999,
+      difference_price: "",
       date_pay: new Date().toISOString().substr(0, 7),
       status: "Non Approve",
     },
@@ -1167,7 +1288,7 @@ export default {
       room: "",
       water_no: "",
       water_meter_no: "",
-      differencePrice: "",
+      difference_price: "",
       sum_price: "",
       date_pay: new Date().toISOString().substr(0, 7),
       status: "Non Approve",
@@ -1207,13 +1328,20 @@ export default {
       return [
         {
           text: "ยศ",
+          class: "",
           align: "left",
           value: "rank",
+          filter: this.rankFilter,
         },
         {
           text: "ชื่อ-นามสกุล",
           value: "name",
           filter: this.nameFilter,
+        },
+        {
+          text: "สายของมิเตอร์",
+          value: "meter_group",
+          filter: this.groupFilter,
         },
         {
           text: "อาคาร",
@@ -1244,7 +1372,7 @@ export default {
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value: "differencePrice",
+          value: "difference_price",
         },
         {
           text: "ค่าน้ำรวม",
@@ -1273,6 +1401,7 @@ export default {
         return "0.00";
       }
     },
+
     // autocomplete  [] {} () <>
     zones() {
       return Object.keys(this.zonesBuildings);
@@ -1313,8 +1442,187 @@ export default {
       val || this.closeDelete();
     },
   },
-
+  // mock data
+  created() {
+    this.initialize();
+  },
   methods: {
+    // mock data in table
+    initialize() {
+      this.waterTable = [
+        {
+          rank: "พล.ต.อ.",
+          name: "ชัชชาช้า ชัชชาวาน",
+          zone: "เขตสุระ",
+          building: "2/20",
+          room: "2",
+          meter_group: "ป.1",
+          water_no: "1234",
+          water_meter_no: "1234",
+          date_pay: "2022-03",
+          price: "30",
+          difference_price: "50",
+          sum_price: "80",
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.หญิง",
+          name: "ภัทรพร ศรีโอภาส",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "103",
+          meter_group: "ป.1",
+          water_no: "4567",
+          water_meter_no: "4567",
+          date_pay: "2021-06",
+          price: "19",
+          difference_price: "25.34",
+          sum_price: "44.34",
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "อมร ภูมพฤกษ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "107",
+          meter_group: "ป.1",
+          water_no: "7540",
+          water_meter_no: "7540",
+          date_pay: "2021-06",
+          price: "57",
+          difference_price: "25.34",
+          sum_price: "82.34",
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "อดุล วงศ์ทอง",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "202",
+          meter_group: "ป.1",
+          water_no: "9856",
+          water_meter_no: "9856",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "Approve",
+        },
+        {
+          rank: "ร.ต.ท.",
+          name: "จรัส สิมฤทธิ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "206",
+          meter_group: "ป.1",
+          water_no: "3214",
+          water_meter_no: "3214",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ส.ต.อ.",
+          name: "ธิชากร ผินดอน",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "305",
+          meter_group: "ป.83",
+          water_no: "5467",
+          water_meter_no: "5467",
+          date_pay: "2021-06",
+          price: "76",
+          difference_price: "25.34",
+          sum_price: "101.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "รุ่ง โฉมกิ่ง",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "402",
+          meter_group: "ป.1",
+          water_no: "8520",
+          water_meter_no: "8520",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "อนุชา ฝากชัยภูมิ",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "413",
+          meter_group: "ป.1",
+          water_no: "7845",
+          water_meter_no: "7845",
+          date_pay: "2021-06",
+          price: "152",
+          difference_price: "25.34",
+          sum_price: "177.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ส.ต.อ.",
+          name: "รัฐพนย์ เรื่องเรือ",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "504",
+          meter_group: "ป.1",
+          water_no: "3568",
+          water_meter_no: "3568",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ร.ต.ท.",
+          name: "อิทธิพล เพ็ญเติมพันธ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "514",
+          meter_group: "ป.1",
+          water_no: "5568",
+          water_meter_no: "5568",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "Non Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "ไพโรจน์ ทนปรางค์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "515",
+          meter_group: "ป.1",
+          water_no: "1123",
+          water_meter_no: "1123",
+          date_pay: "2021-06",
+          price: "19",
+          difference_price: "25.34",
+          sum_price: "44.34",
+          status: "Non Approve",
+        },
+      ];
+    },
+    rankFilter(value) {
+      if (!this.rankFilterValue) {
+        return true;
+      }
+      return value === this.rankFilterValue;
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1323,6 +1631,12 @@ export default {
       // Check if the current loop value (The dessert name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
+    },
+    groupFilter(value) {
+      if (!this.waterGroupfilterValue) {
+        return true;
+      }
+      return value === this.waterGroupfilterValue;
     },
     buildingFilter(value) {
       if (!this.buildingFilterValue) {
@@ -1349,17 +1663,17 @@ export default {
       return value == this.dateFilterValue;
     },
     editItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.waterTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.waterTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      this.electric.splice(this.editedIndex, 1);
+      this.waterTable.splice(this.editedIndex, 1);
       this.closeDelete();
     },
     close() {
@@ -1378,22 +1692,23 @@ export default {
     },
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
+        Object.assign(this.waterTable[this.editedIndex], this.editedItem);
       } else {
-        this.electric.push(this.editedItem);
+        this.waterTable.push(this.editedItem);
       }
       this.close();
     },
-    savea() {
+    savefilter() {
       if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
+        Object.assign(this.waterTable[this.editedIndex], this.editedItem);
       } else {
-        this.electric.push(this.editedItem);
+        this.waterTable.push(this.editedItem);
       }
       this.close();
     },
     clear() {
       (this.NamefilterValue = ""),
+        (this.waterGroupfilterValue = ""),
         (this.buildingFilterValue = ""),
         (this.roomFilterValue = ""),
         (this.stateFilterValue = ""),
@@ -1426,25 +1741,25 @@ export default {
     // clear input form
     clearForm() {
       // this.$refs.form.reset();
-      (this.editedItem.name = null),
-        (this.editedItem.meterGroup = null),
-        (this.editedItem.electric_no = null),
-        (this.editedItem.water_no = null),
-        (this.editedItem.zone = ""),
-        (this.editedItem.building = ""),
-        (this.editedItem.room = ""),
-        (this.editedItem.price = null),
-        (this.editedItem.water_meter_no = null),
-        (this.editedItem.date_pay = null),
-        (this.editedItem.status = null);
+      this.$refs.formAddwater.reset();
     },
     clearDifferences() {
-      // this.$refs['ref'].numberOfroom();
-      // (this.numberOfroom = ""),
-      //   (this.meterGroup = null),
-      //   (this.meterZone = null),
-      //   (this.meterSum = null);
-      this.$refs.input.value = "";
+      this.$refs.formDiffPrice.reset();
+    },
+    validateDiffprice() {
+      if (!this.valid) {
+        this.$refs.formDiffPrice.validate();
+      } else {
+        this.close();
+      }
+    },
+    KeyboardEvent() {
+      window.addEventListener("keydown", (event) => {
+        if (event.code === "Enter") {
+          // do your stuff
+          this.exportExcelwater = false;
+        }
+      });
     },
   },
 };
@@ -1458,11 +1773,20 @@ export default {
 }
 .button-filter {
   margin: 10px;
+  padding: 20px;
 }
 .filter {
   padding: 5px;
 }
+.card-filter {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
 .negative-value {
   color: red;
+}
+
+.v-data-table {
+  font-size: 20px;
 }
 </style>
