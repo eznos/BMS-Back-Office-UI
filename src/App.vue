@@ -82,7 +82,7 @@ export default {
 }
 
 </style>
-<style scoped>
+<style>
 .rounded-card {
   border-radius: 15px;
   border-color: black;
@@ -94,5 +94,10 @@ export default {
 }
 .myFont {
   font-family: 'Sarabun', sans-serif; 
+}
+.v-text-field {
+  height: 30px;
+  font-size: 20px;
+  margin: 20px;
 }
 </style>
