@@ -170,8 +170,9 @@
           width="140"
           v-bind="attrs"
           v-on="on"
-          @click="clear"
           class="button-filter pt-5 pb-5"
+          :disabled="!selectAll"
+          @click="deleteItemSelected"
         >
           <v-icon>mdi-delete-sweep</v-icon>
           ลบข้อมูลที่เลือก
@@ -535,13 +536,10 @@
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >ยกเลิก</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
+                <v-btn color="agree" text @click="deleteItemConfirm"
                   >ยืนยัน</v-btn
                 >
-                <v-spacer></v-spacer>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -699,19 +697,15 @@
           loading
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
+          select-all
+          @input="enterSelect($event)"
         >
-          <!-- <template v-slot:[`item&item.actions`]="{ item }">
-            <tr>
-              <td>{{ item.rank }}</td>
-              <td>{{ item.neme }}</td>
-            </tr>
-          </template> -->
-              <!-- color status on datatable  -->
-            <template v-slot:[`item.price`]="{ item }">
-              <v-chip :color="getColor(item.price)">
-                {{ item.price }}
-              </v-chip>
-            </template>
+          <!-- color status on datatable  -->
+          <template v-slot:[`item.price`]="{ item }">
+            <v-chip :color="getColor(item.price)">
+              {{ item.price }}
+            </v-chip>
+          </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">
               mdi-pencil
@@ -734,6 +728,7 @@ export default {
     attrs: {},
     on: {},
     selectedRows: [],
+    selectAll: false,
     valid: true,
     meterSum: null,
     meterZone: null,
@@ -1680,6 +1675,15 @@ export default {
       this.waterTable.splice(this.editedIndex, 1);
       this.closeDelete();
     },
+    // delete as selected
+    deleteItemSelected(values) {
+      if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่")) {
+        for (var i = 0; i < values.length; i++) {
+          const index = this.waterTable.indexOf(this.selected[i]);
+          this.waterTable.splice(index, 1);
+        }
+      }
+    },
     close() {
       this.dialog = false;
       this.$nextTick(() => {
@@ -1765,10 +1769,19 @@ export default {
         }
       });
     },
-            // color of price
+    // color of price
     getColor(price) {
       if (price == 0) return "red";
       else return "#ffffff";
+    },
+    // show delete as selected button
+    enterSelect(values) {
+      if (values.length >= 2) {
+        return (this.selectAll = true);
+        // alert("selected all");
+      } else {
+        return (this.selectAll = false);
+      }
     },
   },
 };
