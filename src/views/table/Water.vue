@@ -9,7 +9,6 @@
             <div class="ml-3 mt-9">
               <h2>ตารางค่าน้ำประปา</h2>
             </div>
-
             <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
             <h2>{{ ((new Date().getMonth() + 1) % 12) - 1 }}</h2> -->
           </v-row>
@@ -412,7 +411,7 @@
                         ></v-text-field>
                       </v-col>
                       <!-- old unit -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-mol="oldUnit"
                           label="หน่วยค่าน้ำเดือนก่อน"
@@ -423,12 +422,12 @@
                         >
                           >
                           <template v-slot:label>
-                            หน่ยวที่จดได้ของรอบบิลเดือนก่อน
+                            หน่วยที่จดได้ของรอบบิลเดือนก่อน
                           </template>
                         </v-text-field>
-                      </v-col>
+                      </v-col> -->
                       <!-- current unit -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="currentUnit"
                           @keypress="isNumber($event)"
@@ -441,7 +440,7 @@
                             {{ new Date().toISOString().substr(0, 7) }}
                           </template></v-text-field
                         >
-                      </v-col>
+                      </v-col> -->
                       <!-- water price -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
@@ -701,13 +700,18 @@
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
         >
-      
           <!-- <template v-slot:[`item&item.actions`]="{ item }">
             <tr>
               <td>{{ item.rank }}</td>
               <td>{{ item.neme }}</td>
             </tr>
           </template> -->
+              <!-- color status on datatable  -->
+            <template v-slot:[`item.price`]="{ item }">
+              <v-chip :color="getColor(item.price)">
+                {{ item.price }}
+              </v-chip>
+            </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">
               mdi-pencil
@@ -1760,6 +1764,11 @@ export default {
           this.exportExcelwater = false;
         }
       });
+    },
+            // color of price
+    getColor(price) {
+      if (price == 0) return "red";
+      else return "#ffffff";
     },
   },
 };

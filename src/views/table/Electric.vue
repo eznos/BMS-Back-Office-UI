@@ -1,23 +1,171 @@
 <template>
   <v-app id="app">
-    <!-- title and button -->
-    <div class="pa-3 content background-main">
+    <!-- filer and title-->
+    <div class="content background-main">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
           <v-row style="align-items: center">
-            <div class="ml-3 mt-2">
-              <h2>ตารางค่าไฟฟ้า</h2>
+            <div class="ml-3 mt-9">
+              <h2>จัดการไฟฟ้า</h2>
             </div>
           </v-row>
         </div>
-        <!-- button -->
+      </v-row>
+      <!-- filter -->
+      <v-card class="card-filter px-6 py-6">
+        <v-card-title>
+          <v-icon size="35px" class="icon"
+            >mdi-format-list-bulleted-triangle</v-icon
+          >
+          &nbsp;&nbsp;
+          <h3>ตัวกรอง</h3>
+          <!-- button -->
+          <v-spacer></v-spacer
+        ></v-card-title>
+        <!-- filter -->
+        <v-row justify="space-between" class="px-3">
+          <!-- Filter for  name-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-text-field
+              v-model="NamefilterValue"
+              prepend-icon="mdi-magnify"
+              type="text"
+              label="กรองด้วยชื่อ"
+              class="filter"
+              clearable
+            ></v-text-field>
+          </v-col>
+          <!-- Filter for  building-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-select
+              v-model="buildingFilterValue"
+              prepend-icon="mdi-room-service"
+              label="กรองด้วยอาคาร"
+              class="filter"
+              :items="buildings"
+              clearable
+            >
+            </v-select>
+          </v-col>
+          <!-- Filter for  roomnumber-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-select
+              v-model="roomFilterValue"
+              prepend-icon="mdi-room-service"
+              label="กรองด้วยห้อง"
+              class="filter"
+              :items="rooms"
+              clearable
+            >
+            </v-select>
+          </v-col>
+          <!-- filter by date -->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-dialog
+              ref="dialog_filter"
+              v-model="modalfilter"
+              :return-value.sync="date"
+              persistent
+              width="290px"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="dateFilterValue"
+                  label="กรองด้วยเดือน"
+                  prepend-icon="mdi-calendar"
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  class="filter"
+                  clearable
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                v-model="dateFilterValue"
+                type="month"
+                locale="th-TH"
+              >
+                <v-spacer></v-spacer>
+                <v-btn text color="warning" @click="modalfilter = false">
+                  ยกเลิก
+                </v-btn>
+                <v-btn
+                  text
+                  color="agree"
+                  @click="$refs.dialog_filter.save(dateFilterValue)"
+                >
+                  ยืนยัน
+                </v-btn>
+              </v-date-picker>
+            </v-dialog>
+          </v-col>
+          <!-- Filter for  status-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-select
+              v-model="statusFilterValue"
+              :items="statuses"
+              prepend-icon="mdi-list-status"
+              label="กรองด้วยสถานะ"
+              class="filter"
+              clearable
+            ></v-select>
+          </v-col>
+          <v-row> </v-row>
+          <!-- btn filter -->
+          <v-col cols="12" justify="space-between" class="px-3">
+            <!-- enter filter -->
+            <!-- <v-btn
+              outlined
+              color="agree"
+              class="button-filter pt-6 pb-6"
+              width="140"
+            >
+              <v-icon>mdi-magnify</v-icon>
+              กรอง
+            </v-btn> -->
+            <!-- reset filter -->
+            <v-btn
+              outlined
+              color="error"
+              width="140"
+              @click="clearFilter"
+              class="button-filter pt-6 pb-6"
+            >
+              <v-icon>mdi-delete-sweep</v-icon>
+              ล้างการกรอง
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+    </div>
+    <div></div>
+    <!-- data table and button -->
+    <v-card class="card-filter px-6 py-6">
+      <v-card-title>
+        <!-- title -->
+        <v-icon size="35px" class="icon">mdi-table-large</v-icon>
+        &nbsp;&nbsp;
+        <h3>ตารางค่าไฟฟ้า</h3>
+        <!-- delete as selected -->
+        <v-btn
+          dark
+          color="error"
+          width="140"
+          v-bind="attrs"
+          v-on="on"
+          class="button-filter pt-5 pb-5"
+        >
+          <v-icon>mdi-delete-sweep</v-icon>
+          ลบข้อมูลที่เลือก
+        </v-btn>
+        <v-spacer></v-spacer>
         <div>
           <!-- add user -->
           <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter"
+                class="button-filter pt-5 pb-5"
                 color="agree"
                 dark
                 v-on="{ ...attrs }"
@@ -123,8 +271,8 @@
                       <!-- date pay -->
                       <v-col cols="12" sm="6" md="4">
                         <v-dialog
-                          ref="dialog"
-                          v-model="modal"
+                          ref="dialogAdduser"
+                          v-model="modalAddDate"
                           persistent
                           width="290px"
                         >
@@ -146,13 +294,19 @@
                             locale="th-TH"
                           >
                             <v-spacer></v-spacer>
-                            <v-btn text color="warning" @click="modal = false">
+                            <v-btn
+                              text
+                              color="warning"
+                              @click="modalAddDate = false"
+                            >
                               ยกเลิก
                             </v-btn>
                             <v-btn
                               text
                               color="agree"
-                              @click="$refs.dialog.save(editedItem.date_pay)"
+                              @click="
+                                $refs.dialogAdduser.save(editedItem.date_pay)
+                              "
                             >
                               ยืนยัน
                             </v-btn>
@@ -166,12 +320,12 @@
               <!-- save and cancel buttons-->
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-form ref="form" v-model="valid" lazy-validation>
+                <v-form ref="formButton" v-model="valid" lazy-validation>
                   <v-btn color="#A42523" text @click="clearForm">
                     ล้างข้อมูลที่กรอก
                   </v-btn>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
-                  <v-btn color="agree" :disabled="!valid" text @click="save">
+                  <v-btn color="agree" :disabled="!valid" text @click="savea">
                     ยืนยัน
                   </v-btn>
                 </v-form>
@@ -196,24 +350,11 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- delete as selected -->
-          <v-btn
-            dark
-            color="#742872"
-            width="140"
-            v-bind="attrs"
-            v-on="on"
-            @click="clear"
-            class="button-filter"
-          >
-            <v-icon>mdi-delete-sweep</v-icon>
-            ลบข้อมูลที่เลือก
-          </v-btn>
           <!-- import excel -->
           <v-dialog v-model="importExcel" max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                class="button-filter"
+                class="button-filter pt-5 pb-5"
                 color="agree"
                 dark
                 v-on="{ ...attrs }"
@@ -243,7 +384,12 @@
           <!-- export excel to email -->
           <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
-              <v-btn color="#1572A1" class="filter" dark v-on="{ ...attrs }">
+              <v-btn
+                color="#1572A1"
+                class="button-filter pt-5 pb-5"
+                dark
+                v-on="{ ...attrs }"
+              >
                 <v-icon> mdi-file-export-outline </v-icon>
                 Export ข้อมูล Excel
               </v-btn>
@@ -259,7 +405,7 @@
                     <v-col cols="12">
                       <v-menu
                         ref="menu"
-                        v-model="menu"
+                        v-model="menuExportExcel"
                         :close-on-content-click="false"
                         transition="scale-transition"
                         offset-y
@@ -289,7 +435,7 @@
                           <v-btn
                             text
                             color="primary"
-                            @click="$refs.menu.save(date)"
+                            @click="$refs.menuExportExcel.save(date)"
                           >
                             OK
                           </v-btn>
@@ -333,127 +479,38 @@
             </v-card>
           </v-dialog>
         </div>
-      </v-row>
-      <!-- filter -->
-      <v-row justify="space-between" class="px-3">
-        <!-- Filter for  name-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-text-field
-            v-model="NamefilterValue"
-            prepend-icon="mdi-magnify"
-            type="text"
-            label="กรองด้วยชื่อ"
-            class="filter"
-            clearable
-          ></v-text-field>
-        </v-col>
-        <!-- Filter for  building-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="buildingFilterValue"
-            prepend-icon="mdi-room-service"
-            label="ค้นหาด้วยอาคาร"
-            class="filter"
-            :items="buildings"
-            clearable
-          >
-          </v-select>
-        </v-col>
-        <!-- Filter for  roomnumber-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="roomFilterValue"
-            prepend-icon="mdi-room-service"
-            label="ค้นหาด้วยห้อง"
-            class="filter"
-            :items="rooms"
-            clearable
-          >
-          </v-select>
-        </v-col>
-        <!-- filter by date -->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-dialog
-            ref="dialog"
-            v-model="modal"
-            :return-value.sync="date"
-            persistent
-            width="290px"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-text-field
-                v-model="date"
-                label="กรองด้วยเดือน"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-                class="filter"
-                clearable
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="dateFilterValue"
-              type="month"
-              locale="th-TH"
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="warning" @click="modal = false">
-                ยกเลิก
-              </v-btn>
-              <v-btn
-                text
-                color="agree"
-                @click="$refs.dialog.savea(dateFilterValue)"
-              >
-                ยืนยัน
-              </v-btn>
-            </v-date-picker>
-          </v-dialog>
-        </v-col>
-        <!-- Filter for  status-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="stateFilterValue"
-            :items="statuses"
-            prepend-icon="mdi-list-status"
-            label="กรองด้วยสถานะ"
-            class="filter"
-            clearable
-          ></v-select>
-        </v-col>
-        <!-- Filter for  something-->
-        <v-col cols="12" xs="12" sm="12" md="3" lg="2">
-          <v-select
-            v-model="stateFilterValue"
-            :items="statuses"
-            prepend-icon="mdi-list-status"
-            label="กรองด้วยสถานะ"
-            class="filter"
-            clearable
-          ></v-select>
-        </v-col>
-      </v-row>
-    </div>
-    <!-- start data-table -->
-    <v-data-table
-      :headers="headers"
-      :items="electric"
-      item-key="name"
-      :items-per-page="5"
-      class="elevation-1 pa-6"
-      :search="search"
-      loading
-      loading-text="กำลังโหลด... โปรดรอสักครู่"
-      show-select
-    >
-      <!-- data -->
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-      </template>
-    </v-data-table>
-    <!-- end data-table -->
+      </v-card-title>
+      <v-card-text>
+        <!-- start data-table -->
+        <v-data-table
+          :headers="headers"
+          :items="electricTable"
+          item-key="name"
+          :items-per-page="5"
+          class="elevation-1 pa-6"
+          :search="search"
+          loading
+          loading-text="กำลังโหลด... โปรดรอสักครู่"
+          show-select
+        >
+          <!-- data -->
+          <!-- color of price on datatable  -->
+          <template v-slot:[`item.price`]="{ item }">
+            <v-chip :color="getColor(item.price)">
+              {{ item.price }}
+            </v-chip>
+          </template>
+          <!-- editor data -->
+          <template v-slot:[`item.actions`]="{ item }">
+            <v-icon small class="mr-2" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          </template>
+        </v-data-table>
+        <!-- end data-table -->
+      </v-card-text>
+    </v-card>
   </v-app>
 </template>
 
@@ -462,26 +519,32 @@ export default {
   data: () => ({
     el: "#app",
     valid: true,
-    modal: false,
+    modalAddDate: false,
+    modalfilter: false,
     dialog: false,
+    attrs: {},
+    on: {},
     emailtarget: "",
     importExcel: false,
     exportExcelElectric: false,
     dateExport: new Date().toISOString().substr(0, 7),
-    menu: false,
+    menuExportExcel: false,
     search: "",
+    oldUnit: "",
+    currentUnit: "",
     building: null,
     room_no: null,
     dialogDelete: false,
     // Filter models.
+    datefilter: "",
     NamefilterValue: "",
     buildingFilterValue: "",
     roomFilterValue: "",
     dateFilterValue: "",
-    date: "",
-    stateFilterValue: "",
+    date: new Date().toISOString().substr(0, 7),
+    statusFilterValue: "",
     statuses: ["Approve", "Non Approve"],
-    electric: [],
+    electricTable: [],
     editedIndex: -1,
     editedItem: {
       name: "",
@@ -1033,6 +1096,7 @@ export default {
           text: "ยศ",
           align: "left",
           value: "rank",
+          filter: this.rankFilter,
         },
         {
           text: "ชื่อ-นามสกุล",
@@ -1046,16 +1110,16 @@ export default {
         },
         {
           text: "เลขห้องพัก",
-          value: "room_no",
+          value: "room",
           filter: this.roomFilter,
         },
         {
-          text: "เลขผู้ใช้ไฟฟ้า",
-          value: "electric_no",
+          text: "เลขผู้ใช้ไฟ",
+          value: "electricity_no",
         },
         {
-          text: "เลขมิเตอร์ไฟฟ้า",
-          value: "electirc_meter_no",
+          text: "เลขมิเตอร์ไฟ",
+          value: "electricity_meter_no",
         },
         {
           text: "รอบบิล",
@@ -1065,10 +1129,6 @@ export default {
         {
           text: "ค่าไฟฟ้า",
           value: "price",
-        },
-        {
-          text: "ค่าไฟฟ้ารวม",
-          value: this.sumPrice,
         },
         {
           text: "สถานะ",
@@ -1091,7 +1151,7 @@ export default {
         return this.buildingsRooms[this.buildingFilterValue];
       }
       if (!this.editedItem.building) {
-        return "ไม่มีข้อมูล";
+        return ["ไม่มีข้อมูล"];
       } else {
         return this.buildingsRooms[this.editedItem.building];
       }
@@ -1110,8 +1170,146 @@ export default {
       val || this.closeDelete();
     },
   },
-
+  // mock data
+  created() {
+    this.initialize();
+  },
   methods: {
+    // mock data in table
+    initialize() {
+      this.electricTable = [
+        {
+          rank: "ด.ต.หญิง",
+          name: "อธิวัฒน์ เจิมสูงเนิน",
+          zone: "สุรนารายณ์",
+          building: "2/36",
+          room: "132",
+          meter_group: "9040",
+          electricity_no: "200190919501",
+          electricity_meter_no: "20019091950",
+          date_pay: "2021-06",
+          price: 323.6,
+          status: "Non Approve",
+        },
+        {
+          rank: "จ.ส.ต.",
+          name: "ยุพาพร พวงมะเทศ",
+          zone: "สุรนารายณ์",
+          building: "2/36",
+          room: "133",
+          meter_group: "9040",
+          electricity_no: "200190955212",
+          electricity_meter_no: "20019095521",
+          date_pay: "2021-06",
+          price: 742.29,
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "เทวราช ดวงทอง",
+          zone: "สุรนารายณ์",
+          building: "2/36",
+          room: "138",
+          meter_group: "9040",
+          electricity_no: "200190955393",
+          electricity_meter_no: "20019095539",
+          date_pay: "2021-06",
+          price: 0.0,
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "สุรพงษ์ ทั่งทอง",
+          zone: "สุรนารายณ์",
+          building: "2/37",
+          room: "140",
+          meter_group: "9040",
+          electricity_no: "200187439364",
+          electricity_meter_no: "20018743936",
+          date_pay: "2021-06",
+          price: 33.34,
+          status: "Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "จิรสิทธ์ ภูอ่าง",
+          zone: "สุรนารายณ์",
+          building: "2/37",
+          room: "142",
+          meter_group: "9040",
+          electricity_no: "200130597255",
+          electricity_meter_no: "20013059725",
+          date_pay: "2021-06",
+          price: 1068.8,
+          status: "Non Approve",
+        },
+        {
+          rank: "ร.ต.ท.",
+          name: "วุฒิชัย บุญใบ",
+          zone: "สุรนารายณ์",
+          building: "2/37",
+          room: "148",
+          meter_group: "9040",
+          electricity_no: "200130599746",
+          electricity_meter_no: "20013059974",
+          date_pay: "2021-06",
+          price: 220.21,
+          status: "Non Approve",
+        },
+        {
+          rank: "พ.ต.อ.",
+          name: "ธรรมศธรรม นาคมณี",
+          zone: "สุรนารายณ์",
+          building: "2/38",
+          room: "22",
+          meter_group: "9040",
+          electricity_no: "200130694277",
+          electricity_meter_no: "20013069427",
+          date_pay: "2021-06",
+          price: 153.5,
+          status: "Non Approve",
+        },
+        {
+          rank: "พ.ต.อ.",
+          name: "สุพล สุราวุฒิ",
+          zone: "สุรนารายณ์",
+          building: "2/38",
+          room: "23",
+          meter_group: "9040",
+          electricity_no: "200130694548",
+          electricity_meter_no: "20013069454",
+          date_pay: "2021-06",
+          price: 40.9,
+          status: "Non Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "พีรันธร ก้านขุนทด",
+          zone: "สุรนารายณ์",
+          building: "2/38",
+          room: "24",
+          meter_group: "9040",
+          electricity_no: "200130695249",
+          electricity_meter_no: "20013069524",
+          date_pay: "2021-06",
+          price: 829.37,
+          status: "Non Approve",
+        },
+        {
+          rank: "ด.ต.",
+          name: "อักษร ทองวิจิตร",
+          zone: "สุรนารายณ์",
+          building: "2/38",
+          room: "26",
+          meter_group: "9040",
+          electricity_no: "200130696190",
+          electricity_meter_no: "20013069619",
+          date_pay: "2021-06",
+          price: 0.0,
+          status: "Non Approve",
+        },
+      ];
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1134,10 +1332,10 @@ export default {
       return value === this.buildingFilterValue;
     },
     stateFilter(value) {
-      if (!this.stateFilterValue) {
+      if (!this.statusFilterValue) {
         return true;
       }
-      return value === this.stateFilterValue;
+      return value === this.statusFilterValue;
     },
     dateFilter(value) {
       if (!this.dateFilterValue) {
@@ -1146,17 +1344,17 @@ export default {
       return value == this.dateFilterValue;
     },
     editItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.electricTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem(item) {
-      this.editedIndex = this.electric.indexOf(item);
+      this.editedIndex = this.electricTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      this.electric.splice(this.editedIndex, 1);
+      this.electricTable.splice(this.editedIndex, 1);
       this.closeDelete();
     },
     close() {
@@ -1173,36 +1371,35 @@ export default {
         this.editedIndex = -1;
       });
     },
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
-      } else {
-        this.electric.push(this.editedItem);
-      }
-      this.close();
-    },
+    // save() {
+    //   if (this.editedIndex > -1) {
+    //     Object.assign(this.electricTable[this.editedIndex], this.editedItem);
+    //   } else {
+    //     this.electricTable.push(this.editedItem);
+    //   }
+    //   this.close();
+    // },
     savea() {
       if (this.editedIndex > -1) {
-        Object.assign(this.electric[this.editedIndex], this.editedItem);
+        Object.assign(this.electricTable[this.editedIndex], this.editedItem);
       } else {
-        this.electric.push(this.editedItem);
+        this.electricTable.push(this.editedItem);
       }
       this.close();
     },
     // clear form
     clearForm() {
-      // this.$refs.form.reset();
-      (this.editedItem.rank = ""),
-        (this.editedItem.name = null),
-        (this.editedItem.electric_no = null),
-        (this.editedItem.zone = ""),
-        (this.editedItem.building = ""),
-        (this.editedItem.room_no = ""),
-        (this.editedItem.electirc_meter_no = null),
-        (this.editedItem.price = null),
-        (this.editedItem.date_pay = null),
-        (this.editedItem.status = null);
+      this.$refs.form.reset();
     },
+    // clear filter
+    clearFilter() {
+      (this.NamefilterValue = ""),
+        (this.buildingFilterValue = ""),
+        (this.roomFilterValue = ""),
+        (this.dateFilterValue = "");
+      this.statusFilterValue = "";
+    },
+    // search in data table
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -1225,6 +1422,11 @@ export default {
         return true;
       }
     },
+    // color of price
+    getColor(price) {
+      if (price == 0) return "red";
+      else return "#ffffff";
+    },
   },
 };
 </script>
@@ -1235,5 +1437,10 @@ export default {
 }
 .button-filter {
   margin: 10px;
+  padding: 20px;
+}
+.card-filter {
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 </style>
