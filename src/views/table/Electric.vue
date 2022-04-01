@@ -155,6 +155,7 @@
           v-bind="attrs"
           v-on="on"
           class="button-filter pt-5 pb-5"
+          :disabled="!selectAll"
         >
           <v-icon>mdi-delete-sweep</v-icon>
           ลบข้อมูลที่เลือก
@@ -486,12 +487,13 @@
           :headers="headers"
           :items="electricTable"
           item-key="name"
-          :items-per-page="5"
+          :items-per-page="itemsPerPage"
           class="elevation-1 pa-6"
           :search="search"
           loading
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
+          @input="enterSelect($event)"
         >
           <!-- data -->
           <!-- color of price on datatable  -->
@@ -524,6 +526,9 @@ export default {
     dialog: false,
     attrs: {},
     on: {},
+    selected: [],
+    itemsPerPage: 5,
+    selectAll: false,
     emailtarget: "",
     importExcel: false,
     exportExcelElectric: false,
@@ -1426,6 +1431,14 @@ export default {
     getColor(price) {
       if (price == 0) return "red";
       else return "#ffffff";
+    },
+    enterSelect(values) {
+      if (values.length >= 2) {
+        return (this.selectAll = true);
+        // alert("selected all");
+      } else {
+        return (this.selectAll = false);
+      }
     },
   },
 };
