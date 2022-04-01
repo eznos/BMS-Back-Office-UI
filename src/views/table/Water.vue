@@ -693,7 +693,7 @@
         <v-data-table
           :headers="headers"
           :items="waterTable"
-          item-key="id"
+          item-key="name"
           :items-per-page="5"
           class="elevation-1 pa-6 th-1"
           :search="search"
@@ -701,6 +701,7 @@
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
         >
+      
           <!-- <template v-slot:[`item&item.actions`]="{ item }">
             <tr>
               <td>{{ item.rank }}</td>
@@ -1328,7 +1329,6 @@ export default {
       return [
         {
           text: "ยศ",
-          class: "",
           align: "left",
           value: "rank",
           filter: this.rankFilter,
