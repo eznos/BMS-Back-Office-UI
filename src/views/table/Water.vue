@@ -7,7 +7,9 @@
         <div class="mb-4">
           <v-row style="align-items: center">
             <div class="ml-3 mt-9">
-              <h2>ตารางค่าน้ำประปา</h2>
+              <h2>
+                <v-icon size="40" color="blue">mdi-water</v-icon> จัดการน้ำประปา
+              </h2>
             </div>
             <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
             <h2>{{ ((new Date().getMonth() + 1) % 12) - 1 }}</h2> -->
@@ -56,7 +58,7 @@
             <v-autocomplete
               v-model="buildingFilterValue"
               prepend-icon="mdi-office-building"
-              label="ค้นหาด้วยอาคาร"
+              label="กรองด้วยอาคาร"
               class="filter"
               :items="buildings"
               clearable
@@ -68,7 +70,7 @@
             <v-autocomplete
               v-model="roomFilterValue"
               prepend-icon="mdi-room-service"
-              label="ค้นหาด้วยห้อง"
+              label="กรองด้วยห้อง"
               class="filter"
               :items="rooms"
               clearable
@@ -77,17 +79,18 @@
           </v-col>
           <!-- filter by date -->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-            <v-dialog
-              ref="dialog_filter"
-              v-model="modal"
-              :return-value.sync="date"
-              persistent
-              width="290px"
+            <v-menu
+              v-model="menuDatefilter"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              min-width="auto"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
-                  v-model="date"
-                  label="กรองด้วยเดือน"
+                  v-model="dateFilterValue"
+                  label="กรองด้วยรอบบิล"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -100,20 +103,10 @@
                 v-model="dateFilterValue"
                 type="month"
                 locale="th-TH"
-              >
-                <v-spacer></v-spacer>
-                <v-btn text color="warning" @click="modal = false">
-                  ยกเลิก
-                </v-btn>
-                <v-btn
-                  text
-                  color="agree"
-                  @click="$refs.dialog_filter.save(dateFilterValue)"
-                >
-                  ยืนยัน
-                </v-btn>
-              </v-date-picker>
-            </v-dialog>
+                scrollable
+                @input="menuDatefilter = false"
+              ></v-date-picker>
+            </v-menu>
           </v-col>
           <!-- Filter for  status-->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
@@ -136,7 +129,7 @@
               width="140"
             >
               <v-icon>mdi-magnify</v-icon>
-              ค้นหา
+              กรอง
             </v-btn> -->
             <!-- reset filter -->
             <v-btn
@@ -147,7 +140,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              Reset filter
+              ล้างการกรอง
             </v-btn>
           </v-col>
         </v-row>
@@ -162,7 +155,7 @@
           >mdi-format-list-bulleted-triangle</v-icon
         >
         &nbsp;&nbsp;
-        <h3>LIST</h3>
+        <h3>ตารางค่าน้ำประปา</h3>
         <!-- delete as selected -->
         <v-btn
           dark
@@ -697,7 +690,8 @@
           loading
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
-          select-all
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
         >
           <!-- color status on datatable  -->
@@ -723,6 +717,9 @@
 export default {
   data: () => ({
     el: "#app",
+    sortBy: "name",
+    menuDatefilter: false,
+    sortDesc: false,
     oldUnit: null,
     currentUnit: null,
     attrs: {},
@@ -733,7 +730,6 @@ export default {
     meterSum: null,
     meterZone: null,
     numberOfroom: "",
-    rankFilterValue: "",
     rank: null,
     ranks: [
       "พล.ต.อ.",
@@ -1330,7 +1326,6 @@ export default {
           text: "ยศ",
           align: "left",
           value: "rank",
-          filter: this.rankFilter,
         },
         {
           text: "ชื่อ-นามสกุล",
@@ -1616,12 +1611,7 @@ export default {
         },
       ];
     },
-    rankFilter(value) {
-      if (!this.rankFilterValue) {
-        return true;
-      }
-      return value === this.rankFilterValue;
-    },
+
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1699,14 +1689,6 @@ export default {
       });
     },
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.waterTable[this.editedIndex], this.editedItem);
-      } else {
-        this.waterTable.push(this.editedItem);
-      }
-      this.close();
-    },
-    savefilter() {
       if (this.editedIndex > -1) {
         Object.assign(this.waterTable[this.editedIndex], this.editedItem);
       } else {
