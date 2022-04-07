@@ -3,97 +3,104 @@
     <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
     <v-container fill-height fill-width>
       <v-layout align-center justify-center>
-        <v-card class="mx-auto" color="#F4ffff" elevation="10" width="80%">
+        <v-card class="mx-auto" color="#F4ffff" elevation="10" width="90%">
           <v-card-title>
             <!-- <h1 class="h1c">ลงทะเบียน</h1> -->
+            <div class="content background-main">
+              <v-row justify="space-between" class="px-3">
+                <!-- title -->
+                <div class="mb-4">
+                  <v-row style="align-items: center">
+                    <div class="ml-3 mt-9">
+                      <h2>
+                        <v-icon size="40" color="green"
+                          >mdi-account-plus</v-icon
+                        >
+                        ลงทะเบียน
+                      </h2>
+                    </div>
+                  </v-row>
+                </div>
+              </v-row>
+            </div>
           </v-card-title>
           <v-card-text>
-            <v-form ref="form" @submit.prevent="submit">
+            <v-form ref="formRegister" v-model="valid" lazy-validation>
               <v-row>
-                <v-col col="12" l>
+                <v-col col="12">
                   <v-container>
                     <v-row>
+                      <!-- name -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
-                          v-model="firstname"
-                          :rules="nameRules"
+                          v-model="name"
+                          :rules="rules.nameRules"
                           label="ชื่อ"
                           required
                           autofocus
-                        ></v-text-field>
+                        ></v-text-field
+                      ></v-col>
+                      <!-- email -->
+                      <v-col cols="12" md="6" lg="6">
                         <v-text-field
-                          v-model="lastname"
-                          :rules="nameRules"
-                          label="นามสกุล"
-                          required
-                        ></v-text-field>
-                        <v-text-field
+                          label="อีเมลผู้รับ"
+                          :rules="[rules.email.regex]"
                           v-model="email"
-                          :rules="emailRules"
-                          label="อีเมล"
                           required
                         ></v-text-field>
-                        <validation-provider
-                          v-slot="{ errors }"
-                          name="phoneNumber"
-                          :rules="{
-                            required: true,
-                            digits: 10,
-                            regex: '^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})',
-                          }"
-                        >
-                          <!-- ^0[6,8,9][0-9]{8}$ -->
-                          <v-text-field
-                            :rules="rules.phoneNumber"
-                            v-model="phoneNumber"
-                            :counter="10"
-                            :error-messages="errors"
-                            label="เบอร์โทร"
-                            required
-                          ></v-text-field>
-                        </validation-provider>
-                        <v-container class="px-0" fluid>
-                          <v-radio-group v-model="sex" row>
-                            <template v-slot:label>
-                              <h3>เพศ</h3>
-                            </template>
-                            <v-radio
-                              color="blue darken-1"
-                              label="ชาย"
-                              value="male"
-                            ></v-radio>
-                            <v-radio
-                              color="pink darken-1"
-                              label="หญิง"
-                              value="female"
-                            ></v-radio>
-                            <v-radio
-                              color="purple darken-2"
-                              label="เพศทางเลือก"
-                              value="lgbt"
-                            ></v-radio>
-                          </v-radio-group>
-                        </v-container>
                       </v-col>
+                      <!-- phoneNumber -->
+                      <v-col cols="12" md="6" lg="6">
+                        <v-text-field
+                          :rules="[rules.phoneNumber.regex]"
+                          v-model="phoneNumber"
+                          :counter="10"
+                          label="เบอร์โทร"
+                          required
+                        ></v-text-field
+                      ></v-col>
+                      <!-- sex -->
+                      <v-col cols="12" md="6" lg="6">
+                        <v-select
+                          label="เพศ"
+                          :items="sexs"
+                          v-model="sex"
+                          required
+                          :rules="rules.nameRules"
+                        >
+                        </v-select>
+                      </v-col>
+                      <!-- rank -->
                       <v-col cols="12" md="6" lg="6">
                         <v-select
                           v-model="rank"
-                          :items="Rank"
+                          :items="ranks"
+                          :rules="rules.nameRules"
                           label="ยศ"
                           required
                         ></v-select>
+                      </v-col>
+                      <!-- affiliation -->
+                      <v-col cols="12" md="6" lg="6">
                         <v-select
                           v-model="affiliation"
-                          :items="Affiliation"
+                          :items="affiliations"
+                          :rules="rules.nameRules"
                           label="สังกัด"
                           required
                         ></v-select>
+                      </v-col>
+                      <!-- user -->
+                      <v-col cols="12" md="6" lg="6">
                         <v-text-field
                           :rules="rules.username"
                           v-model="username"
                           label="ชื่อผู้ใช้งาน"
                           required
                         ></v-text-field>
+                      </v-col>
+                      <!-- password -->
+                      <v-col cols="12" md="6" lg="6">
                         <v-text-field
                           v-model="password"
                           :append-icon="
@@ -106,6 +113,9 @@
                           label="รหัสผ่านใหม่"
                           @click:append="showpassword = !showpassword"
                         ></v-text-field>
+                      </v-col>
+                      <!-- avatar -->
+                      <v-col cols="12" md="6" lg="6">
                         <v-file-input
                           :rules="rules.Avatar"
                           accept="image/png, image/jpeg, image/bmp"
@@ -123,29 +133,37 @@
           </v-card-text>
           <v-card-actions>
             <div class="mx-auto">
+              <v-form v-model="valid" lazy-validation></v-form>
               <v-btn
                 class="mr-4"
-                color="primary"
+                color="agree"
                 width="200px"
+                outlined
                 large
-                v-bind="attrs"
-                v-on="on"
-                :disabled="!formIsValid"
+                :disabled="!valid"
                 to="/login"
               >
                 ยืนยันการลงทะเบียน
               </v-btn>
               <v-btn
                 class="mr-4"
-                @click="clear"
                 to="/login"
-                dark
                 width="200px"
                 large
+                outlined
                 color="error"
               >
                 ยกเลิกการลงทะเบียน
               </v-btn>
+              <v-btn
+                class="mr-4"
+                large
+                outlined
+                @click="clearForm"
+                color="warning"
+              >
+                ล้างข้อมูลที่กรอก</v-btn
+              >
             </div>
           </v-card-actions>
         </v-card>
@@ -154,74 +172,70 @@
   </v-app>
 </template>
 <script>
-import { required, digits, email, max, regex } from "vee-validate/dist/rules";
-import { extend, ValidationProvider, setInteractionMode } from "vee-validate";
-
-setInteractionMode("eager");
-
-extend("digits", {
-  ...digits,
-  message: "{_field_} needs to be {length} digits. ({_value_})",
-});
-
-extend("required", {
-  ...required,
-  message: "{_field_} can not be empty",
-});
-
-extend("max", {
-  ...max,
-  message: "{_field_} may not be greater than {length} characters",
-});
-
-extend("regex", {
-  ...regex,
-  message: "เบอร์โทรศัพท์ไม่ตรงกับรูปแบบที่กำหนด",
-});
-
-extend("email", {
-  ...email,
-  message: "Email must be valid",
-});
 export default {
-  components: {
-    ValidationProvider,
-  },
+  components: {},
   data: () => ({
-    clicked: false,
-    showpassword: false,
-    loader: null,
-    loading: false,
-    dialog: false,
     valid: false,
-    tel: "",
-    Rank: ["พล.ต.อ. ", "พล.ต.ท.", "พล.ต.ต.", "พ.ต.อ"],
-    Affiliation: ["สยศ.ตร.", "สกบ.", "สกพ.", "สงป"],
-
+    showpassword: false,
+    on: {},
+    attrs: {},
+    name: "",
+    email: "",
+    phoneNumber: "",
+    sex: "",
+    rank: "",
+    affiliation: "",
+    username: "",
+    password: "",
+    ranks: [
+      "พล.ต.อ.",
+      "พล.ต.ท.",
+      "พล.ต.ต.",
+      "พ.ต.อ.",
+      "พ.ต.ท.",
+      "พ.ต.ต.",
+      "ร.ต.อ.",
+      "ร.ต.ท.",
+      "ร.ต.ต.",
+      "ด.ต.",
+      "จ.ส.ต.",
+      "ส.ต.อ.",
+      "ส.ต.ท.",
+      "ส.ต.ต.",
+    ],
+    affiliations: ["สยศ.ตร.", "สกบ.", "สกพ.", "สงป"],
+    sexs: ["ชาย", "หญิง", "ทางเลือก"],
     rules: {
+      email: {
+        required: (v) => !!v || "กรุณาใส่อีเมล",
+        regex: (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            v
+          ) || "อีเมลไม่ถูกต้อง",
+      },
+      phoneNumber: {
+        required: (v) => !!v || "กรุณาใส่เบอร์โทรศัพท์",
+        regex: (v) =>
+          /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
+          "เบอร์โทรศัพท์ม่ถูกต้อง",
+      },
       username: [
-        (val) => (val || "").length >= 6 || "รหัสผ่านต้องมีมากกว่า 6 ตัวอักษร",
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length >= 6) || "ชื่อผู้ใช้ต้องมีมากกว่า 6 ตัวอักษร",
       ],
       password: [
-        (val) => (val || "").length > 8 || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length >= 8) || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
       ],
       Avatar: [
         (value) =>
-          !value ||
-          value.size < 2000000 ||
-          "Avatar size should be less than 2 MB!",
+          !value || value.size < 2000000 || "รูปประจำตัวขนาดไม่เกิน 2 MB",
       ],
-      phoneNumber: [(val) => (val || "").length == 10],
+      nameRules: [
+        (v) => !!v || "กรุณากรอกชื่อ",
+        (v) => v.length >= 3 || "ชื่อต้องมีตัวอักษรมากกว่า 3 ตัวอักษร",
+      ],
     },
-    nameRules: [
-      (v) => !!v || "Name is required",
-      (v) => v.length <= 10 || "Name must be less than 10 characters",
-    ],
-
-    emailRules: [
-      (v) => !!v || "E-mail is required",
-      (v) => /.+@.+/.test(v) || "E-mail must be valid",
-    ],
   }),
 
   setup() {},
@@ -229,21 +243,15 @@ export default {
     loader() {
       const l = this.loader;
       this[l] = !this[l];
-
       setTimeout(() => (this[l] = false), 2000);
-
       this.loader = null;
     },
   },
 
-  computed: {
-    formIsValid() {
-      return this.lastname;
-    },
-  },
+  computed: {},
   methods: {
-    submit() {
-      this.$refs.observer.validate();
+    clearForm() {
+      this.$refs.formRegister.reset();
     },
   },
 };
@@ -251,41 +259,5 @@ export default {
 <style scoped>
 .h1c {
   font-size: 30px;
-}
-.custom-loader {
-  animation: loader 1s infinite;
-  display: flex;
-}
-@-moz-keyframes loader {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@-webkit-keyframes loader {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@-o-keyframes loader {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes loader {
-  from {
-    transform: rotate(0);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
 </style>
