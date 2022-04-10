@@ -16,7 +16,7 @@
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" v-bind="attrs" v-on="on">
                 <v-icon> mdi-application-export </v-icon>
-                Export ข้อมูลภาพรวม
+                &nbsp; Export ข้อมูลภาพรวม
               </v-btn>
             </template>
             <v-card>

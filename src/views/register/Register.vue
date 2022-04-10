@@ -30,14 +30,32 @@
                 <v-col col="12">
                   <v-container>
                     <v-row>
+                      <!-- rank -->
+                      <v-col cols="12" md="6" lg="6">
+                        <v-select
+                          v-model="rank"
+                          :items="ranks"
+                          :rules="rules.zonesBuildingsRoom"
+                          label="ยศ"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <!-- affiliation -->
+                      <v-col cols="12" md="6" lg="6">
+                        <v-select
+                          v-model="affiliation"
+                          :items="affiliations"
+                          :rules="rules.zonesBuildingsRoom"
+                          label="สังกัด"
+                          required
+                        ></v-select>
+                      </v-col>
                       <!-- name -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
                           v-model="name"
-                          :rules="rules.nameRules"
                           label="ชื่อ"
                           required
-                          autofocus
                         ></v-text-field
                       ></v-col>
                       <!-- email -->
@@ -66,30 +84,11 @@
                           :items="sexs"
                           v-model="sex"
                           required
-                          :rules="rules.nameRules"
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-select>
                       </v-col>
-                      <!-- rank -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-select
-                          v-model="rank"
-                          :items="ranks"
-                          :rules="rules.nameRules"
-                          label="ยศ"
-                          required
-                        ></v-select>
-                      </v-col>
-                      <!-- affiliation -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-select
-                          v-model="affiliation"
-                          :items="affiliations"
-                          :rules="rules.nameRules"
-                          label="สังกัด"
-                          required
-                        ></v-select>
-                      </v-col>
+
                       <!-- user -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
@@ -231,10 +230,8 @@ export default {
         (value) =>
           !value || value.size < 2000000 || "รูปประจำตัวขนาดไม่เกิน 2 MB",
       ],
-      nameRules: [
-        (v) => !!v || "กรุณากรอกชื่อ",
-        (v) => v.length >= 3 || "ชื่อต้องมีตัวอักษรมากกว่า 3 ตัวอักษร",
-      ],
+
+      zonesBuildingsRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
 
@@ -251,7 +248,9 @@ export default {
   computed: {},
   methods: {
     clearForm() {
+      this.$refs.formRegister.resetValidation();
       this.$refs.formRegister.reset();
+      this.showpassword = false;
     },
   },
 };

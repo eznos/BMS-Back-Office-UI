@@ -10,39 +10,102 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <v-form ref="form" @submit.prevent="submit" class="form">
+        <v-form ref="formEdit" v-model="valid" class="form" lazy-validation>
           <v-row>
+            <!-- avatar upload and preview -->
+            <v-col cols="12" sm="12" md="2" lg="2">
+              <v-hover v-slot="{ hover }">
+                <v-card
+                  color="#DFDDDD"
+                  height="142"
+                  max-width="230"
+                  tile
+                  class="px-3 mb-2 uploadimg"
+                >
+                  <v-row style="height: 100%" justify="center" align="center">
+                    <v-avatar
+                      v-if="!profileImage"
+                      tile
+                      height="142"
+                      width="230"
+                      color="#DFDDDD"
+                    >
+                      <h2>
+                        {{
+                          firstname != null ? firstname.substring(0, 1) : null
+                        }}
+                        {{ lastname != null ? lastname.substring(0, 1) : null }}
+                      </h2>
+                    </v-avatar>
+                    <v-img
+                      v-if="profileImage !== ''"
+                      :src="profileImage"
+                      height="142"
+                      width="230"
+                    >
+                    </v-img>
+                    <v-expand-transition>
+                      <div
+                        v-if="hover"
+                        class="d-flex v-card--reveal"
+                        style="height: 100%"
+                      >
+                        <div>
+                          <v-btn
+                            fab
+                            color="#F5F5F5"
+                            class="mr-2"
+                            @click="handleImageButtonClick"
+                          >
+                            <v-icon size="30">mdi-file-image-outline</v-icon>
+                          </v-btn>
+                          <input
+                            type="file"
+                            ref="image"
+                            @change="onImageSelected"
+                            style="display: none"
+                            accept="image/png, image/jpeg"
+                          />
+                        </div>
+                      </div>
+                    </v-expand-transition>
+                  </v-row>
+                </v-card>
+              </v-hover>
+            </v-col>
             <v-col col="12">
               <v-container>
                 <v-row>
                   <!-- rank -->
                   <v-col cols="12" sm="4" md="6" lg="2">
-                    <v-select
+                    <v-autocomplete
                       v-model="rank"
-                      :items="Rank"
+                      :items="ranks"
                       label="ยศ"
                       required
+                      :rules="rules.nameRules"
                       autofocus
                       clearable
                       prepend-icon="mdi-chevron-triple-up"
-                    ></v-select>
+                    >
+                    </v-autocomplete>
                   </v-col>
                   <!-- affi -->
                   <v-col cols="12" sm="4" md="6" lg="2">
-                    <v-select
+                    <v-autocomplete
                       v-model="affiliation"
-                      :items="Affiliation"
+                      :items="affiliations"
+                      :rules="rules.nameRules"
                       label="สังกัด"
                       required
-                      clearable
                       prepend-icon="mdi-format-list-group"
-                    ></v-select>
+                    ></v-autocomplete>
                   </v-col>
                   <!-- name -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
                       v-model="firstname"
-                      :rules="nameRules"
+                      :rules="rules.nameRules"
                       label="ชื่อ"
                       prepend-icon="mdi-form-textbox"
                       required
@@ -53,7 +116,7 @@
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
                       v-model="lastname"
-                      :rules="nameRules"
+                      :rules="rules.nameRules"
                       label="นามสกุล"
                       prepend-icon="mdi-rename-box"
                       required
@@ -64,8 +127,7 @@
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
                       v-model="email"
-                      :rules="emailRules"
-                      :error-messages="errors"
+                      :rules="[rules.email.regex]"
                       label="อีเมล"
                       prepend-icon="mdi-email"
                       clearable
@@ -74,33 +136,24 @@
                   </v-col>
                   <!-- tel. -->
                   <v-col cols="12" sm="4" md="6" lg="4">
-                    <validation-provider
-                      v-slot="{ errors }"
-                      name="phoneNumber"
-                      :rules="{
-                        required: true,
-                        digits: 10,
-                        regex: '^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})',
-                      }"
-                    >
-                      <v-text-field
-                        :rules="rules.phoneNumber"
-                        v-model="phoneNumber"
-                        :counter="10"
-                        :error-messages="errors"
-                        label="เบอร์โทร"
-                        required
-                        clearable
-                        prepend-icon="mdi-card-account-phone"
-                      ></v-text-field>
-                    </validation-provider>
+                    <v-text-field
+                      :rules="[rules.phoneNumber.regex]"
+                      v-model="phoneNumber"
+                      :counter="10"
+                      label="เบอร์โทร"
+                      required
+                      clearable
+                      prepend-icon="mdi-card-account-phone"
+                      @keypress="isNumber($event)"
+                    ></v-text-field>
                   </v-col>
                   <!-- sex -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-select
+                      v-model="sex"
                       prepend-icon="mdi-gender-male-female"
                       item-color="red"
-                      :items="sex"
+                      :items="sexs"
                       label="เพศ"
                     >
                     </v-select>
@@ -141,67 +194,8 @@
                     >
                     </v-autocomplete>
                   </v-col>
-                  <!-- avatar upload and preview -->
-                  <v-col></v-col>
-                  <v-col cols="12" sm="4" md="6" lg="2">
-                    <v-hover v-slot="{ hover }">
-                      <div>
-                        <v-card
-                          color="#F3F3F3"
-                          height="150"
-                          max-width="200"
-                          tile
-                          class="px-3 mb-2"
-                        >
-                          <v-row
-                            style="height: 100%"
-                            justify="center"
-                            align="center"
-                          >
-                            <v-img
-                              v-if="profileImage !== ''"
-                              :src="profileImage"
-                              width="150"
-                              height="150"
-                            >
-                            </v-img>
-                            <v-icon v-else size="65" color="#AEAEAE"
-                              >mdi-file-image-outline</v-icon
-                            >
-                            <v-expand-transition>
-                              <div
-                                v-if="hover"
-                                class="d-flex v-card--reveal"
-                                style="height: 100%"
-                              >
-                                <div>
-                                  <v-btn
-                                    fab
-                                    color="#F5F5F5"
-                                    class="mr-2"
-                                    @click="handleImageButtonClick"
-                                  >
-                                    <v-icon size="30"
-                                      >mdi-file-image-outline</v-icon
-                                    >
-                                  </v-btn>
-                                  <input
-                                    type="file"
-                                    ref="image"
-                                    @change="onImageSelected"
-                                    style="display: none"
-                                    accept="image/png, image/jpeg"
-                                  />
-                                </div>
-                              </div>
-                            </v-expand-transition>
-                          </v-row>
-                        </v-card>
-                      </div>
-                    </v-hover>
-                  </v-col>
-                  <v-col></v-col>
                 </v-row>
+                <v-row> </v-row>
               </v-container>
             </v-col>
           </v-row>
@@ -209,22 +203,21 @@
       </v-card-text>
       <v-card-actions>
         <div class="mx-auto">
-          <v-form ref="form" @submit.prevent="submit">
-            <v-btn
-              class="mr-4"
-              color="#71D861"
-              width="200px"
-              large
-              v-bind="attrs"
-              v-on="on"
-              @click="submit"
-              to="/login"
-            >
-              ยืนยันการลงทะเบียน
-            </v-btn>
+          <v-form v-model="valid" ref="formButton" @submit.prevent="submit">
+            <!-- clear form -->
             <v-btn
               class="mr-4"
               @click="clear"
+              outlined
+              width="200px"
+              large
+              color="error"
+            >
+              ล้างข้อมูล
+            </v-btn>
+            <!-- cancel form -->
+            <v-btn
+              class="mr-4"
               to="/login"
               dark
               width="200px"
@@ -233,6 +226,19 @@
             >
               ยกเลิกการลงทะเบียน
             </v-btn>
+            <!-- submit form -->
+            <v-btn
+              class="mr-4"
+              color="#71D861"
+              width="200px"
+              dark
+              large
+              v-bind="attrs"
+              v-on="on"
+              :disabled="!valid"
+            >
+              ยืนยันการลงทะเบียน
+            </v-btn>
           </v-form>
         </div>
       </v-card-actions>
@@ -240,51 +246,62 @@
   </v-app>
 </template>
 <script>
-import { required, digits, email, max, regex } from "vee-validate/dist/rules";
-import { extend, ValidationProvider, setInteractionMode } from "vee-validate";
-
-setInteractionMode("eager");
-extend("digits", {
-  ...digits,
-  message: "{_field_} needs to be {length} digits. ({_value_})",
-});
-extend("required", {
-  ...required,
-  message: "{_field_} จำเป็รต้องกรอก",
-});
-extend("max", {
-  ...max,
-  message: "{_field_} may not be greater than {length} characters",
-});
-extend("regex", {
-  ...regex,
-  message: "เบอร์โทรศัพท์ไม่ตรงกับรูปแบบที่กำหนด",
-});
-extend("email", {
-  ...email,
-  message: "Email ไม่สามารถว่างได้",
-});
 export default {
-  components: {
-    ValidationProvider,
-  },
+  components: {},
   data: () => ({
     loading: false,
     dialog: false,
-    valid: false,
+    on: {},
+    attrs: {},
+    valid: true,
     clicked: false,
     profileImage: "",
     loader: null,
     avatar: null,
-    firstname: null,
+    rank: "",
+    affiliation: "",
+    firstname: "",
     lastname: "",
-    sex: ["ชาย", "หญิง"],
+    sex: "",
+    sexs: ["ชาย", "หญิง", "เพศทางเลือก", "ไม่ระบุ"],
     tel: "",
+    email: "",
+    phoneNumber: "",
     zone: null,
     building: null,
     room: null,
-    Rank: ["พล.ต.อ. ", "พล.ต.ท.", "พล.ต.ต.", "พ.ต.อ"],
-    Affiliation: ["สยศ.ตร.", "สกบ.", "สกพ.", "สงป"],
+    ranks: [
+      "พล.ต.อ.",
+      "พล.ต.ท.",
+      "พล.ต.ต.",
+      "พ.ต.อ.",
+      "พ.ต.ท.",
+      "พ.ต.ต.",
+      "ร.ต.อ.",
+      "ร.ต.ท.",
+      "ร.ต.ต.",
+      "ด.ต.",
+      "จ.ส.ต.",
+      "ส.ต.อ.",
+      "ส.ต.ท.",
+      "ส.ต.ต.",
+    ],
+    affiliations: [
+      "ผบช.ภ.3",
+      "สนง.ผบช.ภ.3",
+      "สนง.รอง ผบช.ภ.3",
+      "ภ.3(ส่วนกลาง)",
+      "บก.สส.ภ.3",
+      "ภ.จว.นม.",
+      "สภ.เมืองนครราชสีมา",
+      "บก.อก.ภ.3",
+      "ศพฐ.3",
+      "ปฏิบัติราชการ",
+      "ประจำ",
+      "สำรอง",
+      "ภ.3",
+      "ศฝร.ภ.3",
+    ],
     // zone and building
     zonesBuildings: {
       เขตส่วนกลาง: [
@@ -788,23 +805,24 @@ export default {
       ],
     },
     rules: {
-      username: [
-        (val) => (val || "").length >= 6 || "รหัสผ่านต้องมีมากกว่า 6 ตัวอักษร",
+      nameRules: [
+        (v) => !!v || "กรุณากรอกข้อมูล",
+        (v) => (v && v.length >= 2) || "กรอกชื่อให้มากกว่า 2 ตัวอักษร",
       ],
-      password: [
-        (val) => (val || "").length > 8 || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
-      ],
-      Avatar: [
-        (value) =>
-          !value || value.size < 2000000 || "รูปภาพต้องมีขนาดเล็กกว่า 2 MB!",
-      ],
-      phoneNumber: [(val) => (val || "").length == 10],
+      email: {
+        required: (v) => !!v || "กรุณาใส่อีเมล",
+        regex: (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            v
+          ) || "อีเมลไม่ถูกต้อง",
+      },
+      phoneNumber: {
+        required: (v) => !!v || "กรุณาใส่เบอร์โทรศัพท์",
+        regex: (v) =>
+          /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
+          "เบอร์โทรศัพท์ม่ถูกต้อง",
+      },
     },
-    nameRules: [
-      (v) => !!v || "กรุณากรอกชื่อ",
-      (v) =>
-        v.length >= 2 || "ชื่อต้องมีจำนวนตัวอักษรมากกว่าหรือเท่ากับ 2 ตัวอักษร",
-    ],
     emailRules: [
       (v) => !!v || "กรุณากรอกอีเมล",
       (v) => /[\w._%+-]+@[\w.-]+\.[a-zA-Z]{2,4}/.test(v) || "อีเมลไม่ผิดรูปแบบ",
@@ -836,6 +854,7 @@ export default {
     submit() {
       this.$refs.observer.validate();
     },
+    // upload image and preview
     handleImageButtonClick() {
       this.$refs.image.click();
     },
@@ -847,6 +866,24 @@ export default {
         this.profileImage = e.target.result;
         this.isUploadProfileImage = true;
       };
+    },
+    clear() {
+      this.$refs.formEdit.reset();
+      this.profileImage = "";
+    },
+    // number only in text field
+    isNumber: function (evt) {
+      evt = evt ? evt : window.event;
+      var charCode = evt.which ? evt.which : evt.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        evt.preventDefault();
+      } else {
+        return true;
+      }
     },
   },
 };
@@ -862,7 +899,11 @@ export default {
 .icon {
   margin-right: 20px;
 }
-
+.uploadimg {
+  margin-top: 20px;
+  margin-right: -30px;
+  margin-bottom: 30px;
+}
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

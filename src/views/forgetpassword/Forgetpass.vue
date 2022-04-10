@@ -27,7 +27,7 @@
                           <v-text-field
                             prepend-icon="email"
                             v-model="email"
-                            :rules="[rules.required, rules.email]"
+                            :rules="[rules.email.regex]"
                             label="อีเมล"
                             autofocus
                           ></v-text-field>
@@ -77,10 +77,12 @@ export default {
     return {
       email: "",
       rules: {
-        email: (value) => {
-          const pattern =
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return pattern.test(value) || "รูปแบบอีเมลไม่ถูกต้อง";
+        email: {
+          required: (v) => !!v || "กรุณาใส่อีเมล",
+          regex: (v) =>
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+              v
+            ) || "อีเมลไม่ถูกต้อง",
         },
       },
     };
