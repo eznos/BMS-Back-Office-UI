@@ -109,6 +109,7 @@
     <v-card class="card-filter px-6 py-6">
       <v-card-title>
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
+        &nbsp;&nbsp;
         <h3>ตารางผู้อยู่อาศัย</h3>
         &nbsp;&nbsp;
         <!-- delete as selected -->

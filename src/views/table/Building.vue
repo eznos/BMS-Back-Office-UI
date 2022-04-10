@@ -29,7 +29,7 @@
       <v-form ref="formFilter">
         <!-- filter -->
         <v-row justify="space-between" class="px-3">
-          <!-- Filter for  frist_name-->
+          <!-- Filter for  first_name-->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-text-field
               v-model="search"
@@ -106,14 +106,232 @@
         </v-col>
       </v-form>
     </v-card>
-    <v-container>
-      <v-row classs="px-3">
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>
-              <v-icon size="35px" class="icon">mdi-table-large</v-icon>
-              <h3>ตารางสถานะห้องพัก</h3>
-              &nbsp;&nbsp;
+    <v-row>
+      <v-col cols="12">
+        <v-card class="card-filter px-6 py-6">
+          <v-card-title>
+            <v-icon size="35px" class="icon">mdi-table-large</v-icon>
+            &nbsp;&nbsp;
+            <h3>ตารางสถานะห้องพัก</h3>
+            &nbsp;&nbsp;
+            <!-- delete as selected -->
+            <v-btn
+              color="error"
+              width="140"
+              v-bind="attrs"
+              v-on="on"
+              class="button-filter pt-5 pb-5"
+              :disabled="!selectAll"
+              @click="deleteItemSelected"
+            >
+              <v-icon>mdi-delete-sweep</v-icon>
+              ลบข้อมูลที่เลือก
+            </v-btn>
+            <v-spacer></v-spacer>
+            <div>
+              <!-- add user -->
+              <v-dialog v-model="dialog" persistent max-width="75%">
+                <template v-slot:activator="{ on: attrs }">
+                  <v-btn
+                    color="agree"
+                    dark
+                    v-on="{ ...attrs }"
+                    class="button-filter"
+                  >
+                    <v-icon> mdi-account-plus </v-icon>
+                    เพิ่มผู้อยู่อาศัย
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    <span>{{ formTitle }}</span>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-container>
+                      <v-form ref="formNewdata" v-model="valid" lazy-validation>
+                        <v-row>
+                          <!-- rank -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-autocomplete
+                              label="ยศ"
+                              v-model="editedItem.rank"
+                              :items="ranks"
+                              required
+                              :rules="rules.nameRules"
+                              autofocus
+                            >
+                            </v-autocomplete>
+                          </v-col>
+                          <!-- first_name -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.first_name"
+                              label="ชื่อ"
+                              required
+                              :rules="rules.nameRules"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- last_name -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.last_name"
+                              label="นามสกุล"
+                              required
+                              :rules="rules.nameRules"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- zone -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-autocomplete
+                              v-model="editedItem.zone"
+                              :items="zones"
+                              label="พื้นที่"
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
+                            >
+                            </v-autocomplete>
+                          </v-col>
+                          <!-- building -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-autocomplete
+                              v-model="editedItem.building"
+                              :items="buildings"
+                              label="อาคาร"
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
+                            >
+                            </v-autocomplete>
+                          </v-col>
+                          <!-- room -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-autocomplete
+                              v-model="editedItem.room"
+                              label="เลขห้องพัก"
+                              :items="rooms"
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
+                            >
+                            </v-autocomplete>
+                          </v-col>
+                          <!-- electric_no -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.electric_no"
+                              label="เลขผู้ใช้ไฟฟ้า"
+                              @keypress="isNumber($event)"
+                              clearable
+                              required
+                              counter="12"
+                              :rules="rules.electricNumber"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- water_no -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.water_no"
+                              label="เลขผู้ใช้น้ำ"
+                              @keypress="isNumber($event)"
+                              clearable
+                              required
+                              counter="4"
+                              :rules="rules.waterNumber"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- electric_meter_no -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.electric_meter_no"
+                              label="เลขมิเตอร์น้ำไฟฟ้า"
+                              @keypress="isNumber($event)"
+                              clearable
+                              required
+                              counter="11"
+                              :rules="rules.electricMeterNumber"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- water_meter_no -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-text-field
+                              v-model="editedItem.water_meter_no"
+                              label="เลขมิเตอร์น้ำประปา"
+                              @keypress="isNumber($event)"
+                              clearable
+                              required
+                              counter="4"
+                              :rules="rules.waterNumber"
+                            ></v-text-field>
+                          </v-col>
+                          <!-- type -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              v-model="editedItem.type"
+                              :items="types"
+                              label="ประเภทห้องพัก"
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
+                            >
+                            </v-select>
+                          </v-col>
+                          <!-- status -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              v-model="editedItem.status"
+                              :items="status"
+                              label="สถานะห้องพัก"
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
+                            >
+                            </v-select>
+                          </v-col>
+                        </v-row>
+                      </v-form>
+                    </v-container>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-btn color="error" text @click="clearForm">
+                        ล้างข้อมูลที่กรอก
+                      </v-btn>
+                      <v-btn large color="warning" text @click="close">
+                        ยกเลิก
+                      </v-btn>
+                      <v-btn
+                        large
+                        color="agree"
+                        :disabled="!valid"
+                        text
+                        @click="save"
+                      >
+                        ยืนยัน
+                      </v-btn>
+                    </v-form>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <!-- delete water user -->
+              <v-dialog v-model="dialogDelete" max-width="75%">
+                <v-card>
+                  <v-card-title class="text-h5"
+                    >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
+                  >
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" text @click="closeDelete"
+                      >ยกเลิก</v-btn
+                    >
+                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                      >ยืนยัน</v-btn
+                    >
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
               <!-- delete as selected -->
               <v-btn
                 dark
@@ -121,320 +339,95 @@
                 width="140"
                 v-bind="attrs"
                 v-on="on"
-                class="button-filter pt-5 pb-5"
-                :disabled="!selectAll"
-                @click="deleteItemSelected"
+                class="button-filter"
               >
                 <v-icon>mdi-delete-sweep</v-icon>
                 ลบข้อมูลที่เลือก
               </v-btn>
-              <v-spacer></v-spacer>
-              <div>
-                <!-- add user -->
-                <v-dialog v-model="dialog" persistent max-width="75%">
-                  <template v-slot:activator="{ on: attrs }">
-                    <v-btn
-                      color="agree"
-                      dark
-                      v-on="{ ...attrs }"
-                      class="button-filter"
-                    >
-                      <v-icon> mdi-account-plus </v-icon>
-                      เพิ่มผู้อยู่อาศัย
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>
-                      <span>{{ formTitle }}</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-container>
-                        <v-form
-                          ref="formNewdata"
-                          v-model="valid"
-                          lazy-validation
-                        >
-                          <v-row>
-                            <!-- rank -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-autocomplete
-                                label="ยศ"
-                                v-model="editedItem.rank"
-                                :items="ranks"
-                                required
-                                :rules="rules.nameRules"
-                                autofocus
-                              >
-                              </v-autocomplete>
-                            </v-col>
-                            <!-- frist_name -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.frist_name"
-                                label="ชื่อ"
-                                required
-                                :rules="rules.nameRules"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- last_name -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.last_name"
-                                label="นามสกุล"
-                                required
-                                :rules="rules.nameRules"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- zone -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-autocomplete
-                                v-model="editedItem.zone"
-                                :items="zones"
-                                label="พื้นที่"
-                                clearable
-                                required
-                                :rules="rules.zonesBuildingsRoom"
-                              >
-                              </v-autocomplete>
-                            </v-col>
-                            <!-- building -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-autocomplete
-                                v-model="editedItem.building"
-                                :items="buildings"
-                                label="อาคาร"
-                                clearable
-                                required
-                                :rules="rules.zonesBuildingsRoom"
-                              >
-                              </v-autocomplete>
-                            </v-col>
-                            <!-- room -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-autocomplete
-                                v-model="editedItem.room"
-                                label="เลขห้องพัก"
-                                :items="rooms"
-                                clearable
-                                required
-                                :rules="rules.zonesBuildingsRoom"
-                              >
-                              </v-autocomplete>
-                            </v-col>
-                            <!-- electric_no -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.electric_no"
-                                label="เลขผู้ใช้ไฟฟ้า"
-                                @keypress="isNumber($event)"
-                                clearable
-                                required
-                                counter="12"
-                                :rules="rules.electricNumber"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- water_no -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.water_no"
-                                label="เลขผู้ใช้น้ำ"
-                                @keypress="isNumber($event)"
-                                clearable
-                                required
-                                counter="4"
-                                :rules="rules.waterNumber"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- electric_meter_no -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.electric_meter_no"
-                                label="เลขมิเตอร์น้ำไฟฟ้า"
-                                @keypress="isNumber($event)"
-                                clearable
-                                required
-                                counter="11"
-                                :rules="rules.electricMeterNumber"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- water_meter_no -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-text-field
-                                v-model="editedItem.water_meter_no"
-                                label="เลขมิเตอร์น้ำประปา"
-                                @keypress="isNumber($event)"
-                                clearable
-                                required
-                                counter="4"
-                                :rules="rules.waterNumber"
-                              ></v-text-field>
-                            </v-col>
-                            <!-- type -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-select
-                                v-model="editedItem.type"
-                                :items="types"
-                                label="ประเภทห้องพัก"
-                                clearable
-                                required
-                                :rules="rules.zonesBuildingsRoom"
-                              >
-                              </v-select>
-                            </v-col>
-                            <!-- status -->
-                            <v-col cols="12" sm="6" md="4">
-                              <v-select
-                                v-model="editedItem.status"
-                                :items="status"
-                                label="สถานะห้องพัก"
-                                clearable
-                                required
-                                :rules="rules.zonesBuildingsRoom"
-                              >
-                              </v-select>
-                            </v-col>
-                          </v-row>
-                        </v-form>
-                      </v-container>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-form ref="form" v-model="valid" lazy-validation>
-                        <v-btn color="error" text @click="clearForm">
-                          ล้างข้อมูลที่กรอก
-                        </v-btn>
-                        <v-btn large color="warning" text @click="close">
-                          ยกเลิก
-                        </v-btn>
-                        <v-btn
-                          large
-                          color="agree"
-                          :disabled="!valid"
-                          text
-                          @click="save"
-                        >
-                          ยืนยัน
-                        </v-btn>
-                      </v-form>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-                <!-- delete water user -->
-                <v-dialog v-model="dialogDelete" max-width="75%">
-                  <v-card>
-                    <v-card-title class="text-h5"
-                      >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
-                    >
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" text @click="closeDelete"
-                        >ยกเลิก</v-btn
-                      >
-                      <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="deleteItemConfirm"
-                        >ยืนยัน</v-btn
-                      >
-                      <v-spacer></v-spacer>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-                <!-- delete as selected -->
-                <v-btn
-                  dark
-                  color="error"
-                  width="140"
-                  v-bind="attrs"
-                  v-on="on"
-                  class="button-filter"
-                >
-                  <v-icon>mdi-delete-sweep</v-icon>
-                  ลบข้อมูลที่เลือก
-                </v-btn>
-                <!-- clear search -->
-                <v-btn
-                  dark
-                  class="button-filter"
-                  color="#F82E39"
-                  v-bind="attrs"
-                  v-on="on"
-                  @click="clear"
-                >
-                  <v-icon>mdi-delete</v-icon>
-                  ลบการค้นหา
-                </v-btn>
-              </div>
-            </v-card-title>
-            <v-card-text>
-              <!-- start data-table -->
-              <v-data-table
-                :headers="headers"
-                :items="building"
-                item-key="frist_name"
-                :items-per-page="5"
-                class="table header-blue"
-                :search="search"
-                loading
-                loading-text="กำลังโหลด... โปรดรอสักครู่"
-                show-select
+              <!-- clear search -->
+              <v-btn
+                dark
+                class="button-filter"
+                color="#F82E39"
+                v-bind="attrs"
+                v-on="on"
+                @click="clear"
               >
-                <!-- color status on datatable  -->
-                <template v-slot:[`item.status`]="{ item }">
-                  <v-chip :color="getColor(item.status)" dark>
-                    {{ item.status }}
-                  </v-chip>
-                </template>
-                <template v-slot:top>
-                  <!-- v-container, v-col and v-row are just for decoration purposes. -->
-                </template>
-                <!-- data edit and delete-->
-                <template v-slot:[`item.actions`]="{ item }">
-                  <v-icon small class="mr-2" @click="editItem(item)">
-                    mdi-pencil
-                  </v-icon>
-                  <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-                </template>
-              </v-data-table>
-              <!-- end data-table -->
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- chart center -->
-        <v-col cols="12" xs="12" sm="12" md="12" lg="4" class="">
-          <v-card>
-            <h2>เขตส่วนกลาง</h2>
-            <v-card-actions>
-              <div class="chart-responsive" :style="{ padding: 10 }">
-                <canvas id="center" width="1500" height="350"></canvas>
-              </div>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-        <!-- chart suranarai -->
-        <v-col cols="12" xs="12" sm="12" md="12" lg="4">
-          <v-card>
-            <h2>เขตถนนสุรนารายณ์</h2>
-            <v-card-actions>
-              <div class="chart-responsive" :style="{ padding: 10 }">
-                <canvas id="suranarai" width="1500" height="350"></canvas>
-              </div>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-        <!-- chart ashtang -->
-        <v-col cols="12" xs="12" sm="12" md="12" lg="4">
-          <v-card>
-            <h2>อัษฎางค์</h2>
-            <v-card-actions>
-              <div class="chart-responsive" :style="{ padding: 10 }">
-                <canvas id="ashtang" width="1500" height="350"></canvas>
-              </div>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+                <v-icon>mdi-delete</v-icon>
+                ลบการค้นหา
+              </v-btn>
+            </div>
+          </v-card-title>
+          <v-card-text>
+            <!-- start data-table -->
+            <v-data-table
+              v-model="selected"
+              :headers="headers"
+              :items="buildingTable"
+              item-key="first_name"
+              :items-per-page="itemsPerPage"
+              class="table header-blue"
+              :search="search"
+              loading
+              loading-text="กำลังโหลด... โปรดรอสักครู่"
+              show-select
+              @input="enterSelect($event)"
+            >
+              <!-- color status on datatable  -->
+              <template v-slot:[`item.status`]="{ item }">
+                <v-chip :color="getColor(item.status)" dark>
+                  {{ item.status }}
+                </v-chip>
+              </template>
+              <template v-slot:top>
+                <!-- v-container, v-col and v-row are just for decoration purposes. -->
+              </template>
+              <!-- data edit and delete-->
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-icon small class="mr-2" @click="editItem(item)">
+                  mdi-pencil
+                </v-icon>
+                <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+              </template>
+            </v-data-table>
+            <!-- end data-table -->
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <!-- chart center -->
+      <v-col cols="12" xs="12" sm="12" md="12" lg="4" class="">
+        <v-card>
+          <h2>เขตส่วนกลาง</h2>
+          <v-card-actions>
+            <div class="chart-responsive" :style="{ padding: 10 }">
+              <canvas id="center" width="1500" height="350"></canvas>
+            </div>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <!-- chart suranarai -->
+      <v-col cols="12" xs="12" sm="12" md="12" lg="4">
+        <v-card>
+          <h2>เขตถนนสุรนารายณ์</h2>
+          <v-card-actions>
+            <div class="chart-responsive" :style="{ padding: 10 }">
+              <canvas id="suranarai" width="1500" height="350"></canvas>
+            </div>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+      <!-- chart ashtang -->
+      <v-col cols="12" xs="12" sm="12" md="12" lg="4">
+        <v-card>
+          <h2>อัษฎางค์</h2>
+          <v-card-actions>
+            <div class="chart-responsive" :style="{ padding: 10 }">
+              <canvas id="ashtang" width="1500" height="350"></canvas>
+            </div>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-app>
 </template>
 
@@ -623,8 +616,10 @@ export default {
     modal: false,
     dialog: false,
     menu: false,
+    selected: [],
+    itemsPerPage: 5,
     selectAll: false,
-    frist_name: "",
+    first_name: "",
     on: {},
     attrs: {},
     zone: null,
@@ -1163,17 +1158,17 @@ export default {
     zoneFilterValue: "",
     statusFilterValue: "",
     buildFilterValue: null,
-    building: [],
+    buildingTable: [],
     editedIndex: -1,
     editedItem: {
-      frist_name: "",
+      first_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
       status: "ว่าง",
     },
     defaultItem: {
-      frist_name: "",
+      first_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
@@ -1215,14 +1210,13 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "frist_name",
+          value: "first_name",
           align: "left",
           // filter: this.nameFilter,
         },
         {
           text: "นามสกุล",
           value: "last_name",
-       
         },
         {
           text: "พื้นที่",
@@ -1240,7 +1234,7 @@ export default {
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
-          value: "electric_no",
+          value: "electricity_no",
         },
         {
           text: "เลขผู้ใช้น้ำ",
@@ -1248,7 +1242,7 @@ export default {
         },
         {
           text: "เลขมิเตอร์ไฟฟ้า",
-          value: "electric_meter_no",
+          value: "electricity_meter_no",
         },
         {
           text: "เลขมิเตอร์น้ำประปา",
@@ -1301,13 +1295,251 @@ export default {
       val || this.closeDelete();
     },
   },
+  created() {
+    this.initialize();
+  },
   methods: {
+    initialize() {
+      this.buildingTable = [
+        {
+          rank: "พล.ต.อ.",
+          first_name: "ชัชชาช้า",
+          last_name: "ชัชชาวาน",
+          zone: "เขตสุระ",
+          building: "2/20",
+          room: "2",
+          meter_group: "ป.1",
+          water_no: "1234",
+          water_meter_no: "1234",
+          electricity_no: "200190919501",
+          electricity_meter_no: "20019091950",
+          date_pay: "2022-03",
+          price: "30",
+          difference_price: "50",
+          sum_price: "80",
+          status: "ไม่ว่าง",
+          permission: "user",
+          email: "user@123.com",
+          type: "ห้องครอบครัว 1",
+        },
+        {
+          rank: "ด.ต.หญิง",
+          first_name: "ภัทรพร",
+          last_name: "ศรีโอภาส",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "103",
+          meter_group: "ป.1",
+          water_no: "4567",
+          water_meter_no: "4567",
+          electricity_no: "200190955212",
+          electricity_meter_no: "20019095521",
+          date_pay: "2021-06",
+          price: "19",
+          difference_price: "25.34",
+          sum_price: "44.34",
+          status: "ไม่ว่าง",
+          permission: "admin",
+          email: "smorston0@nytimes.com",
+          type: "ห้องครอบครัว 2",
+        },
+        {
+          rank: "ด.ต.",
+          first_name: "อมร ",
+          last_name: "ภูมพฤกษ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "107",
+          meter_group: "ป.1",
+          water_no: "7540",
+          water_meter_no: "7540",
+          electricity_no: "200190955393",
+          electricity_meter_no: "20019095539",
+          date_pay: "2021-06",
+          price: "57",
+          difference_price: "25.34",
+          sum_price: "82.34",
+          status: "ไม่ว่าง",
+          permission: "user",
+          email: "mtinkler1@google.ca",
+          type: "ห้องครอบครัว 2",
+        },
+        {
+          rank: "ด.ต.",
+          first_name: "อดุล ",
+          last_name: "วงศ์ทอง",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "202",
+          meter_group: "ป.1",
+          water_no: "9856",
+          water_meter_no: "9856",
+          electricity_no: "200187439364",
+          electricity_meter_no: "20018743936",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "ไม่ว่าง",
+          permission: "user",
+          email: "ssmewings2@umn.edu",
+          type: "ห้องโสด",
+        },
+        {
+          rank: "ร.ต.ท.",
+          first_name: "จรัส ",
+          last_name: "สิมฤทธิ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "206",
+          meter_group: "ป.1",
+          water_no: "3214",
+          water_meter_no: "3214",
+          electricity_no: "200130597255",
+          electricity_meter_no: "20013059725",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "asnartt3@intel.com",
+          type: "ห้องครอบครัว 2",
+        },
+        {
+          rank: "ส.ต.อ.",
+          first_name: "ธิชากร ",
+          last_name: "ผินดอน",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "305",
+          meter_group: "ป.83",
+          water_no: "5467",
+          water_meter_no: "5467",
+          electricity_no: "200130599746",
+          electricity_meter_no: "20013059974",
+          date_pay: "2021-06",
+          price: "76",
+          difference_price: "25.34",
+          sum_price: "101.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "ibirkbeck4@github.com",
+          type: "ห้องโสด",
+        },
+        {
+          rank: "ด.ต.",
+          first_name: "รุ่ง ",
+          last_name: "โฉมกิ่ง",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "402",
+          meter_group: "ป.1",
+          water_no: "8520",
+          water_meter_no: "8520",
+          electricity_no: "200130694277",
+          electricity_meter_no: "20013069427",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "gmcgrah5@ucoz.ru",
+          type: "ห้องครอบครัว 1",
+        },
+        {
+          rank: "ด.ต.",
+          first_name: "อนุชา ",
+          last_name: "ฝากชัยภูมิ",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "413",
+          meter_group: "ป.1",
+          water_no: "7845",
+          water_meter_no: "7845",
+          electricity_no: "200130694548",
+          electricity_meter_no: "20013069454",
+          date_pay: "2021-06",
+          price: "152",
+          difference_price: "25.34",
+          sum_price: "177.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "jkirkby6@answers.com",
+          type: "ห้องครอบครัว 2",
+        },
+        {
+          rank: "ส.ต.อ.",
+          first_name: "รัฐพนย์ ",
+          last_name: "เรื่องเรือ",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "504",
+          meter_group: "ป.1",
+          water_no: "3568",
+          water_meter_no: "3568",
+          electricity_no: "200130695249",
+          electricity_meter_no: "20013069524",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "fillyes7@hubpages.com",
+          type: "ห้องครอบครัว 1",
+        },
+        {
+          rank: "ร.ต.ท.",
+          first_name: "อิทธิพล",
+          last_name: "เพ็ญเติมพันธ์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "514",
+          meter_group: "ป.1",
+          water_no: "5568",
+          water_meter_no: "5568",
+          electricity_no: "200130696190",
+          electricity_meter_no: "20013069619",
+          date_pay: "2021-06",
+          price: "95",
+          difference_price: "25.34",
+          sum_price: "120.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "mlarmet8@mail.ru",
+          type: "ห้องโสด",
+        },
+        {
+          rank: "ด.ต.",
+          first_name: "ไพโรจน์",
+          last_name: "ทนปรางค์",
+          zone: "อัษฎางค์",
+          building: "2/19",
+          room: "515",
+          meter_group: "ป.1",
+          water_no: "1123",
+          water_meter_no: "1123",
+          electricity_no: "200130696190",
+          electricity_meter_no: "20013069619",
+          date_pay: "2021-06",
+          price: "19",
+          difference_price: "25.34",
+          sum_price: "44.34",
+          status: "ว่าง",
+          permission: "user",
+          email: "tgainseford9@sun.com",
+          type: "ห้องครอบครัว 1",
+        },
+      ];
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
         return true;
       }
-      // Check if the current loop value (The dessert frist_name)
+      // Check if the current loop value (The dessert first_name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
@@ -1425,8 +1657,8 @@ export default {
     deleteItemSelected() {
       if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
         for (var i = 0; i < this.selected.length; i++) {
-          const index = this.residentTable.indexOf(this.selected[i]);
-          this.residentTable.splice(index, 1);
+          const index = this.buildingTable.indexOf(this.selected[i]);
+          this.buildingTable.splice(index, 1);
           this.selected.length == 0;
         }
         this.dialog = false;

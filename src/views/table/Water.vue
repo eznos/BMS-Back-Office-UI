@@ -689,6 +689,7 @@
       <v-card-text>
         <!-- start data-table -->
         <v-data-table
+          v-model="selected"
           :headers="headers"
           :items="waterTable"
           item-key="first_name"
@@ -728,6 +729,7 @@ export default {
     sortDesc: false,
     oldUnit: null,
     currentUnit: null,
+    selected: [],
     attrs: {},
     on: {},
     selectedRows: [],
@@ -1685,12 +1687,15 @@ export default {
       this.closeDelete();
     },
     // delete as selected
-    deleteItemSelected(values) {
-      if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่")) {
-        for (var i = 0; i < values.length; i++) {
+
+    deleteItemSelected() {
+      if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
+        for (var i = 0; i < this.selected.length; i++) {
           const index = this.waterTable.indexOf(this.selected[i]);
           this.waterTable.splice(index, 1);
+          this.selected.length == 0;
         }
+        this.dialog = false;
       }
     },
     close() {
