@@ -109,11 +109,10 @@
     <v-card class="card-filter px-6 py-6">
       <v-card-title>
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
-        <h3>ตารางผุ้อยู่อาศัย</h3>
+        <h3>ตารางผู้อยู่อาศัย</h3>
         &nbsp;&nbsp;
         <!-- delete as selected -->
         <v-btn
-          dark
           color="error"
           width="140"
           v-bind="attrs"
@@ -162,10 +161,20 @@
                         >
                         </v-autocomplete>
                       </v-col>
-                      <!-- name -->
+                      <!-- firstname -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.name"
+                          v-model="editedItem.first_name"
+                          label="ชื่อ"
+                          required
+                          :rules="rules.nameRules"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
+                      <!-- lastname -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.last_name"
                           label="ชื่อ"
                           required
                           :rules="rules.nameRules"
@@ -364,7 +373,7 @@
         v-model="selected"
         :headers="headers"
         :items="residentTable"
-        item-key="name"
+        item-key="first_name"
         :items-per-page="itemsPerPage"
         class="elevation-1 pa-6"
         :search="search"
@@ -930,14 +939,14 @@ export default {
     residentTable: [],
     editedIndex: -1,
     editedItem: {
-      name: "",
+      first_name: "",
       room_no: "",
       electric_no: "",
       water_meter_no: "",
       status: "Non Approve",
     },
     defaultItem: {
-      name: "",
+      first_name: "",
       room_no: "",
       electric_no: "",
       water_meter_no: "",
@@ -981,8 +990,12 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "name",
+          value: "first_name",
           filter: this.nameFilter,
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
         },
         {
           text: "พื้นที่",
@@ -1074,7 +1087,8 @@ export default {
       this.residentTable = [
         {
           rank: "ด.ต.หญิง",
-          name: "อธิวัฒน์ เจิมสูงเนิน",
+          first_name: "อธิวัฒน์",
+          last_name: " เจิมสูงเนิน",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "132",
@@ -1089,7 +1103,8 @@ export default {
         },
         {
           rank: "จ.ส.ต.",
-          name: "ยุพาพร พวงมะเทศ",
+          first_name: "ยุพาพร ",
+          last_name: "พวงมะเทศ",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "133",
@@ -1104,7 +1119,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "เทวราช ดวงทอง",
+          first_name: "เทวราช",
+          last_name: " ดวงทอง",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "138",
@@ -1119,7 +1135,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "สุรพงษ์ ทั่งทอง",
+          first_name: "สุรพงษ์ ",
+          last_name: "ทั่งทอง",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "140",
@@ -1134,7 +1151,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "จิรสิทธ์ ภูอ่าง",
+          first_name: "จิรสิทธ์",
+          last_name: " ภูอ่าง",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "142",
@@ -1149,7 +1167,8 @@ export default {
         },
         {
           rank: "ร.ต.ท.",
-          name: "วุฒิชัย บุญใบ",
+          first_name: "วุฒิชัย",
+          last_name: " บุญใบ",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "148",
@@ -1164,7 +1183,8 @@ export default {
         },
         {
           rank: "พ.ต.อ.",
-          name: "ธรรมศธรรม นาคมณี",
+          first_name: "ธรรมศธรรม",
+          last_name: " นาคมณี",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "22",
@@ -1179,7 +1199,8 @@ export default {
         },
         {
           rank: "พ.ต.อ.",
-          name: "สุพล สุราวุฒิ",
+          first_name: "สุพล ",
+          last_name: "สุราวุฒิ",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "23",
@@ -1194,7 +1215,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "พีรันธร ก้านขุนทด",
+          first_name: "พีรันธร",
+          last_name: " ก้านขุนทด",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "24",
@@ -1209,7 +1231,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "อักษร ทองวิจิตร",
+          first_name: "อักษร ",
+          last_name: "ทองวิจิตร",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "26",

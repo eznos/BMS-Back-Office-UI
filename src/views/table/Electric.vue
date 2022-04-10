@@ -132,7 +132,6 @@
         <h3>ตารางค่าไฟฟ้า</h3>
         <!-- delete as selected -->
         <v-btn
-          dark
           color="error"
           width="140"
           v-bind="attrs"
@@ -184,8 +183,17 @@
                       <!-- name -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.name"
-                          label="ชื่อ-นามสกุล"
+                          v-model="editedItem.first_name"
+                          label="ชื่อ"
+                          required
+                          :rules="rules.name"
+                        ></v-text-field>
+                      </v-col>
+                      <!-- lastname -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.last_name"
+                          label="นามสกุล"
                           required
                           :rules="rules.name"
                         ></v-text-field>
@@ -476,7 +484,7 @@
           v-model="selected"
           :headers="headers"
           :items="electricTable"
-          item-key="name"
+          item-key="first_name"
           :items-per-page="itemsPerPage"
           class="elevation-1 pa-6"
           :search="search"
@@ -510,7 +518,7 @@ export default {
   data: () => ({
     el: "#app",
     valid: true,
-    sortBy: "name",
+    sortBy: "first_name",
     sortDesc: false,
     modalAddDate: false,
     modalfilter: false,
@@ -558,7 +566,7 @@ export default {
     electricTable: [],
     editedIndex: -1,
     editedItem: {
-      name: "",
+      first_name: "",
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
@@ -566,7 +574,7 @@ export default {
       date_pay: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
-      name: "",
+      first_name: "",
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
@@ -1112,9 +1120,13 @@ export default {
           filter: this.rankFilter,
         },
         {
-          text: "ชื่อ-นามสกุล",
-          value: "name",
+          text: "ชื่อ",
+          value: "first_name",
           filter: this.nameFilter,
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
         },
         {
           text: "อาคาร",
@@ -1193,7 +1205,8 @@ export default {
       this.electricTable = [
         {
           rank: "ด.ต.หญิง",
-          name: "อธิวัฒน์ เจิมสูงเนิน",
+          first_name: "อธิวัฒน์ ",
+          last_name: "เจิมสูงเนิน",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "132",
@@ -1206,7 +1219,8 @@ export default {
         },
         {
           rank: "จ.ส.ต.",
-          name: "ยุพาพร พวงมะเทศ",
+          first_name: "ยุพาพร ",
+          last_name: "พวงมะเทศ",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "133",
@@ -1219,7 +1233,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "เทวราช ดวงทอง",
+          first_name: "เทวราช ",
+          last_name: "ดวงทอง",
           zone: "สุรนารายณ์",
           building: "2/36",
           room_no: "138",
@@ -1227,12 +1242,13 @@ export default {
           electricity_no: "200190955393",
           electricity_meter_no: "20019095539",
           date_pay: "2021-06",
-          price: 0.0,
+          price: "0.00",
           status: "Approve",
         },
         {
           rank: "ด.ต.",
-          name: "สุรพงษ์ ทั่งทอง",
+          first_name: "สุรพงษ์ ",
+          last_name: "ทั่งทอง",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "140",
@@ -1245,7 +1261,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "จิรสิทธ์ ภูอ่าง",
+          first_name: "จิรสิทธ์ ",
+          last_name: "ภูอ่าง",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "142",
@@ -1258,7 +1275,8 @@ export default {
         },
         {
           rank: "ร.ต.ท.",
-          name: "วุฒิชัย บุญใบ",
+          first_name: "วุฒิชัย ",
+          last_name: "บุญใบ",
           zone: "สุรนารายณ์",
           building: "2/37",
           room_no: "148",
@@ -1271,7 +1289,8 @@ export default {
         },
         {
           rank: "พ.ต.อ.",
-          name: "ธรรมศธรรม นาคมณี",
+          first_name: "ธรรมศธรรม ",
+          last_name: "นาคมณี",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "22",
@@ -1284,7 +1303,8 @@ export default {
         },
         {
           rank: "พ.ต.อ.",
-          name: "สุพล สุราวุฒิ",
+          first_name: "สุพล ",
+          last_name: "สุราวุฒิ",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "23",
@@ -1297,7 +1317,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "พีรันธร ก้านขุนทด",
+          first_name: "พีรันธร ",
+          last_name: "ก้านขุนทด",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "24",
@@ -1310,7 +1331,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "อักษร ทองวิจิตร",
+          first_name: "อักษร ",
+          last_name: "ทองวิจิตร",
           zone: "สุรนารายณ์",
           building: "2/38",
           room_no: "26",
@@ -1318,7 +1340,7 @@ export default {
           electricity_no: "200130696190",
           electricity_meter_no: "20013069619",
           date_pay: "2021-06",
-          price: 0.0,
+          price: "0.00",
           status: "Non Approve",
         },
       ];
@@ -1328,7 +1350,7 @@ export default {
       if (!this.NamefilterValue) {
         return true;
       }
-      // Check if the current loop value (The dessert name)
+      // Check if the current loop value (The name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
@@ -1438,7 +1460,7 @@ export default {
     // color of price
     getColor(price) {
       if (price == 0) return "red";
-      else return "#ffffff";
+      else return "#FFFFFF00";
     },
     // show delete as selected button
     enterSelect() {

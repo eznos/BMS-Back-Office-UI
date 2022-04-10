@@ -8,9 +8,7 @@
           <v-row style="align-items: center">
             <div class="ml-3 mt-9">
               <h2>
-                <v-icon size="40" color="gray">
-                  mdi-office-building-outline
-                </v-icon>
+                <v-icon size="40" color="gray"> mdi-home-circle </v-icon>
                 จัดการหอพัก
               </h2>
             </div>
@@ -31,7 +29,7 @@
       <v-form ref="formFilter">
         <!-- filter -->
         <v-row justify="space-between" class="px-3">
-          <!-- Filter for  name-->
+          <!-- Filter for  frist_name-->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-text-field
               v-model="search"
@@ -157,7 +155,7 @@
                           lazy-validation
                         >
                           <v-row>
-                            <!-- name -->
+                            <!-- rank -->
                             <v-col cols="12" sm="6" md="4">
                               <v-autocomplete
                                 label="ยศ"
@@ -169,11 +167,20 @@
                               >
                               </v-autocomplete>
                             </v-col>
-                            <!-- name -->
+                            <!-- frist_name -->
                             <v-col cols="12" sm="6" md="4">
                               <v-text-field
-                                v-model="editedItem.name"
-                                label="ชื่อ-นามสกุล"
+                                v-model="editedItem.frist_name"
+                                label="ชื่อ"
+                                required
+                                :rules="rules.nameRules"
+                              ></v-text-field>
+                            </v-col>
+                            <!-- last_name -->
+                            <v-col cols="12" sm="6" md="4">
+                              <v-text-field
+                                v-model="editedItem.last_name"
+                                label="นามสกุล"
                                 required
                                 :rules="rules.nameRules"
                               ></v-text-field>
@@ -364,7 +371,7 @@
               <v-data-table
                 :headers="headers"
                 :items="building"
-                item-key="name"
+                item-key="frist_name"
                 :items-per-page="5"
                 class="table header-blue"
                 :search="search"
@@ -617,7 +624,7 @@ export default {
     dialog: false,
     menu: false,
     selectAll: false,
-    name: "",
+    frist_name: "",
     on: {},
     attrs: {},
     zone: null,
@@ -1159,14 +1166,14 @@ export default {
     building: [],
     editedIndex: -1,
     editedItem: {
-      name: "",
+      frist_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
       status: "ว่าง",
     },
     defaultItem: {
-      name: "",
+      frist_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
@@ -1207,10 +1214,15 @@ export default {
           // filter: this.nameFilter,
         },
         {
-          text: "ชื่อผู้อยู่อาศัย",
-          value: "name",
+          text: "ชื่อ",
+          value: "frist_name",
           align: "left",
           // filter: this.nameFilter,
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
+       
         },
         {
           text: "พื้นที่",
@@ -1295,7 +1307,7 @@ export default {
       if (!this.NamefilterValue) {
         return true;
       }
-      // Check if the current loop value (The dessert name)
+      // Check if the current loop value (The dessert frist_name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },

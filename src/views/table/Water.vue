@@ -158,7 +158,6 @@
         <h3>ตารางค่าน้ำประปา</h3>
         <!-- delete as selected -->
         <v-btn
-          dark
           color="error"
           width="140"
           v-bind="attrs"
@@ -330,11 +329,20 @@
                         >
                         </v-autocomplete>
                       </v-col>
-                      <!-- name -->
+                      <!-- firstname -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.name"
-                          label="ชื่อ-นามสกุล"
+                          v-model="editedItem.first_name"
+                          label="ชื่อ"
+                          required
+                          :rules="rules.name"
+                        ></v-text-field>
+                      </v-col>
+                      <!-- lasname -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.last_name"
+                          label="นามสกุล"
                           required
                           :rules="rules.name"
                         ></v-text-field>
@@ -683,7 +691,7 @@
         <v-data-table
           :headers="headers"
           :items="waterTable"
-          item-key="name"
+          item-key="first_name"
           :items-per-page="5"
           class="elevation-1 pa-6 th-1"
           :search="search"
@@ -715,7 +723,7 @@
 export default {
   data: () => ({
     el: "#app",
-    sortBy: "name",
+    sortBy: "first_name",
     menuDatefilter: false,
     sortDesc: false,
     oldUnit: null,
@@ -1269,7 +1277,7 @@ export default {
     waterTable: [],
     editedIndex: -1,
     editedItem: {
-      name: "",
+      first_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
@@ -1278,7 +1286,7 @@ export default {
       status: "Non Approve",
     },
     defaultItem: {
-      name: "",
+      first_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
@@ -1326,9 +1334,13 @@ export default {
           value: "rank",
         },
         {
-          text: "ชื่อ-นามสกุล",
-          value: "name",
+          text: "ชื่อ",
+          value: "first_name",
           filter: this.nameFilter,
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
         },
         {
           text: "สายของมิเตอร์",
@@ -1393,7 +1405,6 @@ export default {
         return "0.00";
       }
     },
-
     // autocomplete  [] {} () <>
     zones() {
       return Object.keys(this.zonesBuildings);
@@ -1444,7 +1455,8 @@ export default {
       this.waterTable = [
         {
           rank: "พล.ต.อ.",
-          name: "ชัชชาช้า ชัชชาวาน",
+          first_name: "ชัชชาช้า",
+          last_name: "ชัชชาวาน",
           zone: "เขตสุระ",
           building: "2/20",
           room: "2",
@@ -1459,7 +1471,8 @@ export default {
         },
         {
           rank: "ด.ต.หญิง",
-          name: "ภัทรพร ศรีโอภาส",
+          first_name: "ภัทรพร",
+          last_name: "ศรีโอภาส",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "103",
@@ -1474,7 +1487,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "อมร ภูมพฤกษ์",
+          first_name: "อมร ",
+          last_name: "ภูมพฤกษ์",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "107",
@@ -1489,7 +1503,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "อดุล วงศ์ทอง",
+          first_name: "อดุล ",
+          last_name: "วงศ์ทอง",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "202",
@@ -1504,7 +1519,8 @@ export default {
         },
         {
           rank: "ร.ต.ท.",
-          name: "จรัส สิมฤทธิ์",
+          first_name: "จรัส ",
+          last_name: "สิมฤทธิ์",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "206",
@@ -1519,7 +1535,8 @@ export default {
         },
         {
           rank: "ส.ต.อ.",
-          name: "ธิชากร ผินดอน",
+          first_name: "ธิชากร ",
+          last_name: "ผินดอน",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "305",
@@ -1534,7 +1551,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "รุ่ง โฉมกิ่ง",
+          first_name: "รุ่ง ",
+          last_name: "โฉมกิ่ง",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "402",
@@ -1549,7 +1567,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "อนุชา ฝากชัยภูมิ",
+          first_name: "อนุชา ",
+          last_name: "ฝากชัยภูมิ",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "413",
@@ -1564,7 +1583,8 @@ export default {
         },
         {
           rank: "ส.ต.อ.",
-          name: "รัฐพนย์ เรื่องเรือ",
+          first_name: "รัฐพนย์ ",
+          last_name: "เรื่องเรือ",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "504",
@@ -1579,7 +1599,8 @@ export default {
         },
         {
           rank: "ร.ต.ท.",
-          name: "อิทธิพล เพ็ญเติมพันธ์",
+          first_name: "อิทธิพล",
+          last_name: "เพ็ญเติมพันธ์",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "514",
@@ -1594,7 +1615,8 @@ export default {
         },
         {
           rank: "ด.ต.",
-          name: "ไพโรจน์ ทนปรางค์",
+          first_name: "ไพโรจน์",
+          last_name: "ทนปรางค์",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "515",
