@@ -94,6 +94,18 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
+          <!-- filter by electricity_no and electricity_meter_no-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-text-field
+              v-model="search"
+              class="filter"
+              prepend-icon="mdi-counter"
+              label="กรองด้วยเลขผู้ไฟฟ้าหรือเลขมิเตอร์"
+              @keypress="isNumber($event)"
+              hint="ตัวอย่าง 123456789123"
+            >
+            </v-text-field>
+          </v-col>
           <!-- Filter for  status-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
@@ -1154,6 +1166,7 @@ export default {
         {
           text: "ค่าไฟฟ้า",
           value: "price",
+          filterable: false,
         },
         {
           text: "สถานะ",
@@ -1433,6 +1446,7 @@ export default {
         (this.roomFilterValue = ""),
         (this.dateFilterValue = "");
       this.statusFilterValue = "";
+      this.search = "";
     },
     // search in data table
     filterOnlyCapsText(value, search) {
