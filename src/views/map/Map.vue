@@ -1,109 +1,130 @@
 <template>
-  <v-card>
-    <v-card-title>
-      <v-row>
-        <v-col>
-          <h2>
-            <v-icon size="30px" color="#1145b7">mdi-google-maps </v-icon> แผนที่
-          </h2>
-        </v-col>
-        <v-col>
-          <v-dialog v-model="dialog" width="75%">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="#092C7A" dark v-bind="attrs" v-on="on">
-                <v-icon> mdi-map-marker-plus </v-icon>
-                เพิ่มเขตอาคารในแผนที่
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title class="text-h5 grey lighten-2">
-                เพิ่มเขตอาคารในแผนที่
-              </v-card-title>
-              <v-card-text>
-                <v-form ref="form" v-model="valid">
-                  <v-row>
-                    <v-col>
-                      <v-text-field
-                        v-model="latitude"
-                        append-icon="mdi-latitude"
-                        label="ละติจูด"
-                        required
-                        :rules="[rules.latitudeRules.regex]"
-                        clearable
-                      >
-                      </v-text-field>
-                    </v-col>
-                    <v-col>
-                      <v-text-field
-                        v-model="longitude"
-                        append-icon="mdi-longitude"
-                        label="ลองติจูด"
-                        required
-                        :rules="[rules.longitudeRules.regex]"
-                        clearable
-                      ></v-text-field>
-                    </v-col>
-                    <v-col>
-                      <v-text-field
-                        required
-                        append-icon="mdi-map-legend"
-                        label="ชื่อเขต"
-                        :rules="rules.name"
-                      >
-                      </v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-card-text>
-              <v-divider></v-divider>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="primary"
-                  :disabled="!valid"
-                  text
-                  @click="dialog = false"
-                >
-                  ยืนยันการเพิ่มพื้นที่เขต
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-col>
+  <v-app id="app">
+    <div class="content background-main">
+      <v-row justify="space-between" class="px-3">
+        <!-- title -->
+        <div class="mb-4">
+          <v-row style="align-items: center">
+            <div class="ml-3 mt-9">
+              <h2>
+                <v-icon size="40" color="#D1473A"> mdi-map-marker-star </v-icon>
+                จัดการแผนที่
+              </h2>
+            </div>
+          </v-row>
+        </div>
       </v-row>
-    </v-card-title>
-    <!-- <label>
+    </div>
+    <v-card class="card-filter px-6 py-6">
+      <v-card-title>
+        <v-icon size="35px" class="icon">mdi-map-legend</v-icon>
+        &nbsp;&nbsp;
+        <h3>จัดการแผนที่</h3>
+        &nbsp;&nbsp;
+        <v-spacer></v-spacer>
+        <!-- add marker buttons -->
+        <v-dialog v-model="dialog" width="75%" persistent>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn color="agree" dark v-bind="attrs" v-on="on">
+              <v-icon> mdi-map-marker-plus </v-icon>
+              เพิ่มเขตอาคารในแผนที่
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="text-h5 grey lighten-2">
+              เพิ่มเขตอาคารในแผนที่
+            </v-card-title>
+            <v-card-text>
+              <v-form ref="formAddmap" v-model="valid">
+                <v-row>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="latitude"
+                      append-icon="mdi-latitude"
+                      label="ละติจูด"
+                      required
+                      :rules="[rules.latitudeRules.regex]"
+                      clearable
+                    >
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      v-model="longitude"
+                      append-icon="mdi-longitude"
+                      label="ลองติจูด"
+                      required
+                      :rules="[rules.longitudeRules.regex]"
+                      clearable
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="4">
+                    <v-text-field
+                      required
+                      append-icon="mdi-map-legend"
+                      label="ชื่อเขต"
+                      :rules="rules.name"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+              </v-form>
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="error" outlined @click="clearform">
+                ล้างข้อมูลที่กรอก
+              </v-btn>
+              <v-btn color="warning" text @click="dialog = false">
+                ยกเลิกการเพิ่มพื้นที่
+              </v-btn>
+              <v-btn
+                color="agree"
+                :disabled="!valid"
+                text
+                @click="dialog = false"
+              >
+                ยืนยันการเพิ่มพื้นที่เขต
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-card-title>
+
+      <!-- <label>
       AutoComplete
       <GmapAutocomplete @place_changed="setPlace"> </GmapAutocomplete>
       <button @click="usePlace">Add</button>
     </label>
     <br /> -->
-    <v-card-text>
-      <div>
-        <GmapMap
-          class="map-responsive"
-          :zoom="15"
-          map-type-id="roadmap"
-          settilt:45.
-          :center="{ lat: 14.9799, lng: 102.097771 }"
-        >
-          <GmapMarker
-            v-for="(marker, index) in markers"
-            :key="index"
-            :position="marker.position"
-          />
-          <GmapMarker
-            v-if="this.place"
-            label="★"
-            :position="{
-              lat: this.place.geometry.location.lat('14.979900'),
-              lng: this.place.geometry.location.lng('102.097771'),
-            }"
-          />
-        </GmapMap>
-      </div>
-    </v-card-text>
-  </v-card>
+      <v-card-text>
+        <div>
+          <GmapMap
+            class="map-responsive"
+            :zoom="15"
+            map-type-id="roadmap"
+            settilt:45.
+            :center="{ lat: 14.9799, lng: 102.097771 }"
+          >
+            <GmapMarker
+              v-for="(marker, index) in markers"
+              :key="index"
+              :position="marker.position"
+            />
+            <GmapMarker
+              v-if="this.place"
+              label="★"
+              :position="{
+                lat: this.place.geometry.location.lat('14.979900'),
+                lng: this.place.geometry.location.lng('102.097771'),
+              }"
+            />
+          </GmapMap>
+        </div>
+      </v-card-text>
+    </v-card>
+  </v-app>
 </template>
 <script src="vue-google-maps.js"></script>
 <script>
@@ -163,22 +184,15 @@ export default {
         this.place = null;
       }
     },
+    clearform() {
+      this.$refs.formAddmap.reset();
+    },
   },
   computed: {},
 };
 </script>
 
 <style scoped>
-.subtitle {
-  font-weight: 300;
-  font-size: 3em;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-.links {
-  padding-top: 15px;
-}
 .map-responsive {
   overflow: hidden;
   padding-bottom: 45.25%;
@@ -191,5 +205,14 @@ export default {
   height: 60%;
   width: 60%;
   position: absolute;
+}
+
+.card-filter {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+.title {
+  font-size: 25px;
+  font-family: Sarabun;
 }
 </style>
