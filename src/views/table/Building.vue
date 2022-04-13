@@ -340,7 +340,7 @@
                 </v-card>
               </v-dialog>
               <!-- delete water user -->
-              <v-dialog v-model="dialogDelete" max-width="75%">
+              <v-dialog v-model="dialogDelete" persistent max-width="75%">
                 <v-card>
                   <v-card-title class="text-h5"
                     >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
@@ -486,10 +486,10 @@
               </template>
               <!-- data edit and delete-->
               <template v-slot:[`item.actions`]="{ item }">
-                <v-icon small class="mr-2" @click="editItem(item)">
+                <v-icon class="mr-2" @click="editItem(item)">
                   mdi-pencil
                 </v-icon>
-                <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+                <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
               </template>
             </v-data-table>
             <!-- end data-table -->

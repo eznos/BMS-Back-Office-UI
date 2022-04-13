@@ -322,7 +322,7 @@
             </v-card>
           </v-dialog>
           <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" max-width="75%">
+          <v-dialog v-model="dialogDelete" persistent max-width="75%">
             <v-card>
               <v-card-title class="text-h5"
                 >ต้องการลบผู้ใช้ไฟฟ้าคนนี้หรือไม่?</v-card-title

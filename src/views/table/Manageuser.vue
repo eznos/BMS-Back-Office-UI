@@ -179,17 +179,15 @@
           </v-card>
         </v-dialog>
         <!-- delete water user -->
-        <v-dialog v-model="dialogDelete" max-width="75%">
+        <v-dialog v-model="dialogDelete" persistent max-width="75%">
           <v-card>
             <v-card-title class="text-h5"
               >ต้องการลบผู้อยู่อาศัยคนนี้หรือไม่?</v-card-title
             >
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete"
-                >ยกเลิก</v-btn
-              >
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+              <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
+              <v-btn color="agree" text @click="deleteItemConfirm"
                 >ยืนยัน</v-btn
               >
               <v-spacer></v-spacer>
@@ -218,10 +216,8 @@
           </template>
           <!-- data -->
           <template v-slot:[`item.actions`]="{ item }">
-            <v-icon small class="mr-2" @click="editItem(item)">
-              mdi-pencil
-            </v-icon>
-            <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+            <v-icon class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
+            <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
           </template>
         </v-data-table>
         <!-- end data-table -->
