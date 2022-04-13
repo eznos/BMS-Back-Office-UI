@@ -34,7 +34,7 @@
               v-model="search"
               prepend-icon="mdi-magnify"
               type="text"
-              label="ค้นหา"
+              label="กรองด้วยชื่อ-นามสกุล และอีเมล"
               clearable
               class="filter"
             ></v-text-field>
@@ -72,7 +72,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              ล้างการกรอง
+              &nbsp; ล้างการกรอง
             </v-btn>
           </v-col>
         </v-row>
@@ -99,15 +99,20 @@
           @click="deleteItemSelected(selected)"
         >
           <v-icon>mdi-delete-sweep</v-icon>
-          ลบข้อมูลที่เลือก
+          &nbsp; ลบข้อมูลที่เลือก
         </v-btn>
         <v-spacer></v-spacer>
         <!-- add user -->
         <v-dialog v-model="dialog" persistent max-width="75%">
           <template v-slot:activator="{ on: attrs }">
-            <v-btn color="#9B3499" class="filter" dark v-on="{ ...attrs }">
+            <v-btn
+              color="agree"
+              class="button-filter pt-5 pb-5"
+              dark
+              v-on="{ ...attrs }"
+            >
               <v-icon> mdi-account-plus </v-icon>
-              เพื่มผู้ใช้งาน
+              &nbsp; เพื่มผู้ใช้งาน
             </v-btn>
           </template>
           <v-card>
@@ -244,7 +249,6 @@ export default {
     statusFilterValue: "",
     selected: [],
     itemsPerPage: 5,
-
     userTable: [],
     editedIndex: -1,
     editedItem: {

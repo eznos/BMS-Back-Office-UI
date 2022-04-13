@@ -126,7 +126,7 @@
             class="button-filter pt-6 pb-6"
           >
             <v-icon>mdi-delete-sweep</v-icon>
-            ล้างการกรอง
+            &nbsp; ล้างการกรอง
           </v-btn>
         </v-col>
       </v-form>
@@ -151,7 +151,7 @@
               @click="deleteItemSelected"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              ลบข้อมูลที่เลือก
+              &nbsp; ลบข้อมูลที่เลือก
             </v-btn>
             <v-spacer></v-spacer>
             <div>
@@ -165,7 +165,7 @@
                     class="button-filter pt-5 pb-5"
                   >
                     <v-icon> mdi-account-plus </v-icon>
-                    เพิ่มผู้อยู่อาศัย
+                    &nbsp; เพิ่มผู้อยู่อาศัย
                   </v-btn>
                 </template>
                 <v-card>
@@ -347,10 +347,10 @@
                   >
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete"
+                    <v-btn color="warning" text @click="closeDelete"
                       >ยกเลิก</v-btn
                     >
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                    <v-btn color="agree" text @click="deleteItemConfirm"
                       >ยืนยัน</v-btn
                     >
                     <v-spacer></v-spacer>
@@ -371,7 +371,7 @@
                     v-on="{ ...attrs }"
                   >
                     <v-icon> mdi-file-export-outline </v-icon>
-                    Export ข้อมูล Excel
+                    &nbsp; Export ข้อมูล Excel
                   </v-btn>
                 </template>
                 <v-card>

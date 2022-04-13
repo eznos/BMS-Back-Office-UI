@@ -140,7 +140,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              ล้างการกรอง
+              &nbsp; ล้างการกรอง
             </v-btn>
           </v-col>
         </v-row>
@@ -167,7 +167,7 @@
           @click="deleteItemSelected"
         >
           <v-icon>mdi-delete-sweep</v-icon>
-          ลบข้อมูลที่เลือก
+          &nbsp; ลบข้อมูลที่เลือก
         </v-btn>
         <!-- button -->
         <v-spacer></v-spacer>
@@ -186,7 +186,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-calculator </v-icon>
-                คำนวนค่าน้ำส่วนต่าง
+                &nbsp; คำนวนค่าน้ำส่วนต่าง
               </v-btn>
             </template>
             <v-card>
@@ -306,7 +306,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-account-plus </v-icon>
-                เพิ่มผู้ใช้น้ำ
+                &nbsp; เพิ่มผู้ใช้น้ำ
               </v-btn>
             </template>
             <v-card>
@@ -554,7 +554,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-account-plus </v-icon>
-                import ข้อมูล Excel
+                &nbsp; import ข้อมูล Excel
               </v-btn>
             </template>
             <v-card>
@@ -601,7 +601,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-file-export-outline </v-icon>
-                Export ข้อมูล Excel
+                &nbsp; Export ข้อมูล Excel
               </v-btn>
             </template>
             <v-card>

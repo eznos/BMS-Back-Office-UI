@@ -76,9 +76,21 @@
               >
               </v-autocomplete>
             </v-col>
+            <!-- Filter for  water electric meter number-->
+            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+              <v-text-field
+                label="กรองด้วยเลขผู้ใช้และเลขมิเตอร์"
+                class="filter"
+                v-model="search"
+                prepend-icon="mdi-room-service"
+                clearable
+                type="text"
+                @keypress="isNumber($event)"
+              >
+              </v-text-field>
+            </v-col>
           </v-row>
-          <v-row> </v-row>
-          <!-- btn -->
+          <!-- button -->
           <v-col cols="12" justify="space-between" class="px-3">
             <!-- enter filter -->
             <!-- <v-btn
@@ -99,7 +111,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              ล้างการกรอง
+              &nbsp; ล้างการกรอง
             </v-btn>
           </v-col>
         </v-form>
@@ -123,7 +135,7 @@
           @click="deleteItemSelected"
         >
           <v-icon>mdi-delete-sweep</v-icon>
-          ลบข้อมูลที่เลือก
+          &nbsp; ลบข้อมูลที่เลือก
         </v-btn>
         <!-- button -->
         <v-spacer></v-spacer>
@@ -138,7 +150,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-account-plus </v-icon>
-                เพิ่มผู้อยู่อาศัย
+                &nbsp; เพิ่มผู้อยู่อาศัย
               </v-btn>
             </template>
             <v-card>
@@ -176,7 +188,7 @@
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.last_name"
-                          label="ชื่อ"
+                          label="นามสกุล"
                           required
                           :rules="rules.nameRules"
                           clearable
@@ -301,15 +313,8 @@
                   ล้างข้อมูลที่กรอก
                 </v-btn>
                 <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-btn color="blue darken-1" text @click="close">
-                    ยกเลิก
-                  </v-btn>
-                  <v-btn
-                    color="blue darken-1"
-                    :disabled="!valid"
-                    text
-                    @click="save"
-                  >
+                  <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
+                  <v-btn color="agree" :disabled="!valid" text @click="save">
                     ยืนยัน
                   </v-btn>
                 </v-form>
@@ -324,10 +329,8 @@
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >ยกเลิก</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
+                <v-btn color="agree" text @click="deleteItemConfirm"
                   >ยืนยัน</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -344,7 +347,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-account-plus </v-icon>
-                import ข้อมูล Excel
+                &nbsp; import ข้อมูล Excel
               </v-btn>
             </template>
             <v-card>
@@ -988,6 +991,7 @@ export default {
           text: "ยศ",
           align: "left",
           value: "rank",
+          filterable: false,
         },
         {
           text: "ชื่อ",
