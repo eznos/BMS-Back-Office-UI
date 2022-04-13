@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <!-- title, filter  -->
+    <!-- title  -->
     <div class="content background-main">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
@@ -66,6 +66,31 @@
             >
             </v-autocomplete>
           </v-col>
+          <!-- search by roomber-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              v-model="roomFilterValue"
+              prepend-icon="mdi-office-building-marker"
+              type="text"
+              label="กรองด้วยห้อง"
+              clearable
+              class="filter"
+              :items="rooms"
+            >
+            </v-autocomplete>
+          </v-col>
+          <!-- search by type -->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-select
+              v-model="typeFilterValue"
+              prepend-icon="mdi-list-status"
+              label="กรองด้วยประเภทห้อง"
+              :items="types"
+              clearable
+              class="filter"
+            >
+            </v-select>
+          </v-col>
           <!-- search by status -->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-select
@@ -106,6 +131,7 @@
         </v-col>
       </v-form>
     </v-card>
+    <!-- table and buttons -->
     <v-row>
       <v-col cols="12">
         <v-card class="card-filter px-6 py-6">
@@ -136,7 +162,7 @@
                     color="agree"
                     dark
                     v-on="{ ...attrs }"
-                    class="button-filter"
+                    class="button-filter pt-5 pb-5"
                   >
                     <v-icon> mdi-account-plus </v-icon>
                     เพิ่มผู้อยู่อาศัย
@@ -150,8 +176,7 @@
                     <v-container>
                       <v-form ref="formNewdata" v-model="valid" lazy-validation>
                         <v-row>
-                          <!-- rank -->
-                          <v-col cols="12" sm="6" md="4">
+                          <!-- <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
                               label="ยศ"
                               v-model="editedItem.rank"
@@ -162,7 +187,7 @@
                             >
                             </v-autocomplete>
                           </v-col>
-                          <!-- first_name -->
+                       
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
                               v-model="editedItem.first_name"
@@ -171,7 +196,7 @@
                               :rules="rules.nameRules"
                             ></v-text-field>
                           </v-col>
-                          <!-- last_name -->
+                         
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
                               v-model="editedItem.last_name"
@@ -179,7 +204,7 @@
                               required
                               :rules="rules.nameRules"
                             ></v-text-field>
-                          </v-col>
+                          </v-col> -->
                           <!-- zone -->
                           <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
@@ -332,30 +357,107 @@
                   </v-card-actions>
                 </v-card>
               </v-dialog>
-              <!-- delete as selected -->
-              <v-btn
-                dark
-                color="error"
-                width="140"
-                v-bind="attrs"
-                v-on="on"
-                class="button-filter"
+              <!-- export excel to email -->
+              <v-dialog
+                v-model="exportExcelResident"
+                persistent
+                max-width="75%"
               >
-                <v-icon>mdi-delete-sweep</v-icon>
-                ลบข้อมูลที่เลือก
-              </v-btn>
-              <!-- clear search -->
-              <v-btn
-                dark
-                class="button-filter"
-                color="#F82E39"
-                v-bind="attrs"
-                v-on="on"
-                @click="clear"
-              >
-                <v-icon>mdi-delete</v-icon>
-                ลบการค้นหา
-              </v-btn>
+                <template v-slot:activator="{ on: attrs }">
+                  <v-btn
+                    color="#1572A1"
+                    class="button-filter pt-5 pb-5"
+                    dark
+                    v-on="{ ...attrs }"
+                  >
+                    <v-icon> mdi-file-export-outline </v-icon>
+                    Export ข้อมูล Excel
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>
+                    ส่งออกข้อมูล Excel ของค่าไฟฟ้าไปยังอีเมลที่ต้องการ
+                  </v-card-title>
+                  <v-card-text>
+                    <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-row>
+                        <!-- date export -->
+                        <v-col cols="12">
+                          <v-menu
+                            ref="menu"
+                            v-model="menuExportExcel"
+                            :close-on-content-click="false"
+                            transition="scale-transition"
+                            offset-y
+                            max-width="70%"
+                            min-width="auto"
+                          >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field
+                                v-model="dateExport"
+                                label="เลือกเดือนที่ต้องการ Export"
+                                prepend-icon="mdi-calendar"
+                                readonly
+                                v-bind="attrs"
+                                v-on="on"
+                              ></v-text-field>
+                            </template>
+                            <v-date-picker
+                              v-model="dateExport"
+                              type="month"
+                              no-title
+                              scrollable
+                            >
+                              <v-spacer></v-spacer>
+                              <v-btn text color="primary" @click="menu = false">
+                                Cancel
+                              </v-btn>
+                              <v-btn
+                                text
+                                color="primary"
+                                @click="$refs.menuExportExcel.save(date)"
+                              >
+                                OK
+                              </v-btn>
+                            </v-date-picker>
+                          </v-menu>
+                        </v-col>
+                        <!-- email -->
+                        <v-col cols="12">
+                          <v-text-field
+                            label="อีเมลผู้รับ"
+                            autofocus
+                            :rules="[rules.email.regex]"
+                            v-model="emailtarget"
+                            prepend-icon="mdi-at"
+                          >
+                          </v-text-field>
+                        </v-col>
+                      </v-row>
+                    </v-form>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-btn
+                        color="warning"
+                        text
+                        @click="exportExcelResident = false"
+                      >
+                        ยกเลิก
+                      </v-btn>
+                      <v-btn
+                        color="agree"
+                        :disabled="!valid"
+                        text
+                        @click="exportExcelResident = false"
+                      >
+                        ยืนยันข้อมูล
+                      </v-btn>
+                    </v-form>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
             </div>
           </v-card-title>
           <v-card-text>
@@ -364,7 +466,7 @@
               v-model="selected"
               :headers="headers"
               :items="buildingTable"
-              item-key="first_name"
+              item-key="room"
               :items-per-page="itemsPerPage"
               class="table header-blue"
               :search="search"
@@ -625,6 +727,10 @@ export default {
     zone: null,
     building: null,
     room: null,
+    emailtarget: "",
+    exportExcelResident: false,
+    dateExport: new Date().toISOString().substr(0, 7),
+    menuExportExcel: false,
     electric_no: "",
     water_no: "",
     electric_meter_no: "",
@@ -1157,7 +1263,9 @@ export default {
     NamefilterValue: "",
     zoneFilterValue: "",
     statusFilterValue: "",
+    typeFilterValue: "",
     buildFilterValue: null,
+    roomFilterValue: null,
     buildingTable: [],
     editedIndex: -1,
     editedItem: {
@@ -1192,32 +1300,37 @@ export default {
         (v) => !!v || "กรุณากรอกข้อมูล",
         (v) => (v && v.length == 11) || "กรอกเลขมิเตอร์ไฟฟ้าไม่ครบ 11 ตัว",
       ],
+      email: {
+        required: (v) => !!v || "กรุณาใส่อีเมลของผู้รับ",
+        regex: (v) =>
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
+            v
+          ) || "อีเมลไม่ถูกต้อง",
+      },
     },
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1
-        ? "เพิ่มผู้อยู่อาศัย"
-        : "แก้ไขผู้อยู่อาศัย";
+      return this.editedIndex === -1 ? "เพิ่มห้องพัก" : "แก้ไขห้องพัก";
     },
     headers() {
       return [
-        {
-          text: "ยศ",
-          value: "rank",
-          align: "left",
-          // filter: this.nameFilter,
-        },
-        {
-          text: "ชื่อ",
-          value: "first_name",
-          align: "left",
-          // filter: this.nameFilter,
-        },
-        {
-          text: "นามสกุล",
-          value: "last_name",
-        },
+        // {
+        //   text: "ยศ",
+        //   value: "rank",
+        //   align: "left",
+        //   // filter: this.nameFilter,
+        // },
+        // {
+        //   text: "ชื่อ",
+        //   value: "first_name",
+        //   align: "left",
+        //   // filter: this.nameFilter,
+        // },
+        // {
+        //   text: "นามสกุล",
+        //   value: "last_name",
+        // },
         {
           text: "พื้นที่",
           value: "zone",
@@ -1231,6 +1344,7 @@ export default {
         {
           text: "เลขห้องพัก",
           value: "room",
+          filter: this.roomFilter,
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
@@ -1251,6 +1365,7 @@ export default {
         {
           text: "ประเภทห้องพัก",
           value: "type",
+          filter: this.typeFilter,
         },
         {
           text: "สถานะ",
@@ -1280,6 +1395,9 @@ export default {
       }
     },
     rooms() {
+      if (this.buildFilterValue) {
+        return this.buildingsRooms[this.buildFilterValue];
+      }
       if (!this.editedItem.building) {
         return ["ไม่มีข้อมูล"];
       } else {
@@ -1555,24 +1673,36 @@ export default {
       }
       return value === this.buildFilterValue;
     },
+    roomFilter(value) {
+      if (!this.roomFilterValue) {
+        return true;
+      }
+      return value === this.roomFilterValue;
+    },
     statusFilter(value) {
       if (!this.statusFilterValue) {
         return true;
       }
       return value === this.statusFilterValue;
     },
+    typeFilter(value) {
+      if (!this.typeFilterValue) {
+        return true;
+      }
+      return value === this.typeFilterValue;
+    },
     editItem(item) {
-      this.editedIndex = this.building.indexOf(item);
+      this.editedIndex = this.buildingTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem(item) {
-      this.editedIndex = this.building.indexOf(item);
+      this.editedIndex = this.buildingTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm() {
-      this.building.splice(this.editedIndex, 1);
+      this.buildingTable.splice(this.editedIndex, 1);
       this.closeDelete();
     },
     close() {
@@ -1592,9 +1722,9 @@ export default {
     // add user
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.building[this.editedIndex], this.editedItem);
+        Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
       } else {
-        this.building.push(this.editedItem);
+        this.buildingTable.push(this.editedItem);
       }
       this.close();
     },
@@ -1709,8 +1839,5 @@ export default {
 }
 .filter {
   padding: 5px;
-}
-.button-filter {
-  margin: 10px;
 }
 </style>
