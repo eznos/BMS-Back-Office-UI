@@ -23,11 +23,17 @@
                   <v-container>
                     <v-row>
                       <v-col cols="12" xl="12">
-                        <v-text-field
-                          prepend-icon="lock"
-                          label="Recovery code"
-                          autofocus
-                        ></v-text-field>
+                        <v-otp-input
+                          v-model="otp"
+                          :disabled="loading"
+                          @finish="onFinish"
+                        ></v-otp-input>
+                        <v-overlay absolute :value="loading">
+                          <v-progress-circular
+                            indeterminate
+                            color="primary"
+                          ></v-progress-circular>
+                        </v-overlay>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -76,6 +82,9 @@
           </v-flex>
         </v-layout>
       </v-container>
+      <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="2500">
+        {{ text }}
+      </v-snackbar>
     </v-content>
   </v-app>
 </template>
@@ -85,6 +94,12 @@ export default {
   data() {
     return {
       timerCount: 20,
+      loading: false,
+      snackbar: false,
+      snackbarColor: "default",
+      otp: "",
+      text: "",
+      expectedOtp: "123456",
     };
   },
   watch: {
@@ -101,13 +116,26 @@ export default {
   },
   methods: {
     reloadPage() {
-      window.location.reload();
+      this.otp = "";
+      this.timerCount = 20;
+    },
+    onFinish(rsp) {
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.snackbarColor = rsp === this.expectedOtp ? "success" : "warning";
+        this.text = `Processed OTP with "${rsp}"(${this.snackbarColor})`;
+        this.snackbar = true;
+      }, 3500);
     },
   },
 };
 </script>
 
 <style scoped>
+.position-relative {
+  position: relative;
+}
 .rounded-card {
   border-radius: 15px;
   border-color: black;
