@@ -46,18 +46,24 @@
     </v-app-bar>
     <!-- จบ -->
     <v-navigation-drawer v-model="drawer" dark app class="background2">
-      <!--old color  class="red darken-4" -->
+      <!-- avatar  -->
       <v-layout column align-center>
         <v-flex class="mt-5">
-          <v-avatar size="100" tile>
-            <img src="/police3.png" alt="" />
+          <v-avatar v-if="!profileImage" tile size="100" color="#DFDDDD">
+            <h2>
+              {{ firstname != null ? firstname.substring(0, 1) : null }}
+              {{ lastname != null ? lastname.substring(0, 1) : null }}
+            </h2>
+          </v-avatar>
+          <v-avatar v-if="profileImage" size="100" tile>
+            <img src="" alt="" />
           </v-avatar>
           <!-- <p class="white--text subheading mt-1 text-center">Username</p> -->
         </v-flex>
         <v-flex class="mt-3">
           <p class="white--text subheading mt-1 text-center">ผู้เข้าใช้งาน</p>
           <p class="white--text subheading mt-1 text-center">
-            {{ rank }} {{ Name }} {{ lname }}
+            {{ rank }} {{ firstname }} {{ lastname }}
           </p>
         </v-flex>
 
@@ -96,9 +102,9 @@ export default {
   data: () => ({
     drawer: true,
     dialog: false,
-
-    Name: "พิชญ์พิสิฐฏ์เสฏ ",
-    lname: "สกธินชารินทร์พธา",
+    profileImage: "",
+    firstname: "พิชญ์พิสิฐฏ์เสฏ ",
+    lastname: "สกธินชารินทร์พธา",
     rank: "พล.ต.อ.",
     // แถบเมนู
     links: [
@@ -201,7 +207,7 @@ export default {
   border-left: 5px solid #a50b20;
 }
 .background {
-background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
+  background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
 }
 .background2 {
   background-image: linear-gradient(180deg, #572021 13%, #833133 66%);
