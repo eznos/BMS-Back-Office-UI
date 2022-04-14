@@ -49,13 +49,13 @@
       <!-- avatar  -->
       <v-layout column align-center>
         <v-flex class="mt-5">
-          <v-avatar v-if="!profileImage" tile size="100" color="#DFDDDD">
+          <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
             <h2>
               {{ firstname != null ? firstname.substring(0, 1) : null }}
               {{ lastname != null ? lastname.substring(0, 1) : null }}
             </h2>
           </v-avatar>
-          <v-avatar v-if="profileImage" size="100" tile>
+          <v-avatar v-if="profileImage" size="100">
             <img src="" alt="" />
           </v-avatar>
           <!-- <p class="white--text subheading mt-1 text-center">Username</p> -->
