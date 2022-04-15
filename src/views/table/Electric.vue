@@ -149,7 +149,7 @@
           v-bind="attrs"
           v-on="on"
           class="button-filter pt-5 pb-5"
-          :disabled="!selectAll"
+          :disabled="!selectItems"
           @click="deleteItemSelected(selected)"
         >
           <v-icon>mdi-delete-sweep</v-icon>
@@ -157,19 +157,8 @@
         </v-btn>
         <v-spacer></v-spacer>
         <div>
-          <!-- add user -->
+          <!-- edit user -->
           <v-dialog v-model="dialog" persistent max-width="75%">
-            <template v-slot:activator="{ on: attrs }">
-              <v-btn
-                class="button-filter pt-5 pb-5"
-                color="agree"
-                dark
-                v-on="{ ...attrs }"
-              >
-                <v-icon> mdi-account-plus </v-icon>
-                &nbsp; เพิ่มผู้ใช้ไฟฟ้า
-              </v-btn>
-            </template>
             <v-card>
               <v-card-title>
                 <!-- title add user -->
@@ -189,6 +178,7 @@
                           autofocus
                           :rules="rules.name"
                           :items="ranks"
+                          disabled
                         >
                         </v-autocomplete>
                       </v-col>
@@ -199,6 +189,7 @@
                           label="ชื่อ"
                           required
                           :rules="rules.name"
+                          disabled
                         ></v-text-field>
                       </v-col>
                       <!-- lastname -->
@@ -208,6 +199,7 @@
                           label="นามสกุล"
                           required
                           :rules="rules.name"
+                          disabled
                         ></v-text-field>
                       </v-col>
                       <!-- building -->
@@ -218,6 +210,7 @@
                           required
                           :rules="rules.buildingRoom"
                           v-model="editedItem.building"
+                          disabled
                         >
                         </v-autocomplete>
                       </v-col>
@@ -229,6 +222,7 @@
                           :items="rooms"
                           required
                           :rules="rules.buildingRoom"
+                          disabled
                         >
                         </v-autocomplete>
                       </v-col>
@@ -240,6 +234,7 @@
                           required
                           counter="12"
                           :rules="rules.electricNumber"
+                          disabled
                           @keypress="isNumber($event)"
                         ></v-text-field>
                       </v-col>
@@ -252,6 +247,7 @@
                           counter="11"
                           :rules="rules.electricMeterNumber"
                           @keypress="isNumber($event)"
+                          disabled
                         ></v-text-field>
                       </v-col>
                       <!-- price -->
@@ -327,15 +323,10 @@
               <!-- save and cancel buttons-->
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-form ref="formButton" v-model="valid" lazy-validation>
-                  <v-btn color="#A42523" text @click="clearForm">
-                    ล้างข้อมูลที่กรอก
-                  </v-btn>
-                  <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
-                  <v-btn color="agree" :disabled="!valid" text @click="save">
-                    ยืนยัน
-                  </v-btn>
-                </v-form>
+                <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
+                <v-btn color="agree" :disabled="!valid" text @click="save">
+                  ยืนยัน
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -355,51 +346,14 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- import excel -->
-          <v-dialog v-model="importExcel" max-width="75%">
-            <template v-slot:activator="{ on: attrs }">
-              <v-btn
-                class="button-filter pt-5 pb-5"
-                color="agree"
-                dark
-                v-on="{ ...attrs }"
-              >
-                <v-icon> mdi-account-plus </v-icon>
-                &nbsp; import ข้อมูล Excel
-              </v-btn>
-            </template>
-            <v-card>
-              <v-card-title> นำเข้าข้อมูล Excel </v-card-title>
-              <v-card-text>
-                <v-file-input
-                  label="เลือกไฟล์ Excel ที่ต้องการ"
-                  counter
-                  multiple
-                  show-size
-                  :rules="rules.fotmat"
-                  type="file"
-                  accept=".xlsx, .xlsm, .xlsb, .xltx, .xltm, .xls, .xla,"
-                ></v-file-input>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="importExcel = false">
-                  ยกเลิก
-                </v-btn>
-                <v-btn color="agree" text @click="importExcel = false">
-                  ยืนยัน
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
           <!-- export excel to email -->
           <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#1572A1"
                 class="button-filter pt-5 pb-5"
-                dark
                 v-on="{ ...attrs }"
+                :disabled="!selectItems"
               >
                 <v-icon> mdi-file-export-outline </v-icon>
                 &nbsp; Export ข้อมูล Excel
@@ -407,85 +361,25 @@
             </template>
             <v-card>
               <v-card-title>
-                ส่งออกข้อมูล Excel ของค่าไฟฟ้าไปยังอีเมลที่ต้องการ
+                ต้องการ export ข้อมูลเป็นรูปแบบ Excel ที่เลือกไว้หรือไม่ ?
               </v-card-title>
-              <v-card-text>
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-row>
-                    <!-- date export -->
-                    <v-col cols="12">
-                      <v-menu
-                        ref="menu"
-                        v-model="menuExportExcel"
-                        :close-on-content-click="false"
-                        transition="scale-transition"
-                        offset-y
-                        max-width="70%"
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="dateExport"
-                            label="เลือกเดือนที่ต้องการ Export"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="dateExport"
-                          type="month"
-                          no-title
-                          scrollable
-                        >
-                          <v-spacer></v-spacer>
-                          <v-btn text color="primary" @click="menu = false">
-                            Cancel
-                          </v-btn>
-                          <v-btn
-                            text
-                            color="primary"
-                            @click="$refs.menuExportExcel.save(date)"
-                          >
-                            OK
-                          </v-btn>
-                        </v-date-picker>
-                      </v-menu>
-                    </v-col>
-                    <!-- email -->
-                    <v-col cols="12">
-                      <v-text-field
-                        label="อีเมลผู้รับ"
-                        autofocus
-                        :rules="[rules.email.regex]"
-                        v-model="emailtarget"
-                        prepend-icon="mdi-at"
-                      >
-                      </v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-btn
-                    color="warning"
-                    text
-                    @click="exportExcelElectric = false"
-                  >
-                    ยกเลิก
-                  </v-btn>
-                  <v-btn
-                    color="agree"
-                    :disabled="!valid"
-                    text
-                    @click="exportExcelElectric = false"
-                  >
-                    ยืนยันข้อมูล
-                  </v-btn>
-                </v-form>
+                <v-btn
+                  color="warning"
+                  text
+                  @click="exportExcelElectric = false"
+                >
+                  ยกเลิก
+                </v-btn>
+                <v-btn
+                  color="agree"
+                  :disabled="!valid"
+                  text
+                  @click="exportExcelElectric = false"
+                >
+                  ยืนยันข้อมูล
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -516,8 +410,8 @@
           </template>
           <!-- editor data -->
           <template v-slot:[`item.actions`]="{ item }">
-            <v-icon class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-            <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
+            <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
+            <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
           </template>
         </v-data-table>
         <!-- end data-table -->
@@ -541,7 +435,7 @@ export default {
     on: {},
     selected: [],
     itemsPerPage: 5,
-    selectAll: false,
+    selectItems: false,
     emailtarget: "",
     importExcel: false,
     exportExcelElectric: false,
@@ -1177,6 +1071,7 @@ export default {
         {
           text: "การจัดการ",
           value: "actions",
+          align: "center",
           sortable: false,
         },
       ];
@@ -1479,10 +1374,10 @@ export default {
     },
     // show delete as selected button
     enterSelect() {
-      if (this.selected.length >= 2) {
-        return (this.selectAll = true);
+      if (this.selected.length >= 1) {
+        return (this.selectItems = true);
       } else {
-        return (this.selectAll = false);
+        return (this.selectItems = false);
       }
     },
     // delete as selected
