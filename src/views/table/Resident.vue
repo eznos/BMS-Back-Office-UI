@@ -15,107 +15,6 @@
           </v-row>
         </div>
       </v-row>
-      <!-- filter -->
-      <v-card class="card-filter px-6 py-6">
-        <v-card-title>
-          <v-icon size="35px" class="icon"
-            >mdi-format-list-bulleted-triangle</v-icon
-          >
-          &nbsp;&nbsp;
-          <h3>ตัวกรอง</h3>
-          <!-- button -->
-          <v-spacer></v-spacer
-        ></v-card-title>
-        <!-- filter -->
-        <v-form ref="formFilter"
-          ><v-row justify="space-between" class="px-3">
-            <!-- Filter for  name-->
-            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-              <v-text-field
-                v-model="NamefilterValue"
-                prepend-icon="mdi-magnify"
-                type="text"
-                label="ค้นหาด้วยชื่อ"
-                class="filter"
-                clearable
-              ></v-text-field>
-            </v-col>
-            <!-- filter for zone -->
-            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-              <v-autocomplete
-                class="filter"
-                prepend-icon="mdi-map-marker"
-                v-model="zoneFilterValue"
-                :items="zones"
-                label="ค้นหาด้วยพื้นที่"
-                clearable
-              >
-              </v-autocomplete>
-            </v-col>
-            <!-- filter for building -->
-            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-              <v-autocomplete
-                class="filter"
-                prepend-icon="mdi-office-building"
-                v-model="buildingFilterValue"
-                :items="buildings"
-                label="ค้นหาด้วยอาคาร"
-                clearable
-              >
-              </v-autocomplete>
-            </v-col>
-            <!-- Filter for  roomnumber-->
-            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-              <v-autocomplete
-                class="filter"
-                prepend-icon="mdi-room-service"
-                v-model="roomFilterValue"
-                :items="rooms"
-                label="ค้นหาด้วยเลขห้อง"
-                clearable
-              >
-              </v-autocomplete>
-            </v-col>
-            <!-- Filter for  water electric meter number-->
-            <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-              <v-text-field
-                label="กรองด้วยเลขผู้ใช้และเลขมิเตอร์"
-                class="filter"
-                v-model="search"
-                prepend-icon="mdi-room-service"
-                clearable
-                type="text"
-                @keypress="isNumber($event)"
-              >
-              </v-text-field>
-            </v-col>
-          </v-row>
-          <!-- button -->
-          <v-col cols="12" justify="space-between" class="px-3">
-            <!-- enter filter -->
-            <!-- <v-btn
-              outlined
-              color="agree"
-              class="button-filter pt-6 pb-6"
-              width="140"
-            >
-              <v-icon>mdi-magnify</v-icon>
-              กรอง
-            </v-btn> -->
-            <!-- reset filter -->
-            <v-btn
-              outlined
-              color="error"
-              width="140"
-              @click="clearFilter"
-              class="button-filter pt-6 pb-6"
-            >
-              <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการกรอง
-            </v-btn>
-          </v-col>
-        </v-form>
-      </v-card>
     </div>
     <!-- data-table and button -->
     <v-card class="card-filter px-6 py-6">
@@ -131,7 +30,7 @@
           v-bind="attrs"
           v-on="on"
           class="button-filter pt-5 pb-5"
-          :disabled="!selectAll"
+          :disabled="!selectItem"
           @click="deleteItemSelected"
         >
           <v-icon>mdi-delete-sweep</v-icon>
@@ -197,11 +96,11 @@
                       <!-- watergroup -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
-                          v-model="editedItem.meter_group"
+                          v-model="editedItem.water_zone"
                           required
                           :items="meterGroups"
                           label="สายของมิเตอร์น้ำ"
-                          :rules="rules.buildingRoom"
+                          :rules="rules.zonesBuildingsRoom"
                           clearable
                         >
                         </v-autocomplete>
@@ -213,7 +112,7 @@
                           label="พื้นที่"
                           required
                           :items="zones"
-                          :rules="rules.buildingRoom"
+                          :rules="rules.zonesBuildingsRoom"
                           clearable
                         >
                         </v-autocomplete>
@@ -225,7 +124,7 @@
                           label="อาคาร"
                           required
                           :items="buildings"
-                          :rules="rules.buildingRoom"
+                          :rules="rules.zonesBuildingsRoom"
                           clearable
                         >
                         </v-autocomplete>
@@ -238,7 +137,7 @@
                           required
                           @keypress="isNumber($event)"
                           :items="rooms"
-                          :rules="rules.buildingRoom"
+                          :rules="rules.zonesBuildingsRoom"
                           clearable
                         >
                         </v-autocomplete>
@@ -252,6 +151,8 @@
                           clearable
                           required
                           counter="12"
+                          maxlength="12"
+                          disabled
                           :rules="rules.electricNumber"
                         ></v-text-field>
                       </v-col>
@@ -264,6 +165,7 @@
                           clearable
                           required
                           counter="11"
+                          disabled
                           :rules="rules.electricMeterNumber"
                         ></v-text-field>
                       </v-col>
@@ -276,6 +178,7 @@
                           clearable
                           required
                           counter="4"
+                          disabled
                           :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
@@ -288,18 +191,19 @@
                           clearable
                           required
                           counter="4"
+                          disabled
                           :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
-                      <!-- status -->
+                      <!-- room_type -->
                       <v-col cols="12" sm="6" md="4">
                         <v-select
-                          v-model="editedItem.status"
-                          :items="statuses"
-                          label="สถานะ"
+                          v-model="editedItem.room_type"
+                          :items="room_types"
+                          label="ประเภทห้อง"
                           clearable
                           required
-                          :rules="rules.buildingRoom"
+                          :rules="rules.zonesBuildingsRoom"
                         >
                         </v-select>
                       </v-col>
@@ -309,9 +213,6 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn large color="error" text @click="clearForm">
-                  ล้างข้อมูลที่กรอก
-                </v-btn>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
                   <v-btn color="agree" :disabled="!valid" text @click="save">
@@ -337,42 +238,80 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- import excel -->
-          <v-dialog v-model="importExcel" max-width="75%">
+          <!-- export excel to email -->
+          <v-dialog v-model="exportExcelResident" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="agree"
+                color="#1572A1"
                 class="button-filter pt-5 pb-5"
-                dark
                 v-on="{ ...attrs }"
+                :disabled="!selectItem"
               >
-                <v-icon> mdi-account-plus </v-icon>
-                &nbsp; import ข้อมูล Excel
+                <v-icon> mdi-file-export-outline </v-icon>
+                &nbsp; Export ข้อมูล Excel
               </v-btn>
             </template>
             <v-card>
-              <v-card-title> นำเข้าข้อมูล Excel </v-card-title>
-              <v-card-text>
-                <v-file-input
-                  label="เลือกไฟล์ Excel ที่ต้องการ"
-                  counter
-                  multiple
-                  show-size
-                  :rules="rules.fotmat"
-                  type="file"
-                  accept=".xlsx, .xlsm, .xlsb, .xltx, .xltm,  .xls,  .xla,"
-                ></v-file-input>
-              </v-card-text>
+              <v-card-title>
+                ต้องการ export ข้อมูลเป็นรูปแบบ Excel ที่เลือกไว้หรือไม่ ?
+              </v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="agree" @click="importExcel = false">
-                  ยืนยัน
+                <v-btn
+                  color="warning"
+                  text
+                  @click="exportExcelResident = false"
+                >
+                  ยกเลิก
+                </v-btn>
+                <v-btn color="agree" text @click="exportExcelResident = false">
+                  ยืนยันข้อมูล
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </div>
       </v-card-title>
+      <v-card-text>
+        <!-- filter -->
+        <v-row justify="space-between" class="px-3">
+          <!-- Filter for  name-->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-text-field
+              v-model="search"
+              prepend-icon="mdi-magnify"
+              type="text"
+              label="ค้นหาด้วย"
+              class="filter"
+              clearable
+            ></v-text-field>
+          </v-col>
+          <!-- filter for zone -->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              class="filter"
+              prepend-icon="mdi-map-marker"
+              v-model="zoneFilterValue"
+              :items="zones"
+              label="กรองด้วยพื้นที่"
+              clearable
+            >
+            </v-autocomplete>
+          </v-col>
+          <!-- filter for building -->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              class="filter"
+              prepend-icon="mdi-office-building"
+              v-model="buildingFilterValue"
+              :items="buildings"
+              label="กรองด้วยอาคาร"
+              clearable
+            >
+            </v-autocomplete>
+          </v-col>
+        </v-row>
+      </v-card-text>
       <v-data-table
         v-model="selected"
         :headers="headers"
@@ -409,14 +348,15 @@ export default {
     on: {},
     selected: [],
     itemsPerPage: 5,
-    selectAll: false,
+    selectItem: false,
     menu: false,
-    status: "",
+    room_type: "",
     search: "",
     dialogDelete: false,
+    exportExcelResident: false,
     meterGroup: "",
     meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
-    statuses: ["Approve", "Non Approve"],
+    room_types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
     // Filter models.
     NamefilterValue: "",
     zoneFilterValue: "",
@@ -440,7 +380,7 @@ export default {
       "ส.ต.ต.",
     ],
     zonesBuildings: {
-      ส่วนกลาง: [
+      เขตส่วนกลาง: [
         "2/11",
         "2/12",
         "2/13",
@@ -450,7 +390,7 @@ export default {
         "2/17",
         "2/18",
       ],
-      สุรนารายณ์: [
+      เขตสุรนารายณ์: [
         "2/20",
         "2/21",
         "2/22",
@@ -473,7 +413,7 @@ export default {
         "2/40",
         "2/41",
       ],
-      อังฏดาง: ["2/19"],
+      เขตอังฏดาง: ["2/19"],
     },
     buildingsRooms: {
       "2/11": [
@@ -947,14 +887,14 @@ export default {
       room_no: "",
       electric_no: "",
       water_meter_no: "",
-      status: "Non Approve",
+      room_type: "ห้องครอบครัว 1",
     },
     defaultItem: {
       first_name: "",
       room_no: "",
       electric_no: "",
       water_meter_no: "",
-      status: "",
+      room_type: "",
     },
     rules: {
       format: [
@@ -996,7 +936,6 @@ export default {
         {
           text: "ชื่อ",
           value: "first_name",
-          filter: this.nameFilter,
         },
         {
           text: "นามสกุล",
@@ -1015,11 +954,10 @@ export default {
         {
           text: "เลขห้องพัก",
           value: "room_no",
-          filter: this.roomFilter,
         },
         {
           text: "สายมิเตอร์น้ำ",
-          value: "meter_group",
+          value: "water_zone",
         },
         {
           text: "เลขผู้ใช้น้ำ",
@@ -1039,7 +977,7 @@ export default {
         },
         {
           text: "สถานะ",
-          value: "status",
+          value: "room_type",
         },
         {
           text: "การจัดการ",
@@ -1094,169 +1032,163 @@ export default {
           rank: "ด.ต.หญิง",
           first_name: "อธิวัฒน์",
           last_name: " เจิมสูงเนิน",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "132",
-          meter_group: "9040",
+          water_zone: "ป.1",
           electricity_no: "200190919501",
           electricity_meter_no: "20019091950",
           water_no: "4567",
           water_meter_no: "4567",
           date_pay: "2021-06",
           price: 323.6,
-          status: "Non Approve",
+          room_type: "ห้องโสด",
         },
         {
           rank: "จ.ส.ต.",
           first_name: "ยุพาพร ",
           last_name: "พวงมะเทศ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "133",
-          meter_group: "9040",
+          water_zone: "ป.1",
           electricity_no: "200190955212",
           electricity_meter_no: "20019095521",
           water_no: "7540",
           water_meter_no: "7540",
           date_pay: "2021-06",
           price: 742.29,
-          status: "Approve",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ด.ต.",
           first_name: "เทวราช",
           last_name: " ดวงทอง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "138",
-          meter_group: "9040",
+          water_zone: "ป.1",
           electricity_no: "200190955393",
           electricity_meter_no: "20019095539",
           water_no: "9856",
           water_meter_no: "9856",
           date_pay: "2021-06",
           price: 0.0,
-          status: "Approve",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ด.ต.",
           first_name: "สุรพงษ์ ",
           last_name: "ทั่งทอง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "140",
-          meter_group: "9040",
+          water_zone: "ป.1",
           electricity_no: "200187439364",
           electricity_meter_no: "20018743936",
           water_no: "3214",
           water_meter_no: "3214",
           date_pay: "2021-06",
           price: 33.34,
-          status: "Approve",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ด.ต.",
           first_name: "จิรสิทธ์",
           last_name: " ภูอ่าง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "142",
-          meter_group: "9040",
+          water_zone: "ป.83",
           electricity_no: "200130597255",
           electricity_meter_no: "20013059725",
           water_no: "5467",
           water_meter_no: "5467",
           date_pay: "2021-06",
           price: 1068.8,
-          status: "Non Approve",
+          room_type: "ห้องโสด",
         },
         {
           rank: "ร.ต.ท.",
           first_name: "วุฒิชัย",
           last_name: " บุญใบ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "148",
-          meter_group: "9040",
+          water_zone: "ป.83",
           electricity_no: "200130599746",
           electricity_meter_no: "20013059974",
           water_no: "8520",
           water_meter_no: "8520",
           date_pay: "2021-06",
           price: 220.21,
-          status: "Non Approve",
+          room_type: "ห้องโสด",
         },
         {
           rank: "พ.ต.อ.",
           first_name: "ธรรมศธรรม",
           last_name: " นาคมณี",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "22",
-          meter_group: "9040",
+          water_zone: "ป.83",
           electricity_no: "200130694277",
           electricity_meter_no: "20013069427",
           water_no: "7845",
           water_meter_no: "7845",
           date_pay: "2021-06",
           price: 153.5,
-          status: "Non Approve",
+          room_type: "ห้องโสด",
         },
         {
           rank: "พ.ต.อ.",
           first_name: "สุพล ",
           last_name: "สุราวุฒิ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "23",
-          meter_group: "9040",
+          water_zone: "ป.83",
           electricity_no: "200130694548",
           electricity_meter_no: "20013069454",
           water_no: "3568",
           water_meter_no: "3568",
           date_pay: "2021-06",
           price: 40.9,
-          status: "Non Approve",
+          room_type: "ห้องโสด",
         },
         {
           rank: "ด.ต.",
           first_name: "พีรันธร",
           last_name: " ก้านขุนทด",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "24",
-          meter_group: "9040",
+          water_zone: "ป.83",
           electricity_no: "200130695249",
           electricity_meter_no: "20013069524",
           water_no: "5568",
           water_meter_no: "5568",
           date_pay: "2021-06",
           price: 829.37,
-          status: "Non Approve",
+          room_type: "ห้องครอบครัว 1",
         },
         {
           rank: "ด.ต.",
           first_name: "อักษร ",
           last_name: "ทองวิจิตร",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "26",
-          meter_group: "9040",
+          water_zone: "ป.212",
           electricity_no: "200130696190",
           electricity_meter_no: "20013069619",
           water_no: "1123",
           water_meter_no: "1123",
           date_pay: "2021-06",
           price: 0.0,
-          status: "Non Approve",
+          room_type: "ห้องครอบครัว 1",
         },
       ];
-    },
-    nameFilter(value) {
-      if (!this.NamefilterValue) {
-        return true;
-      }
-      return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
     //  zone filter
     zoneFilter(value) {
@@ -1271,13 +1203,6 @@ export default {
         return true;
       }
       return value === this.buildingFilterValue;
-    },
-    // roomFilter
-    roomFilter(value) {
-      if (!this.roomFilterValue) {
-        return true;
-      }
-      return value === this.roomFilterValue;
     },
     editItem(item) {
       this.editedIndex = this.residentTable.indexOf(item);
@@ -1345,19 +1270,11 @@ export default {
         return true;
       }
     },
-    // clear form add user
-    clearForm() {
-      this.$refs.formAdduser.reset();
-    },
-    // clear filter
-    clearFilter() {
-      this.$refs.formFilter.reset();
-    },
     enterSelect() {
-      if (this.selected.length >= 2) {
-        return (this.selectAll = true);
+      if (this.selected.length >= 1) {
+        return (this.selectItem = true);
       } else {
-        return (this.selectAll = false);
+        return (this.selectItem = false);
       }
     },
     // delete as selected
@@ -1377,7 +1294,8 @@ export default {
 
 <style scoped>
 .filter {
-  padding: 5px;
+  margin-bottom: 25px;
+  padding: 10px;
 }
 .button-filter {
   margin: 10px;
