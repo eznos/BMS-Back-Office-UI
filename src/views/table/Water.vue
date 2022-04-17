@@ -36,7 +36,7 @@
               v-model="search"
               prepend-icon="mdi-magnify"
               type="text"
-              label="กรองด้วยชื่อ"
+              label="ค้นหา"
               class="filter"
               clearable
             ></v-text-field>
@@ -57,7 +57,7 @@
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-autocomplete
               v-model="zoneFilterValue"
-              prepend-icon="mdi-office-building"
+              prepend-icon="mdi-map-legend"
               label="กรองด้วยเขต"
               class="filter"
               :items="zones"

@@ -31,13 +31,25 @@
           <!-- Filter for  name-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-text-field
-              v-model="NamefilterValue"
+              v-model="search"
               prepend-icon="mdi-magnify"
               type="text"
-              label="กรองด้วยชื่อ"
+              label="ค้นหา"
               class="filter"
               clearable
             ></v-text-field>
+          </v-col>
+          <!-- Filter for  zone-->
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+            <v-autocomplete
+              v-model="zoneFilterValue"
+              prepend-icon="mdi-map-legend"
+              label="กรองด้วยพื้นที่"
+              class="filter"
+              :items="zones"
+              clearable
+            >
+            </v-autocomplete>
           </v-col>
           <!-- Filter for  building-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
@@ -47,18 +59,6 @@
               label="กรองด้วยอาคาร"
               class="filter"
               :items="buildings"
-              clearable
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- Filter for  roomnumber-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="roomFilterValue"
-              prepend-icon="mdi-room-service"
-              label="กรองด้วยห้อง"
-              class="filter"
-              :items="rooms"
               clearable
             >
             </v-autocomplete>
@@ -76,7 +76,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                   v-model="dateFilterValue"
-                  label="กรองด้วยรอบบิล"
+                  label="กรองด้วยเดือน"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -94,23 +94,11 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <!-- filter by electricity_no and electricity_meter_no-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-text-field
-              v-model="search"
-              class="filter"
-              prepend-icon="mdi-counter"
-              label="กรองด้วยเลขผู้ไฟฟ้าหรือเลขมิเตอร์"
-              @keypress="isNumber($event)"
-              hint="ตัวอย่าง 123456789123"
-            >
-            </v-text-field>
-          </v-col>
-          <!-- Filter for  status-->
+          <!-- Filter for  billing_status-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               v-model="statusFilterValue"
-              :items="statuses"
+              :items="billing_statuses"
               prepend-icon="mdi-list-status"
               label="กรองด้วยสถานะ"
               class="filter"
@@ -166,7 +154,7 @@
               </v-card-title>
               <v-card-text>
                 <v-container>
-                  <!-- form add user -->
+                  <!-- edit user -->
                   <v-form ref="form" v-model="valid" lazy-validation>
                     <v-row>
                       <!-- rank -->
@@ -201,6 +189,18 @@
                           :rules="rules.name"
                           disabled
                         ></v-text-field>
+                      </v-col>
+                      <!-- zone -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          label="พื้นที่"
+                          :items="zones"
+                          required
+                          :rules="rules.buildingRoom"
+                          v-model="editedItem.zone"
+                          disabled
+                        >
+                        </v-autocomplete>
                       </v-col>
                       <!-- building -->
                       <v-col cols="12" sm="6" md="4">
@@ -250,6 +250,17 @@
                           disabled
                         ></v-text-field>
                       </v-col>
+                      <!-- unit-->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          v-model="editedItem.unit"
+                          label="หน่วยไฟฟ้า"
+                          required
+                          :rules="rules.buildingRoom"
+                          @keypress="isNumber($event)"
+                          clearable
+                        ></v-text-field>
+                      </v-col>
                       <!-- price -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
@@ -258,16 +269,18 @@
                           required
                           :rules="rules.buildingRoom"
                           @keypress="isNumber($event)"
+                          clearable
                         ></v-text-field>
                       </v-col>
-                      <!-- status -->
+                      <!-- billing_status -->
                       <v-col cols="12" sm="6" md="4">
                         <v-select
-                          v-model="editedItem.status"
-                          :items="statuses"
+                          v-model="editedItem.billing_status"
+                          :items="billing_statuses"
                           label="สถานะ"
                           required
                           :rules="rules.buildingRoom"
+                          clearable
                         >
                         </v-select>
                       </v-col>
@@ -282,13 +295,14 @@
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
                               v-model="editedItem.date_pay"
-                              label="รอบบิล"
+                              label="เดือน"
                               prepend-icon="mdi-calendar"
                               readonly
                               required
                               :rules="rules.buildingRoom"
                               v-bind="attrs"
                               v-on="on"
+                              clearable
                             ></v-text-field>
                           </template>
                           <v-date-picker
@@ -372,12 +386,7 @@
                 >
                   ยกเลิก
                 </v-btn>
-                <v-btn
-                  color="agree"
-                  :disabled="!valid"
-                  text
-                  @click="exportExcelElectric = false"
-                >
+                <v-btn color="agree" text @click="exportExcelElectric = false">
                   ยืนยันข้อมูล
                 </v-btn>
               </v-card-actions>
@@ -463,29 +472,31 @@ export default {
     room_no: null,
     dialogDelete: false,
     // Filter models.
-    NamefilterValue: "",
+    zoneFilterValue: "",
     buildingFilterValue: "",
     roomFilterValue: "",
     dateFilterValue: "",
     statusFilterValue: "",
     date: new Date().toISOString().substr(0, 7),
-    statuses: ["Approve", "Non Approve"],
+    billing_statuses: ["draft", "in_progess", "exported"],
     electricTable: [],
     editedIndex: -1,
     editedItem: {
       first_name: "",
+      zone: "",
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
-      status: "Non Approve",
+      billing_status: "draft",
       date_pay: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
       first_name: "",
+      zone: "เขตส่วนกลาง",
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
-      status: "",
+      billing_status: "draft",
       date_pay: new Date().toISOString().substr(0, 7),
     },
     zonesBuildings: {
@@ -499,7 +510,7 @@ export default {
         "2/17",
         "2/18",
       ],
-      เขตสุระ: [
+      เขตสุรนารายณ์: [
         "2/20",
         "2/21",
         "2/22",
@@ -1029,11 +1040,15 @@ export default {
         {
           text: "ชื่อ",
           value: "first_name",
-          filter: this.nameFilter,
         },
         {
           text: "นามสกุล",
           value: "last_name",
+        },
+        {
+          text: "พื้นที่",
+          value: "zone",
+          filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
@@ -1043,7 +1058,6 @@ export default {
         {
           text: "เลขห้องพัก",
           value: "room_no",
-          filter: this.roomFilter,
         },
         {
           text: "เลขผู้ใช้ไฟ",
@@ -1054,9 +1068,14 @@ export default {
           value: "electricity_meter_no",
         },
         {
-          text: "รอบบิล",
+          text: "เดือน",
           value: "date_pay",
           filter: this.dateFilter,
+        },
+        {
+          text: "หน่วย",
+          value: "unit",
+          filterable: false,
         },
         {
           text: "ค่าไฟฟ้า",
@@ -1065,7 +1084,7 @@ export default {
         },
         {
           text: "สถานะ",
-          value: "status",
+          value: "billing_status",
           filter: this.stateFilter,
         },
         {
@@ -1076,9 +1095,19 @@ export default {
         },
       ];
     },
+    zones() {
+      return Object.keys(this.zonesBuildings);
+    },
     // autocomplete
     buildings() {
-      return Object.keys(this.buildingsRooms);
+      if (this.zoneFilterValue) {
+        return this.zonesBuildings[this.zoneFilterValue];
+      }
+      if (!this.editedItem.zone) {
+        return ["ไม่มีข้อมูล"];
+      } else {
+        return this.zonesBuildings[this.editedItem.zone];
+      }
     },
     rooms() {
       if (this.buildingFilterValue) {
@@ -1116,7 +1145,7 @@ export default {
           rank: "ด.ต.หญิง",
           first_name: "อธิวัฒน์ ",
           last_name: "เจิมสูงเนิน",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "132",
           meter_group: "9040",
@@ -1124,13 +1153,14 @@ export default {
           electricity_meter_no: "20019091950",
           date_pay: "2021-06",
           price: 323.6,
-          status: "Non Approve",
+          unit: "91",
+          billing_status: "draft",
         },
         {
           rank: "จ.ส.ต.",
           first_name: "ยุพาพร ",
           last_name: "พวงมะเทศ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "133",
           meter_group: "9040",
@@ -1138,13 +1168,14 @@ export default {
           electricity_meter_no: "20019095521",
           date_pay: "2021-06",
           price: 742.29,
-          status: "Approve",
+          unit: "21",
+          billing_status: "draft",
         },
         {
           rank: "ด.ต.",
           first_name: "เทวราช ",
           last_name: "ดวงทอง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/36",
           room_no: "138",
           meter_group: "9040",
@@ -1152,13 +1183,14 @@ export default {
           electricity_meter_no: "20019095539",
           date_pay: "2021-06",
           price: "0.00",
-          status: "Approve",
+          unit: "91",
+          billing_status: "in_progess",
         },
         {
           rank: "ด.ต.",
           first_name: "สุรพงษ์ ",
           last_name: "ทั่งทอง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "140",
           meter_group: "9040",
@@ -1166,13 +1198,14 @@ export default {
           electricity_meter_no: "20018743936",
           date_pay: "2021-06",
           price: 33.34,
-          status: "Approve",
+          unit: "38",
+          billing_status: "in_progess",
         },
         {
           rank: "ด.ต.",
           first_name: "จิรสิทธ์ ",
           last_name: "ภูอ่าง",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "142",
           meter_group: "9040",
@@ -1180,13 +1213,14 @@ export default {
           electricity_meter_no: "20013059725",
           date_pay: "2021-06",
           price: 1068.8,
-          status: "Non Approve",
+          unit: "74",
+          billing_status: "in_progess",
         },
         {
           rank: "ร.ต.ท.",
           first_name: "วุฒิชัย ",
           last_name: "บุญใบ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/37",
           room_no: "148",
           meter_group: "9040",
@@ -1194,13 +1228,14 @@ export default {
           electricity_meter_no: "20013059974",
           date_pay: "2021-06",
           price: 220.21,
-          status: "Non Approve",
+          unit: "98",
+          billing_status: "in_progess",
         },
         {
           rank: "พ.ต.อ.",
           first_name: "ธรรมศธรรม ",
           last_name: "นาคมณี",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "22",
           meter_group: "9040",
@@ -1208,13 +1243,14 @@ export default {
           electricity_meter_no: "20013069427",
           date_pay: "2021-06",
           price: 153.5,
-          status: "Non Approve",
+          unit: "91",
+          billing_status: "in_progess",
         },
         {
           rank: "พ.ต.อ.",
           first_name: "สุพล ",
           last_name: "สุราวุฒิ",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "23",
           meter_group: "9040",
@@ -1222,13 +1258,14 @@ export default {
           electricity_meter_no: "20013069454",
           date_pay: "2021-06",
           price: 40.9,
-          status: "Non Approve",
+          unit: "61",
+          billing_status: "in_progess",
         },
         {
           rank: "ด.ต.",
           first_name: "พีรันธร ",
           last_name: "ก้านขุนทด",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "24",
           meter_group: "9040",
@@ -1236,13 +1273,14 @@ export default {
           electricity_meter_no: "20013069524",
           date_pay: "2021-06",
           price: 829.37,
-          status: "Non Approve",
+          unit: "31",
+          billing_status: "in_progess",
         },
         {
           rank: "ด.ต.",
           first_name: "อักษร ",
           last_name: "ทองวิจิตร",
-          zone: "สุรนารายณ์",
+          zone: "เขตสุรนารายณ์",
           building: "2/38",
           room_no: "26",
           meter_group: "9040",
@@ -1250,7 +1288,8 @@ export default {
           electricity_meter_no: "20013069619",
           date_pay: "2021-06",
           price: "0.00",
-          status: "Non Approve",
+          unit: "91",
+          billing_status: "in_progess",
         },
       ];
     },
@@ -1263,11 +1302,11 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-    roomFilter(value) {
-      if (!this.roomFilterValue) {
+    zoneFilter(value) {
+      if (!this.zoneFilterValue) {
         return true;
       }
-      return value === this.roomFilterValue;
+      return value === this.zoneFilterValue;
     },
     buildingFilter(value) {
       if (!this.buildingFilterValue) {
@@ -1337,9 +1376,8 @@ export default {
     },
     // clear filter
     clearFilter() {
-      (this.NamefilterValue = ""),
-        (this.buildingFilterValue = ""),
-        (this.roomFilterValue = ""),
+      (this.buildingFilterValue = ""),
+        (this.zoneFilterValue = ""),
         (this.dateFilterValue = "");
       this.statusFilterValue = "";
       this.search = "";
@@ -1369,7 +1407,7 @@ export default {
     },
     // color of price
     getColor(price) {
-      if (price == 0) return "red";
+      if (price == 0) return "#FF606090";
       else return "#FFFFFF00";
     },
     // show delete as selected button
