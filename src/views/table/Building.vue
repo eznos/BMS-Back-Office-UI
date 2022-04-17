@@ -28,8 +28,8 @@
       </v-card-title>
       <v-form ref="formFilter">
         <!-- filter -->
-        <v-row justify="space-between" class="px-3">
-          <!-- Filter for  first_name-->
+        <v-row class="px-3">
+          <!-- search -->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-text-field
               v-model="search"
@@ -39,6 +39,19 @@
               clearable
               class="filter"
             ></v-text-field>
+          </v-col>
+          <!-- search -->
+          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+            <v-autocomplete
+              v-model="waterGroupFilterValue"
+              prepend-icon="mdi-water-circle"
+              type="text"
+              label="กรองด้วยสายมิเตอร์น้ำประปา"
+              clearable
+              class="filter"
+              :items="water_groups"
+            >
+            </v-autocomplete>
           </v-col>
           <!-- Filter for  zone-->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
@@ -66,26 +79,13 @@
             >
             </v-autocomplete>
           </v-col>
-          <!-- search by roomber-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
-            <v-autocomplete
-              v-model="roomFilterValue"
-              prepend-icon="mdi-office-building-marker"
-              type="text"
-              label="กรองด้วยห้อง"
-              clearable
-              class="filter"
-              :items="rooms"
-            >
-            </v-autocomplete>
-          </v-col>
           <!-- search by type -->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-select
               v-model="typeFilterValue"
               prepend-icon="mdi-list-status"
               label="กรองด้วยประเภทห้อง"
-              :items="types"
+              :items="room_types"
               clearable
               class="filter"
             >
@@ -104,31 +104,6 @@
             </v-select>
           </v-col>
         </v-row>
-        <v-row> </v-row>
-        <!-- btn -->
-        <v-col cols="12" justify="space-between" class="px-3">
-          <!-- enter filter -->
-          <!-- <v-btn
-              outlined
-              color="agree"
-              class="button-filter pt-6 pb-6"
-              width="140"
-            >
-              <v-icon>mdi-magnify</v-icon>
-              กรอง
-            </v-btn> -->
-          <!-- reset filter -->
-          <v-btn
-            outlined
-            color="error"
-            width="140"
-            @click="clearFilter"
-            class="button-filter pt-6 pb-6"
-          >
-            <v-icon>mdi-delete-sweep</v-icon>
-            &nbsp; ล้างการกรอง
-          </v-btn>
-        </v-col>
       </v-form>
     </v-card>
     <!-- table and buttons -->
@@ -143,11 +118,8 @@
             <!-- delete as selected -->
             <v-btn
               color="error"
-              width="140"
-              v-bind="attrs"
-              v-on="on"
               class="button-filter pt-5 pb-5"
-              :disabled="!selectAll"
+              :disabled="!selectItems"
               @click="deleteItemSelected"
             >
               <v-icon>mdi-delete-sweep</v-icon>
@@ -176,35 +148,19 @@
                     <v-container>
                       <v-form ref="formNewdata" v-model="valid" lazy-validation>
                         <v-row>
-                          <!-- <v-col cols="12" sm="6" md="4">
-                            <v-autocomplete
-                              label="ยศ"
-                              v-model="editedItem.rank"
-                              :items="ranks"
-                              required
-                              :rules="rules.nameRules"
+                          <!-- water group -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              v-model="editedItem.water_group"
+                              :items="water_groups"
+                              label="สายของมิเตอร์น้ำ"
                               autofocus
+                              clearable
+                              required
+                              :rules="rules.zonesBuildingsRoom"
                             >
-                            </v-autocomplete>
+                            </v-select>
                           </v-col>
-                       
-                          <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="editedItem.first_name"
-                              label="ชื่อ"
-                              required
-                              :rules="rules.nameRules"
-                            ></v-text-field>
-                          </v-col>
-                         
-                          <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="editedItem.last_name"
-                              label="นามสกุล"
-                              required
-                              :rules="rules.nameRules"
-                            ></v-text-field>
-                          </v-col> -->
                           <!-- zone -->
                           <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
@@ -241,10 +197,10 @@
                             >
                             </v-autocomplete>
                           </v-col>
-                          <!-- electric_no -->
+                          <!-- electricity_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.electric_no"
+                              v-model="editedItem.electricity_no"
                               label="เลขผู้ใช้ไฟฟ้า"
                               @keypress="isNumber($event)"
                               clearable
@@ -265,10 +221,10 @@
                               :rules="rules.waterNumber"
                             ></v-text-field>
                           </v-col>
-                          <!-- electric_meter_no -->
+                          <!-- electricity_meter_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.electric_meter_no"
+                              v-model="editedItem.electricity_meter_no"
                               label="เลขมิเตอร์น้ำไฟฟ้า"
                               @keypress="isNumber($event)"
                               clearable
@@ -292,8 +248,8 @@
                           <!-- type -->
                           <v-col cols="12" sm="6" md="4">
                             <v-select
-                              v-model="editedItem.type"
-                              :items="types"
+                              v-model="editedItem.room_type"
+                              :items="room_types"
                               label="ประเภทห้องพัก"
                               clearable
                               required
@@ -367,8 +323,8 @@
                   <v-btn
                     color="#1572A1"
                     class="button-filter pt-5 pb-5"
-                    dark
                     v-on="{ ...attrs }"
+                    :disabled="!selectItems"
                   >
                     <v-icon> mdi-file-export-outline </v-icon>
                     &nbsp; Export ข้อมูล Excel
@@ -376,85 +332,24 @@
                 </template>
                 <v-card>
                   <v-card-title>
-                    ส่งออกข้อมูล Excel ของค่าไฟฟ้าไปยังอีเมลที่ต้องการ
+                    ต้องการ export ข้อมูลเป็นรูปแบบ Excel ที่เลือกไว้หรือไม่ ?
                   </v-card-title>
-                  <v-card-text>
-                    <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-row>
-                        <!-- date export -->
-                        <v-col cols="12">
-                          <v-menu
-                            ref="menu"
-                            v-model="menuExportExcel"
-                            :close-on-content-click="false"
-                            transition="scale-transition"
-                            offset-y
-                            max-width="70%"
-                            min-width="auto"
-                          >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field
-                                v-model="dateExport"
-                                label="เลือกเดือนที่ต้องการ Export"
-                                prepend-icon="mdi-calendar"
-                                readonly
-                                v-bind="attrs"
-                                v-on="on"
-                              ></v-text-field>
-                            </template>
-                            <v-date-picker
-                              v-model="dateExport"
-                              type="month"
-                              no-title
-                              scrollable
-                            >
-                              <v-spacer></v-spacer>
-                              <v-btn text color="primary" @click="menu = false">
-                                Cancel
-                              </v-btn>
-                              <v-btn
-                                text
-                                color="primary"
-                                @click="$refs.menuExportExcel.save(date)"
-                              >
-                                OK
-                              </v-btn>
-                            </v-date-picker>
-                          </v-menu>
-                        </v-col>
-                        <!-- email -->
-                        <v-col cols="12">
-                          <v-text-field
-                            label="อีเมลผู้รับ"
-                            autofocus
-                            :rules="[rules.email.regex]"
-                            v-model="emailtarget"
-                            prepend-icon="mdi-at"
-                          >
-                          </v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-form>
-                  </v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-btn
-                        color="warning"
-                        text
-                        @click="exportExcelResident = false"
-                      >
-                        ยกเลิก
-                      </v-btn>
-                      <v-btn
-                        color="agree"
-                        :disabled="!valid"
-                        text
-                        @click="exportExcelResident = false"
-                      >
-                        ยืนยันข้อมูล
-                      </v-btn>
-                    </v-form>
+                    <v-btn
+                      color="warning"
+                      text
+                      @click="exportExcelResident = false"
+                    >
+                      ยกเลิก
+                    </v-btn>
+                    <v-btn
+                      color="agree"
+                      text
+                      @click="exportExcelResident = false"
+                    >
+                      ยืนยันข้อมูล
+                    </v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
@@ -486,232 +381,19 @@
               </template>
               <!-- data edit and delete-->
               <template v-slot:[`item.actions`]="{ item }">
-                <v-icon class="mr-2" @click="editItem(item)">
-                  mdi-pencil
-                </v-icon>
-                <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
+                <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
+                <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
               </template>
             </v-data-table>
-            <!-- end data-table -->
           </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- chart center -->
-      <v-col cols="12" xs="12" sm="12" md="12" lg="4" class="">
-        <v-card>
-          <h2>เขตส่วนกลาง</h2>
-          <v-card-actions>
-            <div class="chart-responsive" :style="{ padding: 10 }">
-              <canvas id="center" width="1500" height="350"></canvas>
-            </div>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-      <!-- chart suranarai -->
-      <v-col cols="12" xs="12" sm="12" md="12" lg="4">
-        <v-card>
-          <h2>เขตถนนสุรนารายณ์</h2>
-          <v-card-actions>
-            <div class="chart-responsive" :style="{ padding: 10 }">
-              <canvas id="suranarai" width="1500" height="350"></canvas>
-            </div>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-      <!-- chart ashtang -->
-      <v-col cols="12" xs="12" sm="12" md="12" lg="4">
-        <v-card>
-          <h2>อัษฎางค์</h2>
-          <v-card-actions>
-            <div class="chart-responsive" :style="{ padding: 10 }">
-              <canvas id="ashtang" width="1500" height="350"></canvas>
-            </div>
-          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
   </v-app>
 </template>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-import Chart from "chart.js";
 export default {
-  mounted: function () {
-    var chart = new Chart(center, {
-      type: "doughnut",
-      data: {
-        labels: [
-          "อาคาร2/11",
-          "อาคาร2/12",
-          "อาคาร2/13",
-          "อาคาร2/14",
-          "อาคาร2/15",
-          "อาคาร2/16",
-          "อาคาร2/17",
-          "อาคาร2/18",
-        ], // responsible for how many bars are gonna show on the chart
-        // create 12 datasets, since we have 12 items
-        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-        // put 0, if there is no data for the particular bar
-        datasets: [
-          {
-            label: "ส่วนกลาง",
-            data: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-            backgroundColor: [
-              "#22EACA",
-              "#B31E6F",
-              "#EE5A5A",
-              "#FF9E74",
-              "#22EACA",
-              "#B31E6F",
-              "#EE5A5A",
-              "#FF9E74",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: 15,
-        },
-        legend: {
-          locale: "th-TH",
-          position: "top", // place legend on the right side of chart
-          plugins: {
-            labels: {
-              font: {
-                size: 20,
-                family: "Sarabun",
-              },
-            },
-          },
-        },
-      },
-    });
-    var chart = new Chart(suranarai, {
-      type: "doughnut",
-      data: {
-        labels: [
-          "เรือนแถว2/31 ถึง 2/37",
-          "อาคาร 2/38",
-          "อาคาร 2/39",
-          "อาคาร 2/40",
-          "อาคารบ้านแผด2/20 ถึง 2/29",
-          "อาคารสร้างใหม่",
-        ], // responsible for how many bars are gonna show on the chart
-        // create 12 datasets, since we have 12 items
-        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-        // put 0, if there is no data for the particular bar
-        datasets: [
-          {
-            data: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-            backgroundColor: [
-              "#1A1A40",
-              "#270082",
-              "#7A0BC0",
-              "#7897AB",
-              "#655D8A",
-              "#FA58B6",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: 15,
-        },
-        legend: {
-          locale: "th-TH",
-          position: "top", // place legend on the right side of chart
-          plugins: {
-            labels: {
-              font: {
-                size: 20,
-                family: "Sarabun",
-              },
-            },
-          },
-        },
-      },
-    });
-    var chart = new Chart(ashtang, {
-      type: "doughnut",
-      data: {
-        labels: [
-          "อาคาร2/19 ชั้น1",
-          "อาคาร2/19 ชั้น2",
-          "อาคาร2/19 ชั้น3",
-          "อาคาร2/19 ชั้น4",
-          "อาคาร2/19 ชั้น5",
-        ], // responsible for how many bars are gonna show on the chart
-        // create 12 datasets, since we have 12 items
-        // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-        // put 0, if there is no data for the particular bar
-        datasets: [
-          {
-            label: "ส่วนกลาง",
-            data: [
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-              this.getRandomInt(),
-            ],
-            backgroundColor: [
-              "#655D8A",
-              "#7897AB",
-              "#D885A3",
-              "#FDCEB9",
-              "#FFBBBB",
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: {
-          padding: 15,
-        },
-        legend: {
-          locale: "th-TH",
-          position: "top", // place legend on the right side of chart
-          plugins: {
-            labels: {
-              font: {
-                size: 20,
-                family: "Sarabun",
-              },
-            },
-          },
-        },
-      },
-    });
-  },
   data: () => ({
     el: "#app",
     valid: true,
@@ -720,7 +402,7 @@ export default {
     menu: false,
     selected: [],
     itemsPerPage: 5,
-    selectAll: false,
+    selectItems: false,
     first_name: "",
     on: {},
     attrs: {},
@@ -731,11 +413,11 @@ export default {
     exportExcelResident: false,
     dateExport: new Date().toISOString().substr(0, 7),
     menuExportExcel: false,
-    electric_no: "",
+    electricity_no: "",
     water_no: "",
-    electric_meter_no: "",
+    electricity_meter_no: "",
     water_meter_no: "",
-    type: "",
+    room_type: "",
     rank: "",
     ranks: [
       "พล.ต.อ.",
@@ -753,7 +435,6 @@ export default {
       "ส.ต.ท.",
       "ส.ต.ต.",
     ],
-    status: "",
     zonesBuildings: {
       เขตส่วนกลาง: [
         "2/11",
@@ -765,7 +446,7 @@ export default {
         "2/17",
         "2/18",
       ],
-      เขตสุระ: [
+      เขตสุรนารายณ์: [
         "2/20",
         "2/21",
         "2/22",
@@ -1254,13 +935,13 @@ export default {
         "240",
       ],
     },
-    types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
+    water_groups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
+    room_types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
     status: ["ว่าง", "ไม่ว่าง"],
     search: "",
-    direction: "bottom",
     dialogDelete: false,
     // Filter models.
-    NamefilterValue: "",
+    waterGroupFilterValue: "",
     zoneFilterValue: "",
     statusFilterValue: "",
     typeFilterValue: "",
@@ -1315,22 +996,11 @@ export default {
     },
     headers() {
       return [
-        // {
-        //   text: "ยศ",
-        //   value: "rank",
-        //   align: "left",
-        //   // filter: this.nameFilter,
-        // },
-        // {
-        //   text: "ชื่อ",
-        //   value: "first_name",
-        //   align: "left",
-        //   // filter: this.nameFilter,
-        // },
-        // {
-        //   text: "นามสกุล",
-        //   value: "last_name",
-        // },
+        {
+          text: "สายมิเตอร์น้ำ",
+          value: "water_group",
+          filter: this.waterGroupFilter,
+        },
         {
           text: "พื้นที่",
           value: "zone",
@@ -1344,7 +1014,6 @@ export default {
         {
           text: "เลขห้องพัก",
           value: "room",
-          filter: this.roomFilter,
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
@@ -1364,7 +1033,7 @@ export default {
         },
         {
           text: "ประเภทห้องพัก",
-          value: "type",
+          value: "room_type",
           filter: this.typeFilter,
         },
         {
@@ -1423,10 +1092,10 @@ export default {
           rank: "พล.ต.อ.",
           first_name: "ชัชชาช้า",
           last_name: "ชัชชาวาน",
-          zone: "เขตสุระ",
+          zone: "เขตสุรนารายณ์",
           building: "2/20",
           room: "2",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "1234",
           water_meter_no: "1234",
           electricity_no: "200190919501",
@@ -1438,16 +1107,16 @@ export default {
           status: "ไม่ว่าง",
           permission: "user",
           email: "user@123.com",
-          type: "ห้องครอบครัว 1",
+          room_type: "ห้องครอบครัว 1",
         },
         {
           rank: "ด.ต.หญิง",
           first_name: "ภัทรพร",
           last_name: "ศรีโอภาส",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "103",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "4567",
           water_meter_no: "4567",
           electricity_no: "200190955212",
@@ -1459,16 +1128,16 @@ export default {
           status: "ไม่ว่าง",
           permission: "admin",
           email: "smorston0@nytimes.com",
-          type: "ห้องครอบครัว 2",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ด.ต.",
           first_name: "อมร ",
           last_name: "ภูมพฤกษ์",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "107",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "7540",
           water_meter_no: "7540",
           electricity_no: "200190955393",
@@ -1480,16 +1149,16 @@ export default {
           status: "ไม่ว่าง",
           permission: "user",
           email: "mtinkler1@google.ca",
-          type: "ห้องครอบครัว 2",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ด.ต.",
           first_name: "อดุล ",
           last_name: "วงศ์ทอง",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "202",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "9856",
           water_meter_no: "9856",
           electricity_no: "200187439364",
@@ -1501,16 +1170,16 @@ export default {
           status: "ไม่ว่าง",
           permission: "user",
           email: "ssmewings2@umn.edu",
-          type: "ห้องโสด",
+          room_type: "ห้องโสด",
         },
         {
           rank: "ร.ต.ท.",
           first_name: "จรัส ",
           last_name: "สิมฤทธิ์",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "206",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "3214",
           water_meter_no: "3214",
           electricity_no: "200130597255",
@@ -1522,16 +1191,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "asnartt3@intel.com",
-          type: "ห้องครอบครัว 2",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ส.ต.อ.",
           first_name: "ธิชากร ",
           last_name: "ผินดอน",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "305",
-          meter_group: "ป.83",
+          water_group: "ป.83",
           water_no: "5467",
           water_meter_no: "5467",
           electricity_no: "200130599746",
@@ -1543,16 +1212,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "ibirkbeck4@github.com",
-          type: "ห้องโสด",
+          room_type: "ห้องโสด",
         },
         {
           rank: "ด.ต.",
           first_name: "รุ่ง ",
           last_name: "โฉมกิ่ง",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "402",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "8520",
           water_meter_no: "8520",
           electricity_no: "200130694277",
@@ -1564,16 +1233,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "gmcgrah5@ucoz.ru",
-          type: "ห้องครอบครัว 1",
+          room_type: "ห้องครอบครัว 1",
         },
         {
           rank: "ด.ต.",
           first_name: "อนุชา ",
           last_name: "ฝากชัยภูมิ",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "413",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "7845",
           water_meter_no: "7845",
           electricity_no: "200130694548",
@@ -1585,16 +1254,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "jkirkby6@answers.com",
-          type: "ห้องครอบครัว 2",
+          room_type: "ห้องครอบครัว 2",
         },
         {
           rank: "ส.ต.อ.",
           first_name: "รัฐพนย์ ",
           last_name: "เรื่องเรือ",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "504",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "3568",
           water_meter_no: "3568",
           electricity_no: "200130695249",
@@ -1606,16 +1275,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "fillyes7@hubpages.com",
-          type: "ห้องครอบครัว 1",
+          room_type: "ห้องครอบครัว 1",
         },
         {
           rank: "ร.ต.ท.",
           first_name: "อิทธิพล",
           last_name: "เพ็ญเติมพันธ์",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "514",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "5568",
           water_meter_no: "5568",
           electricity_no: "200130696190",
@@ -1627,16 +1296,16 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "mlarmet8@mail.ru",
-          type: "ห้องโสด",
+          room_type: "ห้องโสด",
         },
         {
           rank: "ด.ต.",
           first_name: "ไพโรจน์",
           last_name: "ทนปรางค์",
-          zone: "อัษฎางค์",
+          zone: "เขตอังฏดาง",
           building: "2/19",
           room: "515",
-          meter_group: "ป.1",
+          water_group: "ป.1",
           water_no: "1123",
           water_meter_no: "1123",
           electricity_no: "200130696190",
@@ -1648,7 +1317,7 @@ export default {
           status: "ว่าง",
           permission: "user",
           email: "tgainseford9@sun.com",
-          type: "ห้องครอบครัว 1",
+          room_type: "ห้องครอบครัว 1",
         },
       ];
     },
@@ -1660,6 +1329,13 @@ export default {
       // Check if the current loop value (The dessert first_name)
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
+    },
+
+    waterGroupFilter(value) {
+      if (!this.waterGroupFilterValue) {
+        return true;
+      }
+      return value === this.waterGroupFilterValue;
     },
     zoneFilter(value) {
       if (!this.zoneFilterValue) {
@@ -1775,12 +1451,12 @@ export default {
       if (status == "ว่าง") return "agree";
       else return "#ffffff";
     },
-    // Check selectAll column
+    // Check selectItems column
     enterSelect() {
-      if (this.selected.length >= 2) {
-        return (this.selectAll = true);
+      if (this.selected.length >= 1) {
+        return (this.selectItems = true);
       } else {
-        return (this.selectAll = false);
+        return (this.selectItems = false);
       }
     },
     // delete as selected
