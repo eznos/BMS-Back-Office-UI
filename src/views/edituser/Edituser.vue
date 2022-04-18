@@ -137,8 +137,8 @@
                   <!-- tel. -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
-                      :rules="[rules.phoneNumber.regex]"
-                      v-model="phoneNumber"
+                      :rules="[rules.phone_number.regex]"
+                      v-model="phone_number"
                       :counter="10"
                       label="เบอร์โทร"
                       required
@@ -147,52 +147,16 @@
                       @keypress="isNumber($event)"
                     ></v-text-field>
                   </v-col>
-                  <!-- sex -->
+                  <!-- gender -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-select
-                      v-model="sex"
+                      v-model="gender"
                       prepend-icon="mdi-gender-male-female"
                       item-color="red"
-                      :items="sexs"
+                      :items="genders"
                       label="เพศ"
                     >
                     </v-select>
-                  </v-col>
-                  <!-- zone -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-autocomplete
-                      v-model="zone"
-                      label="พื้นที่"
-                      :items="zones"
-                      prepend-icon="mdi-google-maps"
-                      required
-                      clearable
-                    >
-                    </v-autocomplete>
-                  </v-col>
-                  <!-- building -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-autocomplete
-                      v-model="building"
-                      :items="buildings"
-                      label="อาคาร"
-                      required
-                      clearable
-                      prepend-icon="mdi-office-building-marker-outline"
-                    >
-                    </v-autocomplete>
-                  </v-col>
-                  <!-- roomnumber -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-autocomplete
-                      v-model="room"
-                      :items="rooms"
-                      label="เลขห้องพัก"
-                      required
-                      clearable
-                      prepend-icon="mdi-numeric"
-                    >
-                    </v-autocomplete>
                   </v-col>
                 </v-row>
                 <v-row> </v-row>
@@ -216,25 +180,15 @@
               ล้างข้อมูล
             </v-btn>
             <!-- cancel form -->
-            <v-btn
-              class="mr-4"
-              to="/login"
-              dark
-              width="200px"
-              large
-              color="error"
-            >
+            <v-btn class="mr-4" to="/login" width="200px" large color="error">
               ยกเลิกการลงทะเบียน
             </v-btn>
             <!-- submit form -->
             <v-btn
               class="mr-4"
-              color="#71D861"
+              color="agree"
               width="200px"
-              dark
               large
-              v-bind="attrs"
-              v-on="on"
               :disabled="!valid"
             >
               ยืนยันการลงทะเบียน
@@ -255,18 +209,19 @@ export default {
     attrs: {},
     valid: true,
     clicked: false,
-    profileImage: "",
+
     loader: null,
     avatar: null,
+    profileImage: "",
     rank: "",
     affiliation: "",
     firstname: "",
     lastname: "",
-    sex: "",
-    sexs: ["ชาย", "หญิง", "ไม่ระบุ"],
+    gender: "",
+    genders: ["ชาย", "หญิง", "ไม่ระบุ"],
     tel: "",
     email: "",
-    phoneNumber: "",
+    phone_number: "",
     zone: null,
     building: null,
     room: null,
@@ -816,7 +771,7 @@ export default {
             v
           ) || "อีเมลไม่ถูกต้อง",
       },
-      phoneNumber: {
+      phone_number: {
         required: (v) => !!v || "กรุณาใส่เบอร์โทรศัพท์",
         regex: (v) =>
           /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
