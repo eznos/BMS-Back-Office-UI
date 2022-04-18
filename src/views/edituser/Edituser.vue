@@ -263,7 +263,7 @@ export default {
     firstname: "",
     lastname: "",
     sex: "",
-    sexs: ["ชาย", "หญิง", "เพศทางเลือก", "ไม่ระบุ"],
+    sexs: ["ชาย", "หญิง", "ไม่ระบุ"],
     tel: "",
     email: "",
     phoneNumber: "",

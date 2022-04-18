@@ -15,68 +15,6 @@
           </v-row>
         </div>
       </v-row>
-      <!-- filter -->
-      <v-card class="card-filter px-6 py-6">
-        <v-card-title>
-          <v-icon size="35px" class="icon"
-            >mdi-format-list-bulleted-triangle</v-icon
-          >
-          &nbsp;&nbsp;
-          <h3>ตัวกรอง</h3>
-          <!-- button -->
-          <v-spacer></v-spacer>
-        </v-card-title>
-        <!-- filter -->
-        <v-row justify="space-between" class="px-3">
-          <v-col cols="6">
-            <!-- Filter for  name-->
-            <v-text-field
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              type="text"
-              label="กรองด้วยชื่อ-นามสกุล และอีเมล"
-              clearable
-              class="filter"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="6">
-            <!-- search by permission -->
-            <v-select
-              v-model="statusFilterValue"
-              prepend-icon=""
-              label="กรองตำแหน่ง"
-              :items="permission"
-              clearable
-              class="filter"
-            >
-            </v-select>
-          </v-col>
-          <!-- btn filter -->
-          <v-col justify="space-between" class="px-3">
-            <!-- enter filter -->
-            <!-- <v-btn
-              outlined
-              color="agree"
-              class="button-filter pt-6 pb-6"
-              width="140"
-            >
-              <v-icon>mdi-magnify</v-icon>
-              กรอง
-            </v-btn> -->
-            <!-- reset filter -->
-            <v-btn
-              outlined
-              color="error"
-              width="140"
-              @click="clear"
-              class="button-filter pt-6 pb-6"
-            >
-              <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการกรอง
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card>
     </div>
     <!-- table and buttons -->
     <v-card class="card-filter px-6 py-6">
@@ -95,7 +33,7 @@
           v-bind="attrs"
           v-on="on"
           class="button-filter pt-5 pb-5"
-          :disabled="!selectAll"
+          :disabled="!selectItems"
           @click="deleteItemSelected(selected)"
         >
           <v-icon>mdi-delete-sweep</v-icon>
@@ -104,7 +42,7 @@
         <v-spacer></v-spacer>
         <!-- add user -->
         <v-dialog v-model="dialog" persistent max-width="75%">
-          <template v-slot:activator="{ on: attrs }">
+          <!-- <template v-slot:activator="{ on: attrs }">
             <v-btn
               color="agree"
               class="button-filter pt-5 pb-5"
@@ -114,10 +52,10 @@
               <v-icon> mdi-account-plus </v-icon>
               &nbsp; เพื่มผู้ใช้งาน
             </v-btn>
-          </template>
+          </template> -->
           <v-card>
             <v-card-title>
-              <div class="myFont">
+              <div>
                 <span>{{ formTitle }}</span>
               </div>
             </v-card-title>
@@ -126,12 +64,34 @@
                 <v-form ref="formAdduser" v-model="valid" lazy-validation>
                   <v-row>
                     <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        label="ยศ"
+                        :items="ranks"
+                        v-model="editedItem.rank"
+                        required
+                        :rules="rules.name"
+                        disabled
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="editedItem.affiliation"
+                        :items="affiliations"
+                        required
+                        :rules="rules.name"
+                        disabled
+                        label="สังกัด"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.first_name"
                         label="ชื่อ"
-                        autofocus
                         required
                         :rules="rules.name"
+                        disabled
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -140,6 +100,26 @@
                         label="นามสกุล"
                         required
                         :rules="rules.name"
+                        disabled
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="editedItem.gender"
+                        label="เพศ"
+                        required
+                        :rules="rules.name"
+                        disabled
+                      >
+                      </v-select>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.phone_number"
+                        label="เบอร์โทรศัพท์"
+                        required
+                        :rules="[rules.phoneNumber.regex]"
+                        disabled
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -157,6 +137,7 @@
                         :items="permission"
                         required
                         :rules="rules.name"
+                        disabled
                       >
                       </v-select>
                     </v-col>
@@ -167,9 +148,6 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-form>
-                <v-btn color="error" text @click="clearform">
-                  ล้างข้อมูลที่กรอก
-                </v-btn>
                 <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
                 <v-btn color="agree" text :disabled="!valid" @click="save">
                   ยืนยัน
@@ -197,31 +175,60 @@
       </v-card-title>
       <!-- data table -->
       <v-card-text>
-        <!-- start data-table -->
-        <v-data-table
-          v-model="selected"
-          :headers="headers"
-          :items="userTable"
-          item-key="first_name"
-          :items-per-page="itemsPerPage"
-          class="elevation-1 pa-6"
-          :search="search"
-          loading
-          loading-text="กำลังโหลด... โปรดรอสักครู่"
-          show-select
-          @input="enterSelect($event)"
-        >
-          <template v-slot:top>
-            <!-- v-container, v-col and v-row are just for decoration purposes. -->
-          </template>
-          <!-- data -->
-          <template v-slot:[`item.actions`]="{ item }">
-            <v-icon class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-            <v-icon @click="deleteItem(item)"> mdi-delete </v-icon>
-          </template>
-        </v-data-table>
-        <!-- end data-table -->
+        <!-- filter -->
+        <v-row justify="space-between" class="px-3">
+          <v-col cols="6">
+            <!-- Filter for  name-->
+            <v-text-field
+              v-model="search"
+              prepend-icon="mdi-magnify"
+              type="text"
+              label="ค้นหา"
+              clearable
+              class="filter"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="6">
+            <!-- search by permission -->
+            <v-select
+              v-model="statusFilterValue"
+              prepend-icon=""
+              label="ตำแหน่ง"
+              :items="permission"
+              clearable
+              class="filter"
+            >
+            </v-select>
+          </v-col>
+        </v-row>
       </v-card-text>
+      <!-- start data-table -->
+      <v-data-table
+        v-model="selected"
+        :headers="headers"
+        :items="userTable"
+        item-key="first_name"
+        :items-per-page="itemsPerPage"
+        class="elevation-1 pa-6"
+        :search="search"
+        loading
+        loading-text="กำลังโหลด... โปรดรอสักครู่"
+        show-select
+        @input="enterSelect($event)"
+      >
+        <!-- color of permission on datatable  -->
+        <template v-slot:[`item.permission`]="{ item }">
+          <v-chip :color="getColor(item.permission)" dark>
+            {{ item.permission }}
+          </v-chip>
+        </template>
+        <!-- data -->
+        <template v-slot:[`item.actions`]="{ item }">
+          <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
+          <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
+        </template>
+      </v-data-table>
+      <!-- end data-table -->
     </v-card>
   </v-app>
 </template>
@@ -234,7 +241,7 @@ export default {
     on: {},
     attrs: {},
     modal: false,
-    selectAll: false,
+    selectItems: false,
     dialog: false,
     menu: false,
     permission: ["admin", "user"],
@@ -243,6 +250,38 @@ export default {
     // Filter models.
     NamefilterValue: "",
     statusFilterValue: "",
+    affiliations: [
+      "ผบช.ภ.3",
+      "สนง.ผบช.ภ.3",
+      "สนง.รอง ผบช.ภ.3",
+      "ภ.3(ส่วนกลาง)",
+      "บก.สส.ภ.3",
+      "ภ.จว.นม.",
+      "สภ.เมืองนครราชสีมา",
+      "บก.อก.ภ.3",
+      "ศพฐ.3",
+      "ปฏิบัติราชการ",
+      "ประจำ",
+      "สำรอง",
+      "ภ.3",
+      "ศฝร.ภ.3",
+    ],
+    ranks: [
+      "พล.ต.อ.",
+      "พล.ต.ท.",
+      "พล.ต.ต.",
+      "พ.ต.อ.",
+      "พ.ต.ท.",
+      "พ.ต.ต.",
+      "ร.ต.อ.",
+      "ร.ต.ท.",
+      "ร.ต.ต.",
+      "ด.ต.",
+      "จ.ส.ต.",
+      "ส.ต.อ.",
+      "ส.ต.ท.",
+      "ส.ต.ต.",
+    ],
     selected: [],
     itemsPerPage: 5,
     userTable: [],
@@ -268,6 +307,12 @@ export default {
             v
           ) || "อีเมลไม่ถูกต้อง",
       },
+      phoneNumber: {
+        required: (v) => !!v || "กรุณาใส่เบอร์โทรศัพท์",
+        regex: (v) =>
+          /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
+          "เบอร์โทรศัพท์ม่ถูกต้อง",
+      },
     },
   }),
   computed: {
@@ -277,22 +322,32 @@ export default {
     headers() {
       return [
         {
-          text: "ชื่อผู้ใช้งาน",
-          value: "first_name",
-          align: "left",
-          search: "",
-          filter: this.nameFilter,
+          text: "ยศ",
+          value: "rank",
         },
         {
-          text: "ชื่อนามสกุลผู้ใช้งาน",
-          value: "last_name",
-          align: "left",
-          search: "",
+          text: "สังกัด",
+          value: "affiliation",
         },
-        // email
+        {
+          text: "ชื่อ",
+          value: "first_name",
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
+        },
+        {
+          text: "เพศ",
+          value: "gender",
+        },
         {
           text: "อีเมล",
           value: "email",
+        },
+        {
+          text: "เบอร์โทรศัพท์",
+          value: "phone_number",
         },
         {
           text: "ตำแหน่ง",
@@ -323,8 +378,10 @@ export default {
       this.userTable = [
         {
           rank: "พล.ต.อ.",
+          affiliation: "สภ.เมืองนครราชสีมา",
           first_name: "ชัชชาช้า",
           last_name: "ชัชชาวาน",
+          gender: "ชาย",
           zone: "เขตสุระ",
           building: "2/20",
           room: "2",
@@ -338,11 +395,14 @@ export default {
           status: "Approve",
           permission: "user",
           email: "user@123.com",
+          phone_number: "0896585452",
         },
         {
           rank: "ด.ต.หญิง",
+          affiliation: "ศพฐ.3",
           first_name: "ภัทรพร",
           last_name: "ศรีโอภาส",
+          gender: "หญิง",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "103",
@@ -356,11 +416,14 @@ export default {
           status: "Approve",
           permission: "admin",
           email: "smorston0@nytimes.com",
+          phone_number: "0896545652",
         },
         {
           rank: "ด.ต.",
+          affiliation: "ศพฐ.3",
           first_name: "อมร ",
           last_name: "ภูมพฤกษ์",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "107",
@@ -374,11 +437,14 @@ export default {
           status: "Approve",
           permission: "user",
           email: "mtinkler1@google.ca",
+          phone_number: "0896582458",
         },
         {
           rank: "ด.ต.",
+          affiliation: "ศพฐ.3",
           first_name: "อดุล ",
           last_name: "วงศ์ทอง",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "202",
@@ -392,11 +458,14 @@ export default {
           status: "Approve",
           permission: "user",
           email: "ssmewings2@umn.edu",
+          phone_number: "0896548572",
         },
         {
           rank: "ร.ต.ท.",
+          affiliation: "ศพฐ.3",
           first_name: "จรัส ",
           last_name: "สิมฤทธิ์",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "206",
@@ -410,11 +479,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "asnartt3@intel.com",
+          phone_number: "0995585452",
         },
         {
           rank: "ส.ต.อ.",
+          affiliation: "ศพฐ.3",
           first_name: "ธิชากร ",
           last_name: "ผินดอน",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "305",
@@ -428,11 +500,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "ibirkbeck4@github.com",
+          phone_number: "0685585452",
         },
         {
           rank: "ด.ต.",
+          affiliation: "ภ.3(ส่วนกลาง)",
           first_name: "รุ่ง ",
           last_name: "โฉมกิ่ง",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "402",
@@ -446,11 +521,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "gmcgrah5@ucoz.ru",
+          phone_number: "0689585452",
         },
         {
           rank: "ด.ต.",
+          affiliation: "ภ.3(ส่วนกลาง)",
           first_name: "อนุชา ",
           last_name: "ฝากชัยภูมิ",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "413",
@@ -464,11 +542,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "jkirkby6@answers.com",
+          phone_number: "0894587452",
         },
         {
           rank: "ส.ต.อ.",
+          affiliation: "สนง.ผบช.ภ.3",
           first_name: "รัฐพนย์ ",
           last_name: "เรื่องเรือ",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "504",
@@ -482,11 +563,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "fillyes7@hubpages.com",
+          phone_number: "0891254452",
         },
         {
           rank: "ร.ต.ท.",
+          affiliation: "สนง.ผบช.ภ.3",
           first_name: "อิทธิพล",
           last_name: "เพ็ญเติมพันธ์",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "514",
@@ -500,11 +584,14 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "mlarmet8@mail.ru",
+          phone_number: "0890256452",
         },
         {
           rank: "ด.ต.",
+          affiliation: "ผบช.ภ.3",
           first_name: "ไพโรจน์",
           last_name: "ทนปรางค์",
+          gender: "ชาย",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "515",
@@ -518,22 +605,9 @@ export default {
           status: "Non Approve",
           permission: "user",
           email: "tgainseford9@sun.com",
+          phone_number: "0805785452",
         },
       ];
-    },
-    /**
-     * Filter for dessert names column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
-    nameFilter(value) {
-      // If this filter has no value we just skip the entire filter.
-      if (!this.NamefilterValue) {
-        return true;
-      }
-      // Check if the current loop value (The dessert name)
-      // partially contains the searched word.
-      return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
     statusFilter(value) {
       if (!this.statusFilterValue) {
@@ -541,11 +615,6 @@ export default {
       }
       return value === this.statusFilterValue;
     },
-    /**
-     * Filter for เลขห้องพัก column.
-     * @param value Value to be tested.
-     * @returns {boolean}
-     */
     editItem(item) {
       this.editedIndex = this.userTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -603,11 +672,11 @@ export default {
     },
     // show delete as selected button
     enterSelect(values) {
-      if (values.length >= 2) {
-        return (this.selectAll = true);
+      if (values.length >= 1) {
+        return (this.selectItems = true);
         // alert("selected all");
       } else {
-        return (this.selectAll = false);
+        return (this.selectItems = false);
       }
     },
 
@@ -629,6 +698,11 @@ export default {
     },
     clearform() {
       this.$refs.formAdduser.reset();
+    },
+    // color of price
+    getColor(permission) {
+      if (permission == "admin") return "error";
+      else return "agree";
     },
   },
 };

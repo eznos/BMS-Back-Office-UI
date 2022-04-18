@@ -103,6 +103,20 @@
             >
             </v-select>
           </v-col>
+          <v-row> </v-row>
+          <!-- btn filter -->
+          <v-col cols="12" justify="space-between" class="px-3">
+            <v-btn
+              outlined
+              color="error"
+              width="140"
+              @click="clearFilter"
+              class="button-filter pt-6 pb-6"
+            >
+              <v-icon>mdi-delete-sweep</v-icon>
+              &nbsp; ล้างการกรอง
+            </v-btn>
+          </v-col>
         </v-row>
       </v-form>
     </v-card>
@@ -137,7 +151,7 @@
                     class="button-filter pt-5 pb-5"
                   >
                     <v-icon> mdi-account-plus </v-icon>
-                    &nbsp; เพิ่มผู้อยู่อาศัย
+                    &nbsp; เพิ่มห้องพัก
                   </v-btn>
                 </template>
                 <v-card>
@@ -276,9 +290,6 @@
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-btn color="error" text @click="clearForm">
-                        ล้างข้อมูลที่กรอก
-                      </v-btn>
                       <v-btn large color="warning" text @click="close">
                         ยกเลิก
                       </v-btn>

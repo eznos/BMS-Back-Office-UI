@@ -73,9 +73,6 @@
             <v-divider></v-divider>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="error" outlined @click="clearform">
-                ล้างข้อมูลที่กรอก
-              </v-btn>
               <v-btn color="warning" text @click="dialog = false">
                 ยกเลิกการเพิ่มพื้นที่
               </v-btn>
