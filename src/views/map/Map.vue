@@ -23,7 +23,7 @@
         &nbsp;&nbsp;
         <v-spacer></v-spacer>
         <!-- add marker buttons -->
-        <v-dialog v-model="dialog" width="75%" persistent>
+        <v-dialog v-model="dialog" max-width="90%" persistent>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="agree" dark v-bind="attrs" v-on="on">
               <v-icon> mdi-map-marker-plus </v-icon>
@@ -35,38 +35,113 @@
               เพิ่มเขตอาคารในแผนที่
             </v-card-title>
             <v-card-text>
-              <v-form ref="formAddmap" v-model="valid">
+              <v-form ref="formAddmap" class="form" v-model="valid">
                 <v-row>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field
-                      v-model="latitude"
-                      append-icon="mdi-latitude"
-                      label="ละติจูด"
-                      required
-                      :rules="[rules.latitudeRules.regex]"
-                      clearable
-                    >
-                    </v-text-field>
+                  <v-col cols="12" sm="12" md="4" lg="2">
+                    <v-hover v-slot="{ hover }">
+                      <v-card
+                        color="#DFDDDD"
+                        height="142"
+                        max-width="230"
+                        tile
+                        class="mt-10 px-3 mb-2"
+                      >
+                        <v-row
+                          style="height: 100%"
+                          justify="center"
+                          align="center"
+                        >
+                          <v-avatar
+                            v-if="!mapImage"
+                            tile
+                            height="142"
+                            width="230"
+                            color="#DFDDDD"
+                          >
+                          </v-avatar>
+                          <v-img
+                            v-if="mapImage !== ''"
+                            :src="mapImage"
+                            height="142"
+                            width="230"
+                          >
+                          </v-img>
+                          <v-expand-transition>
+                            <div
+                              v-if="hover"
+                              class="d-flex v-card--reveal"
+                              style="height: 100%"
+                            >
+                              <div>
+                                <v-btn
+                                  fab
+                                  color="#F5F5F5"
+                                  class="mr-2"
+                                  @click="handleImageButtonClick"
+                                >
+                                  <v-icon size="30"
+                                    >mdi-file-image-outline</v-icon
+                                  >
+                                </v-btn>
+                                <input
+                                  type="file"
+                                  ref="image"
+                                  @change="onImageSelected"
+                                  style="display: none"
+                                  accept="image/png, image/jpeg"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </v-expand-transition>
+                        </v-row>
+                      </v-card>
+                    </v-hover>
                   </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field
-                      v-model="longitude"
-                      append-icon="mdi-longitude"
-                      label="ลองติจูด"
-                      required
-                      :rules="[rules.longitudeRules.regex]"
-                      clearable
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="4">
-                    <v-text-field
-                      required
-                      append-icon="mdi-map-legend"
-                      label="ชื่อเขต"
-                      :rules="rules.name"
-                    >
-                    </v-text-field>
-                  </v-col>
+                  <v-row>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="latitude"
+                        append-icon="mdi-latitude"
+                        label="ละติจูด"
+                        required
+                        autofocus
+                        :rules="[rules.latitudeRules.regex]"
+                        clearable
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="longitude"
+                        append-icon="mdi-longitude"
+                        label="ลองติจูด"
+                        required
+                        :rules="[rules.longitudeRules.regex]"
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="zone"
+                        required
+                        append-icon="mdi-map-legend"
+                        label="ชื่อเขต"
+                        :rules="rules.name"
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="building"
+                        required
+                        append-icon="mdi-map-legend"
+                        label="อาคาร"
+                        :rules="rules.name"
+                      >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
                 </v-row>
               </v-form>
             </v-card-text>
@@ -135,6 +210,9 @@ export default {
       valid: true,
       markers: [],
       place: null,
+      building: "",
+      zone: "",
+      mapImage: "",
       latitude: "",
       longitude: "",
       dialog: false,
@@ -181,8 +259,24 @@ export default {
         this.place = null;
       }
     },
+    // upload image and preview
+    handleImageButtonClick() {
+      this.$refs.image.click();
+    },
+    onImageSelected(event) {
+      var file = event.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        this.mapImage = e.target.result;
+        this.isUploadProfileImage = true;
+      };
+    },
     clearform() {
       this.$refs.formAddmap.reset();
+    },
+    Preview_image() {
+      this.url = URL.createObjectURL(this.image);
     },
   },
   computed: {},
@@ -190,6 +284,10 @@ export default {
 </script>
 
 <style scoped>
+.form {
+  padding: 25px;
+  margin-top: 10px;
+}
 .map-responsive {
   overflow: hidden;
   padding-bottom: 45.25%;
