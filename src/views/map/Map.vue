@@ -23,7 +23,7 @@
         &nbsp;&nbsp;
         <v-spacer></v-spacer>
         <!-- add marker buttons -->
-        <v-dialog v-model="dialog" max-width="90%" persistent>
+        <v-dialog v-model="dialog" max-width="75%" persistent>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="agree" dark v-bind="attrs" v-on="on">
               <v-icon> mdi-map-marker-plus </v-icon>
@@ -31,18 +31,17 @@
             </v-btn>
           </template>
           <v-card>
-            <v-card-title class="text-h5 grey lighten-2">
-              เพิ่มเขตอาคารในแผนที่
-            </v-card-title>
+            <v-card-title><h4>เพิ่มเขตอาคารในแผนที่</h4></v-card-title>
             <v-card-text>
               <v-form ref="formAddmap" class="form" v-model="valid">
-                <v-row>
-                  <v-col cols="12" sm="12" md="4" lg="2">
+                <v-row justify="space-between">
+                  <v-col cols="1"></v-col>
+                  <v-col cols="10">
                     <v-hover v-slot="{ hover }">
                       <v-card
                         color="#DFDDDD"
-                        height="142"
-                        max-width="230"
+                        height="300"
+                        max-width="100%"
                         tile
                         class="mt-10 px-3 mb-2"
                       >
@@ -54,16 +53,16 @@
                           <v-avatar
                             v-if="!mapImage"
                             tile
-                            height="142"
-                            width="230"
+                            height="300"
+                            width="1300"
                             color="#DFDDDD"
                           >
                           </v-avatar>
                           <v-img
                             v-if="mapImage !== ''"
                             :src="mapImage"
-                            height="142"
-                            width="230"
+                            height="300"
+                            width="1300"
                           >
                           </v-img>
                           <v-expand-transition>
@@ -98,11 +97,12 @@
                       </v-card>
                     </v-hover>
                   </v-col>
+                  <v-col cols="1"></v-col>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="latitude"
-                        append-icon="mdi-latitude"
+                        prepend-icon="mdi-latitude"
                         label="ละติจูด"
                         required
                         autofocus
@@ -111,31 +111,31 @@
                       >
                       </v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="longitude"
-                        append-icon="mdi-longitude"
+                        prepend-icon="mdi-longitude"
                         label="ลองติจูด"
                         required
                         :rules="[rules.longitudeRules.regex]"
                         clearable
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="zone"
                         required
-                        append-icon="mdi-map-legend"
-                        label="ชื่อเขต"
+                        prepend-icon="mdi-map-legend"
+                        label="เขต"
                         :rules="rules.name"
                       >
                       </v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12">
                       <v-text-field
                         v-model="building"
                         required
-                        append-icon="mdi-map-legend"
+                        prepend-icon="mdi-office-building"
                         label="อาคาร"
                         :rules="rules.name"
                       >
@@ -275,9 +275,6 @@ export default {
     clearform() {
       this.$refs.formAddmap.reset();
     },
-    Preview_image() {
-      this.url = URL.createObjectURL(this.image);
-    },
   },
   computed: {},
 };
@@ -286,13 +283,15 @@ export default {
 <style scoped>
 .form {
   padding: 25px;
-  margin-top: 10px;
+  margin-top: -25px;
 }
 .map-responsive {
   overflow: hidden;
   padding-bottom: 45.25%;
   position: relative;
   height: 0;
+  margin-top: 10px;
+  margin-bottom: -5px;
 }
 .map-responsive iframe {
   left: 0;
