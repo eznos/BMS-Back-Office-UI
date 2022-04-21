@@ -23,7 +23,7 @@
         &nbsp;&nbsp;
         <v-spacer></v-spacer>
         <!-- add marker buttons -->
-        <v-dialog v-model="dialog" max-width="75%" persistent>
+        <v-dialog v-model="dialog" max-width="45%" persistent>
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="agree" dark v-bind="attrs" v-on="on">
               <v-icon> mdi-map-marker-plus </v-icon>
