@@ -12,11 +12,11 @@
         </div>
         <!-- export data -->
         <div>
-          <v-dialog v-model="dialog" persistent width="600px">
+          <v-dialog v-model="dialog" persistent width="50%">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" v-bind="attrs" v-on="on">
                 <v-icon> mdi-application-export </v-icon>
-                &nbsp; Export ข้อมูลภาพรวม
+                &nbsp; Export ข้อมูลภาพรวม 
               </v-btn>
             </template>
             <v-card>
@@ -24,9 +24,9 @@
                 <v-icon size="30px" color="red">
                   mdi-application-export
                 </v-icon>
-                &nbsp; Export ข้อมูลภาพรวมเป็นไฟล์ Excel
+                &nbsp; Export ข้อมูลภาพรวมเป็นไฟล์ Excel หรือไม่ ?
               </v-card-title>
-              <v-card-text>
+              <!-- <v-card-text>
                 <v-row>
                   <v-col cols="12">
                     <v-select
@@ -38,11 +38,11 @@
                     </v-select>
                   </v-col>
                 </v-row>
-              </v-card-text>
+              </v-card-text> -->
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="agree" @click="dialog = false"> ตกลง </v-btn>
-                <v-btn color="warning" @click="dialog = false"> ยกเลิก </v-btn>
+                <v-btn text color="warning" @click="dialog = false"> ยกเลิก </v-btn>
+                <v-btn text color="agree" @click="dialog = false"> ตกลง </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -57,7 +57,7 @@
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
-                    <v-icon large>mdi-face-man-shimmer</v-icon>
+                    <v-icon color="#3EDBF0" large>mdi-face-man-shimmer</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
@@ -78,7 +78,7 @@
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
-                    <v-icon large>mdi-room-service</v-icon>
+                    <v-icon color="#04009A" large>mdi-room-service</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
@@ -99,7 +99,7 @@
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
-                    <v-icon large>mdi-location-enter</v-icon>
+                    <v-icon color="green" large>mdi-location-enter</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
@@ -122,7 +122,7 @@
               <v-list-item>
                 <v-list-item-avatar>
                   <v-sheet>
-                    <v-icon large>mdi mdi-exit-run</v-icon>
+                    <v-icon color="red" large>mdi mdi-exit-run</v-icon>
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>

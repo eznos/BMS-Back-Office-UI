@@ -37,13 +37,15 @@
                     type="password"
                     :rules="rules.Password_Format"
                   ></v-text-field>
+                </v-form>
+                <div class="btn-register-forget">
                   <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
                     >ลืมรหัสผ่าน</v-btn
                   >
                   <v-btn text dark color="rgb(131,49,51)" to="/register"
                     >ลงทะเบียน</v-btn
                   >
-                </v-form>
+                </div>
               </v-card-text>
               <v-card-actions class="row-btn">
                 <v-row>
@@ -91,5 +93,10 @@ export default {
 .row-btn {
   padding: 0;
   margin-top: 10px;
+}
+.btn-register-forget {
+  padding: 0;
+  margin-top: 30px;
+  margin-bottom: 15px;
 }
 </style>

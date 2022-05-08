@@ -127,14 +127,14 @@ export default {
         route: "/electricbill",
       },
       {
-        icon: "person",
-        text: "ผู้อยู่อาศัย",
-        route: "/residents",
-      },
-      {
         icon: " mdi-home-circle",
         text: "สถานะหอพัก",
         route: "/building",
+      },
+      {
+        icon: "person",
+        text: "ผู้อยู่อาศัย",
+        route: "/residents",
       },
       {
         icon: "mdi-account-edit",

@@ -150,11 +150,13 @@
                   <!-- gender -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-select
-                      v-model="gender"
+                      v-model="defaultGender"
                       prepend-icon="mdi-gender-male-female"
                       item-color="red"
                       :items="genders"
                       label="เพศ"
+                      item-text="text"
+                      item-value="value"
                     >
                     </v-select>
                   </v-col>
@@ -190,6 +192,7 @@
               width="200px"
               large
               :disabled="!valid"
+              @click="validate"
             >
               ยืนยันการลงทะเบียน
             </v-btn>
@@ -209,7 +212,6 @@ export default {
     attrs: {},
     valid: true,
     clicked: false,
-
     loader: null,
     avatar: null,
     profileImage: "",
@@ -217,8 +219,24 @@ export default {
     affiliation: "",
     firstname: "",
     lastname: "",
-    gender: "",
-    genders: ["ชาย", "หญิง", "ไม่ระบุ"],
+    defaultGender: {
+      text: "ไม่ระบุ",
+      value: "",
+    },
+    genders: [
+      {
+        text: "ชาย",
+        value: "male",
+      },
+      {
+        text: "หญิง",
+        value: "female",
+      },
+      {
+        text: "ไม่ระบุ",
+        value: "",
+      },
+    ],
     tel: "",
     email: "",
     phone_number: "",
@@ -825,6 +843,9 @@ export default {
     clear() {
       this.$refs.formEdit.reset();
       this.profileImage = "";
+    },
+    validate() {
+      this.$refs.formEdit.validate();
     },
     // number only in text field
     isNumber: function (evt) {

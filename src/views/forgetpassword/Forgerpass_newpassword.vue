@@ -66,7 +66,6 @@
                           text
                           type="error"
                           v-if="!$v.password.minLength"
-                          
                           dark
                         >
                           กรุณากรอกรหัสผ่านใหม่ให้มีมากกว่า
@@ -96,11 +95,10 @@
                           ></v-text-field>
                         </div>
                         <v-alert
-                        dense
+                          dense
                           text
                           type="error"
                           v-if="!$v.repeatPassword.sameAsPassword"
-                        
                           dark
                         >
                           รหัสผ่านไม่ตรงกัน
@@ -156,16 +154,8 @@ export default {
       showpassword2: false,
       repeatpassword: "",
       timerCount: 20,
-      email: "",
       password: "",
       repeatPassword: "",
-      rules: {
-        email: (value) => {
-          const pattern =
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          return pattern.test(value) || "Invalid e-mail." || "อีเมลถูกต้อง";
-        },
-      },
     };
   },
   validations: {
@@ -177,23 +167,8 @@ export default {
       sameAsPassword: sameAs("password"),
     },
   },
-  watch: {
-    timerCount: {
-      handler(value) {
-        if (value > 0) {
-          setTimeout(() => {
-            this.timerCount--;
-          }, 1000);
-        }
-      },
-      immediate: true, // This ensures the watcher is triggered upon creation
-    },
-  },
-  methods: {
-    reloadPage() {
-      window.location.reload();
-    },
-  },
+  watch: {},
+  methods: {},
   computed: {},
 };
 </script>
@@ -218,10 +193,7 @@ export default {
 .style-card-title {
   padding: 30px;
 }
-.container{
+.container {
   margin-bottom: -10px;
 }
-
-
-
 </style>
