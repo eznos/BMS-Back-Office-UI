@@ -204,6 +204,8 @@
                           clearable
                           required
                           :rules="rules.zonesBuildingsRoom"
+                          item-text="text"
+                          item-value="value"
                         >
                         </v-select>
                       </v-col>
@@ -293,7 +295,7 @@
               prepend-icon="mdi-map-marker"
               v-model="zoneFilterValue"
               :items="zones"
-              label="กรองด้วยพื้นที่"
+              label="ค้นหาด้วยพื้นที่"
               clearable
             >
             </v-autocomplete>
@@ -305,7 +307,7 @@
               prepend-icon="mdi-office-building"
               v-model="buildingFilterValue"
               :items="buildings"
-              label="กรองด้วยอาคาร"
+              label="ค้นหาด้วยอาคาร"
               clearable
             >
             </v-autocomplete>
@@ -325,7 +327,13 @@
         show-select
         @input="enterSelect($event)"
       >
-        <!-- data -->
+        <!-- room_type -->
+        <template v-slot:[`item.room_type`]="{ item }">
+          <td v-if="item.room_type == 'single'">{{ "ห้องโสด" }}</td>
+          <td v-if="item.room_type == 'family_1'">{{ "ห้องครอบครัว 1" }}</td>
+          <td v-if="item.room_type == 'family_2'">{{ "ห้องครอบครัว 2" }}</td>
+        </template>
+        <!-- edit -->
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
           <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
@@ -356,7 +364,20 @@ export default {
     exportExcelResident: false,
     meterGroup: "",
     meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
-    room_types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
+    room_types: [
+      {
+        text: "ห้องโสด",
+        value: "single",
+      },
+      {
+        text: "ห้องครอบครัว 1",
+        value: "family_1",
+      },
+      {
+        text: "ห้องครอบครัว 2",
+        value: "family_2",
+      },
+    ],
     // Filter models.
     NamefilterValue: "",
     zoneFilterValue: "",
@@ -887,7 +908,7 @@ export default {
       room_no: "",
       electric_no: "",
       water_meter_no: "",
-      room_type: "ห้องครอบครัว 1",
+      room_type: "",
     },
     defaultItem: {
       first_name: "",
@@ -976,7 +997,7 @@ export default {
           value: "electricity_meter_no",
         },
         {
-          text: "สถานะ",
+          text: "ประเภทห้อง",
           value: "room_type",
         },
         {
@@ -1042,7 +1063,7 @@ export default {
           water_meter_no: "4567",
           date_pay: "2021-06",
           price: 323.6,
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "จ.ส.ต.",
@@ -1058,7 +1079,7 @@ export default {
           water_meter_no: "7540",
           date_pay: "2021-06",
           price: 742.29,
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ด.ต.",
@@ -1074,7 +1095,7 @@ export default {
           water_meter_no: "9856",
           date_pay: "2021-06",
           price: 0.0,
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ด.ต.",
@@ -1090,7 +1111,7 @@ export default {
           water_meter_no: "3214",
           date_pay: "2021-06",
           price: 33.34,
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ด.ต.",
@@ -1106,7 +1127,7 @@ export default {
           water_meter_no: "5467",
           date_pay: "2021-06",
           price: 1068.8,
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "ร.ต.ท.",
@@ -1122,7 +1143,7 @@ export default {
           water_meter_no: "8520",
           date_pay: "2021-06",
           price: 220.21,
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "พ.ต.อ.",
@@ -1138,7 +1159,7 @@ export default {
           water_meter_no: "7845",
           date_pay: "2021-06",
           price: 153.5,
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "พ.ต.อ.",
@@ -1154,7 +1175,7 @@ export default {
           water_meter_no: "3568",
           date_pay: "2021-06",
           price: 40.9,
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "ด.ต.",
@@ -1170,7 +1191,7 @@ export default {
           water_meter_no: "5568",
           date_pay: "2021-06",
           price: 829.37,
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
         {
           rank: "ด.ต.",
@@ -1186,7 +1207,7 @@ export default {
           water_meter_no: "1123",
           date_pay: "2021-06",
           price: 0.0,
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
       ];
     },

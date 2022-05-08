@@ -22,10 +22,10 @@
             >mdi-format-list-bulleted-triangle</v-icon
           >
           &nbsp;&nbsp;
-          <h3>ตัวกรอง</h3>
+          <h3>เครื่องมือค้นหา</h3>
           <!-- button -->
-          <v-spacer></v-spacer
-        ></v-card-title>
+          <v-spacer></v-spacer>
+        </v-card-title>
         <!-- filter -->
         <v-row justify="space-between" class="px-3">
           <!-- Filter for  name-->
@@ -44,7 +44,7 @@
             <v-autocomplete
               v-model="zoneFilterValue"
               prepend-icon="mdi-map-legend"
-              label="กรองด้วยพื้นที่"
+              label="ค้นหาด้วยพื้นที่"
               class="filter"
               :items="zones"
               clearable
@@ -56,7 +56,7 @@
             <v-autocomplete
               v-model="buildingFilterValue"
               prepend-icon="mdi-office-building-outline"
-              label="กรองด้วยอาคาร"
+              label="ค้นหาด้วยอาคาร"
               class="filter"
               :items="buildings"
               clearable
@@ -76,7 +76,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-text-field
                   v-model="dateFilterValue"
-                  label="กรองด้วยเดือน"
+                  label="ค้นหาด้วยเดือน"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -94,14 +94,16 @@
               ></v-date-picker>
             </v-menu>
           </v-col>
-          <!-- Filter for  billing_status-->
+          <!-- Filter for  status-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               v-model="statusFilterValue"
-              :items="billing_statuses"
+              :items="statuses"
               prepend-icon="mdi-list-status"
-              label="กรองด้วยสถานะ"
+              label="ค้นหาด้วยสถานะ"
               class="filter"
+              item-text="statusText"
+              item-value="statusValue"
               clearable
             ></v-select>
           </v-col>
@@ -116,7 +118,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการกรอง
+              &nbsp; ล้างการค้นหา
             </v-btn>
           </v-col>
         </v-row>
@@ -272,14 +274,16 @@
                           clearable
                         ></v-text-field>
                       </v-col>
-                      <!-- billing_status -->
+                      <!-- status -->
                       <v-col cols="12" sm="6" md="4">
                         <v-select
-                          v-model="editedItem.billing_status"
-                          :items="billing_statuses"
+                          v-model="editedItem.status"
+                          :items="statuses"
                           label="สถานะ"
                           required
                           :rules="rules.buildingRoom"
+                          item-text="statusText"
+                          item-value="statusValue"
                           clearable
                         >
                         </v-select>
@@ -303,6 +307,7 @@
                               v-bind="attrs"
                               v-on="on"
                               clearable
+                              disabled
                             ></v-text-field>
                           </template>
                           <v-date-picker
@@ -417,6 +422,15 @@
               {{ item.price }}
             </v-chip>
           </template>
+          <!-- status text and status color -->
+          <template v-slot:[`item.status`]="{ item }">
+            <v-chip :color="getColorForStatus(item.status)">
+              <td v-if="item.status == 'draft'">{{ "ร่าง" }}</td>
+              <td v-if="item.status == 'in_progess'">{{ "กำลังดำเนินการ" }}</td>
+              <td v-if="item.status == 'calculated'">{{ "คำนวนแล้ว" }}</td>
+              <td v-if="item.status == 'exported'">{{ "Export แล้ว" }}</td>
+            </v-chip>
+          </template>
           <!-- editor data -->
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
@@ -478,7 +492,24 @@ export default {
     dateFilterValue: "",
     statusFilterValue: "",
     date: new Date().toISOString().substr(0, 7),
-    billing_statuses: ["draft", "in_progess", "exported"],
+    statuses: [
+      {
+        statusText: "ร่าง",
+        statusValue: "draft",
+      },
+      {
+        statusText: "กำลังดำเนินการ",
+        statusValue: "in_progess",
+      },
+      // {
+      //   statusText: "คำนวนแล้ว",
+      //   statusValue: "calculated",
+      // },
+      {
+        statusText: "Export แล้ว",
+        statusValue: "exported",
+      },
+    ],
     electricTable: [],
     editedIndex: -1,
     editedItem: {
@@ -487,7 +518,7 @@ export default {
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
-      billing_status: "draft",
+      status: "draft",
       date_pay: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
@@ -496,7 +527,7 @@ export default {
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
-      billing_status: "draft",
+      status: "draft",
       date_pay: new Date().toISOString().substr(0, 7),
     },
     zonesBuildings: {
@@ -1084,7 +1115,7 @@ export default {
         },
         {
           text: "สถานะ",
-          value: "billing_status",
+          value: "status",
           filter: this.stateFilter,
         },
         {
@@ -1154,7 +1185,7 @@ export default {
           date_pay: "2021-06",
           price: 323.6,
           unit: "91",
-          billing_status: "draft",
+          status: "draft",
         },
         {
           rank: "จ.ส.ต.",
@@ -1169,7 +1200,7 @@ export default {
           date_pay: "2021-06",
           price: 742.29,
           unit: "21",
-          billing_status: "draft",
+          status: "draft",
         },
         {
           rank: "ด.ต.",
@@ -1184,7 +1215,7 @@ export default {
           date_pay: "2021-06",
           price: "0.00",
           unit: "91",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "ด.ต.",
@@ -1199,7 +1230,7 @@ export default {
           date_pay: "2021-06",
           price: 33.34,
           unit: "38",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "ด.ต.",
@@ -1214,7 +1245,7 @@ export default {
           date_pay: "2021-06",
           price: 1068.8,
           unit: "74",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "ร.ต.ท.",
@@ -1229,7 +1260,7 @@ export default {
           date_pay: "2021-06",
           price: 220.21,
           unit: "98",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "พ.ต.อ.",
@@ -1244,7 +1275,7 @@ export default {
           date_pay: "2021-06",
           price: 153.5,
           unit: "91",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "พ.ต.อ.",
@@ -1259,7 +1290,7 @@ export default {
           date_pay: "2021-06",
           price: 40.9,
           unit: "61",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "ด.ต.",
@@ -1274,7 +1305,7 @@ export default {
           date_pay: "2021-06",
           price: 829.37,
           unit: "31",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
         {
           rank: "ด.ต.",
@@ -1289,7 +1320,7 @@ export default {
           date_pay: "2021-06",
           price: "0.00",
           unit: "91",
-          billing_status: "in_progess",
+          status: "in_progess",
         },
       ];
     },
@@ -1409,6 +1440,13 @@ export default {
     getColor(price) {
       if (price == 0) return "#FF606090";
       else return "#FFFFFF00";
+    },
+    // status color
+    getColorForStatus(status) {
+      if (status == "draft") return "yellow";
+      if (status == "in_progess") return "red";
+      if (status == "calculated") return "gray";
+      else return "green";
     },
     // show delete as selected button
     enterSelect() {

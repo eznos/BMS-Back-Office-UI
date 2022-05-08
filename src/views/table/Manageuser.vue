@@ -24,7 +24,7 @@
           >mdi-format-list-bulleted-triangle</v-icon
         >
         &nbsp;&nbsp;
-        <h3>ตารางค่าน้ำประปา</h3>
+        <h3>ตารางผู้ใช้งาน</h3>
         &nbsp;&nbsp;
         <!-- delete as selected -->
         <v-btn
@@ -106,9 +106,12 @@
                     <v-col cols="12" sm="6" md="4">
                       <v-select
                         v-model="editedItem.gender"
+                        :items="genders"
                         label="เพศ"
                         required
                         :rules="rules.name"
+                        item-text="text"
+                        item-value="value"
                         disabled
                       >
                       </v-select>
@@ -132,11 +135,13 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-select
-                        v-model="editedItem.permission"
+                        v-model="editedItem.role"
                         label="ตำแหน่ง"
-                        :items="permission"
+                        :items="roles"
                         required
                         :rules="rules.name"
+                        item-text="roleText"
+                        item-value="roleValue"
                         disabled
                       >
                       </v-select>
@@ -189,14 +194,16 @@
             ></v-text-field>
           </v-col>
           <v-col cols="6">
-            <!-- search by permission -->
+            <!-- search by roles -->
             <v-select
-              v-model="statusFilterValue"
-              prepend-icon=""
+              v-model="roleFilterValue"
+              prepend-icon="mdi-account-circle-outline"
               label="ตำแหน่ง"
-              :items="permission"
+              :items="roles"
               clearable
               class="filter"
+              item-text="roleText"
+              item-value="roleValue"
             >
             </v-select>
           </v-col>
@@ -216,11 +223,17 @@
         show-select
         @input="enterSelect($event)"
       >
-        <!-- color of permission on datatable  -->
-        <template v-slot:[`item.permission`]="{ item }">
-          <v-chip :color="getColor(item.permission)" dark>
-            {{ item.permission }}
+        <!-- color of roles on datatable  -->
+        <template v-slot:[`item.role`]="{ item }">
+          <v-chip :color="getColor(item.role)">
+            <td v-if="item.role == 'admin'">{{ "เจ้าหน้าที่" }}</td>
+            <td v-if="item.role == 'user'">{{ "ผู้ใช้งาน" }}</td>
           </v-chip>
+        </template>
+        <template v-slot:[`item.gender`]="{ item }">
+          <td v-if="item.gender == 'male'">{{ "ชาย" }}</td>
+          <td v-if="item.gender == 'female'">{{ "หญิง" }}</td>
+          <td v-if="item.gender == ''">{{ "ไม่ระบุ" }}</td>
         </template>
         <!-- data -->
         <template v-slot:[`item.actions`]="{ item }">
@@ -244,12 +257,35 @@ export default {
     selectItems: false,
     dialog: false,
     menu: false,
-    permission: ["admin", "user"],
+    roles: [
+      {
+        roleText: "เจ้าหน้าที่",
+        roleValue: "admin",
+      },
+      {
+        roleText: "ผู้ใช้งาน",
+        roleValue: "user",
+      },
+    ],
+    genders: [
+      {
+        text: "ชาย",
+        value: "male",
+      },
+      {
+        text: "หญิง",
+        value: "female",
+      },
+      {
+        text: "ไม่ระบุ",
+        value: "",
+      },
+    ],
     search: "",
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
-    statusFilterValue: "",
+    roleFilterValue: "",
     affiliations: [
       "ผบช.ภ.3",
       "สนง.ผบช.ภ.3",
@@ -288,11 +324,11 @@ export default {
     editedIndex: -1,
     editedItem: {
       first_name: "",
-      permission: "",
+      role: "",
     },
     defaultItem: {
       first_name: "",
-      permission: "",
+      role: "",
     },
     rules: {
       name: [
@@ -351,7 +387,7 @@ export default {
         },
         {
           text: "ตำแหน่ง",
-          value: "permission",
+          value: "role",
           filter: this.statusFilter,
         },
         {
@@ -381,7 +417,7 @@ export default {
           affiliation: "สภ.เมืองนครราชสีมา",
           first_name: "ชัชชาช้า",
           last_name: "ชัชชาวาน",
-          gender: "ชาย",
+          gender: "male",
           zone: "เขตสุระ",
           building: "2/20",
           room: "2",
@@ -393,7 +429,7 @@ export default {
           difference_price: "50",
           sum_price: "80",
           status: "Approve",
-          permission: "user",
+          role: "user",
           email: "user@123.com",
           phone_number: "0896585452",
         },
@@ -402,7 +438,7 @@ export default {
           affiliation: "ศพฐ.3",
           first_name: "ภัทรพร",
           last_name: "ศรีโอภาส",
-          gender: "หญิง",
+          gender: "female",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "103",
@@ -414,7 +450,7 @@ export default {
           difference_price: "25.34",
           sum_price: "44.34",
           status: "Approve",
-          permission: "admin",
+          role: "admin",
           email: "smorston0@nytimes.com",
           phone_number: "0896545652",
         },
@@ -423,7 +459,7 @@ export default {
           affiliation: "ศพฐ.3",
           first_name: "อมร ",
           last_name: "ภูมพฤกษ์",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "107",
@@ -435,7 +471,7 @@ export default {
           difference_price: "25.34",
           sum_price: "82.34",
           status: "Approve",
-          permission: "user",
+          role: "user",
           email: "mtinkler1@google.ca",
           phone_number: "0896582458",
         },
@@ -444,7 +480,7 @@ export default {
           affiliation: "ศพฐ.3",
           first_name: "อดุล ",
           last_name: "วงศ์ทอง",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "202",
@@ -456,7 +492,7 @@ export default {
           difference_price: "25.34",
           sum_price: "120.34",
           status: "Approve",
-          permission: "user",
+          role: "user",
           email: "ssmewings2@umn.edu",
           phone_number: "0896548572",
         },
@@ -465,7 +501,7 @@ export default {
           affiliation: "ศพฐ.3",
           first_name: "จรัส ",
           last_name: "สิมฤทธิ์",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "206",
@@ -477,7 +513,7 @@ export default {
           difference_price: "25.34",
           sum_price: "120.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "asnartt3@intel.com",
           phone_number: "0995585452",
         },
@@ -486,7 +522,7 @@ export default {
           affiliation: "ศพฐ.3",
           first_name: "ธิชากร ",
           last_name: "ผินดอน",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "305",
@@ -498,7 +534,7 @@ export default {
           difference_price: "25.34",
           sum_price: "101.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "ibirkbeck4@github.com",
           phone_number: "0685585452",
         },
@@ -507,7 +543,7 @@ export default {
           affiliation: "ภ.3(ส่วนกลาง)",
           first_name: "รุ่ง ",
           last_name: "โฉมกิ่ง",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "402",
@@ -519,7 +555,7 @@ export default {
           difference_price: "25.34",
           sum_price: "120.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "gmcgrah5@ucoz.ru",
           phone_number: "0689585452",
         },
@@ -528,7 +564,7 @@ export default {
           affiliation: "ภ.3(ส่วนกลาง)",
           first_name: "อนุชา ",
           last_name: "ฝากชัยภูมิ",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "413",
@@ -540,7 +576,7 @@ export default {
           difference_price: "25.34",
           sum_price: "177.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "jkirkby6@answers.com",
           phone_number: "0894587452",
         },
@@ -549,7 +585,7 @@ export default {
           affiliation: "สนง.ผบช.ภ.3",
           first_name: "รัฐพนย์ ",
           last_name: "เรื่องเรือ",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "504",
@@ -561,7 +597,7 @@ export default {
           difference_price: "25.34",
           sum_price: "120.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "fillyes7@hubpages.com",
           phone_number: "0891254452",
         },
@@ -570,7 +606,7 @@ export default {
           affiliation: "สนง.ผบช.ภ.3",
           first_name: "อิทธิพล",
           last_name: "เพ็ญเติมพันธ์",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "514",
@@ -582,7 +618,7 @@ export default {
           difference_price: "25.34",
           sum_price: "120.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "mlarmet8@mail.ru",
           phone_number: "0890256452",
         },
@@ -591,7 +627,7 @@ export default {
           affiliation: "ผบช.ภ.3",
           first_name: "ไพโรจน์",
           last_name: "ทนปรางค์",
-          gender: "ชาย",
+          gender: "male",
           zone: "อัษฎางค์",
           building: "2/19",
           room: "515",
@@ -603,17 +639,17 @@ export default {
           difference_price: "25.34",
           sum_price: "44.34",
           status: "Non Approve",
-          permission: "user",
+          role: "user",
           email: "tgainseford9@sun.com",
           phone_number: "0805785452",
         },
       ];
     },
     statusFilter(value) {
-      if (!this.statusFilterValue) {
+      if (!this.roleFilterValue) {
         return true;
       }
-      return value === this.statusFilterValue;
+      return value === this.roleFilterValue;
     },
     editItem(item) {
       this.editedIndex = this.userTable.indexOf(item);
@@ -659,9 +695,7 @@ export default {
       }
       this.close();
     },
-    clear() {
-      (this.statusFilterValue = ""), (this.search = "");
-    },
+
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -700,9 +734,9 @@ export default {
       this.$refs.formAdduser.reset();
     },
     // color of price
-    getColor(permission) {
-      if (permission == "admin") return "error";
-      else return "agree";
+    getColor(role) {
+      if (role == "admin") return "red";
+      else return "green";
     },
   },
 };

@@ -23,7 +23,7 @@
           >mdi-format-list-bulleted-triangle</v-icon
         >
         &nbsp;&nbsp;
-        <h3>ตัวกรอง</h3>
+        <h3>ตัวค้นหา</h3>
         <v-spacer></v-spacer>
       </v-card-title>
       <v-form ref="formFilter">
@@ -46,7 +46,7 @@
               v-model="waterGroupFilterValue"
               prepend-icon="mdi-water-circle"
               type="text"
-              label="กรองด้วยสายมิเตอร์น้ำประปา"
+              label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
               clearable
               class="filter"
               :items="water_groups"
@@ -59,7 +59,7 @@
               v-model="zoneFilterValue"
               prepend-icon="mdi-map-marker-radius"
               type="text"
-              label="กรองด้วยพื้นที่"
+              label="ค้นหาด้วยพื้นที่"
               clearable
               class="filter"
               :items="zones"
@@ -72,7 +72,7 @@
               v-model="buildFilterValue"
               prepend-icon="mdi-office-building-marker"
               type="text"
-              label="กรองด้วยอาคาร"
+              label="ค้นหาด้วยอาคาร"
               clearable
               class="filter"
               :items="buildings"
@@ -83,21 +83,21 @@
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-select
               v-model="typeFilterValue"
-              prepend-icon="mdi-list-status"
-              label="กรองด้วยประเภทห้อง"
+              prepend-icon="mdi-shape-outline"
+              label="ค้นหาด้วยประเภทห้อง"
               :items="room_types"
               clearable
               class="filter"
             >
             </v-select>
           </v-col>
-          <!-- search by status -->
+          <!-- search by room_status -->
           <v-col cols="12" xs="12" sm="12" md="3" lg="4">
             <v-select
               v-model="statusFilterValue"
               prepend-icon="mdi-list-status"
-              label="กรองด้วยสถานะ"
-              :items="status"
+              label="ค้นหาด้วยสถานะ"
+              :items="room_statuses"
               clearable
               class="filter"
             >
@@ -114,7 +114,7 @@
               class="button-filter pt-6 pb-6"
             >
               <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการกรอง
+              &nbsp; ล้างการค้นหา
             </v-btn>
           </v-col>
         </v-row>
@@ -141,7 +141,7 @@
             </v-btn>
             <v-spacer></v-spacer>
             <div>
-              <!-- add user -->
+              <!-- add room -->
               <v-dialog v-model="dialog" persistent max-width="75%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
@@ -268,14 +268,16 @@
                               clearable
                               required
                               :rules="rules.zonesBuildingsRoom"
+                              item-text="text"
+                              item-value="value"
                             >
                             </v-select>
                           </v-col>
-                          <!-- status -->
+                          <!-- room_status -->
                           <v-col cols="12" sm="6" md="4">
                             <v-select
-                              v-model="editedItem.status"
-                              :items="status"
+                              v-model="editedItem.room_status"
+                              :items="room_statuses"
                               label="สถานะห้องพัก"
                               clearable
                               required
@@ -381,14 +383,23 @@
               show-select
               @input="enterSelect($event)"
             >
-              <!-- color status on datatable  -->
-              <template v-slot:[`item.status`]="{ item }">
-                <v-chip :color="getColor(item.status)" dark>
-                  {{ item.status }}
+              <!-- color room_status on datatable  -->
+              <template v-slot:[`item.room_status`]="{ item }">
+                <v-chip :color="getColor(item.room_status)" dark>
+                  <td v-if="item.room_status == 'empty'">{{ "ว่าง" }}</td>
+                  <td v-if="item.room_status == 'not_empty'">
+                    {{ "ไม่ว่าง" }}
+                  </td>
                 </v-chip>
               </template>
-              <template v-slot:top>
-                <!-- v-container, v-col and v-row are just for decoration purposes. -->
+              <template v-slot:[`item.room_type`]="{ item }">
+                <td v-if="item.room_type == 'single'">{{ "ห้องโสด" }}</td>
+                <td v-if="item.room_type == 'family_1'">
+                  {{ "ห้องครอบครัว 1" }}
+                </td>
+                <td v-if="item.room_type == 'family_2'">
+                  {{ "ห้องครอบครัว 2" }}
+                </td>
               </template>
               <!-- data edit and delete-->
               <template v-slot:[`item.actions`]="{ item }">
@@ -429,6 +440,7 @@ export default {
     electricity_meter_no: "",
     water_meter_no: "",
     room_type: "",
+    room_status: "",
     rank: "",
     ranks: [
       "พล.ต.อ.",
@@ -947,8 +959,30 @@ export default {
       ],
     },
     water_groups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
-    room_types: ["ห้องโสด", "ห้องครอบครัว 1", "ห้องครอบครัว 2"],
-    status: ["ว่าง", "ไม่ว่าง"],
+    room_types: [
+      {
+        text: "ห้องโสด",
+        value: "single",
+      },
+      {
+        text: "ห้องครอบครัว 1",
+        value: "family_1",
+      },
+      {
+        text: "ห้องครอบครัว 2",
+        value: "family_2",
+      },
+    ],
+    room_statuses: [
+      {
+        text: "ว่าง",
+        value: "empty",
+      },
+      {
+        text: "ไม่ว่าง",
+        value: "not_empty",
+      },
+    ],
     search: "",
     dialogDelete: false,
     // Filter models.
@@ -965,14 +999,14 @@ export default {
       room: "",
       water_no: "",
       water_meter_no: "",
-      status: "ว่าง",
+      room_status: "",
     },
     defaultItem: {
       first_name: "",
       room: "",
       water_no: "",
       water_meter_no: "",
-      status: "ว่าง",
+      room_status: "",
     },
     rules: {
       nameRules: [
@@ -1026,21 +1060,22 @@ export default {
           text: "เลขห้องพัก",
           value: "room",
         },
-        {
-          text: "เลขผู้ใช้ไฟฟ้า",
-          value: "electricity_no",
-        },
+
         {
           text: "เลขผู้ใช้น้ำ",
           value: "water_no",
         },
         {
-          text: "เลขมิเตอร์ไฟฟ้า",
-          value: "electricity_meter_no",
-        },
-        {
           text: "เลขมิเตอร์น้ำประปา",
           value: "water_meter_no",
+        },
+        {
+          text: "เลขผู้ใช้ไฟฟ้า",
+          value: "electricity_no",
+        },
+        {
+          text: "เลขมิเตอร์ไฟฟ้า",
+          value: "electricity_meter_no",
         },
         {
           text: "ประเภทห้องพัก",
@@ -1049,12 +1084,13 @@ export default {
         },
         {
           text: "สถานะ",
-          value: "status",
+          value: "room_status",
           filter: this.statusFilter,
         },
         {
           text: "การจัดการ",
           value: "actions",
+          align: "center",
           sortable: false,
         },
       ];
@@ -1115,10 +1151,10 @@ export default {
           price: "30",
           difference_price: "50",
           sum_price: "80",
-          status: "ไม่ว่าง",
+          room_status: "not_empty",
           permission: "user",
           email: "user@123.com",
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
         {
           rank: "ด.ต.หญิง",
@@ -1136,10 +1172,10 @@ export default {
           price: "19",
           difference_price: "25.34",
           sum_price: "44.34",
-          status: "ไม่ว่าง",
+          room_status: "not_empty",
           permission: "admin",
           email: "smorston0@nytimes.com",
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ด.ต.",
@@ -1157,10 +1193,10 @@ export default {
           price: "57",
           difference_price: "25.34",
           sum_price: "82.34",
-          status: "ไม่ว่าง",
+          room_status: "not_empty",
           permission: "user",
           email: "mtinkler1@google.ca",
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ด.ต.",
@@ -1178,10 +1214,10 @@ export default {
           price: "95",
           difference_price: "25.34",
           sum_price: "120.34",
-          status: "ไม่ว่าง",
+          room_status: "not_empty",
           permission: "user",
           email: "ssmewings2@umn.edu",
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "ร.ต.ท.",
@@ -1199,10 +1235,10 @@ export default {
           price: "95",
           difference_price: "25.34",
           sum_price: "120.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "asnartt3@intel.com",
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ส.ต.อ.",
@@ -1220,10 +1256,10 @@ export default {
           price: "76",
           difference_price: "25.34",
           sum_price: "101.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "ibirkbeck4@github.com",
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "ด.ต.",
@@ -1241,10 +1277,10 @@ export default {
           price: "95",
           difference_price: "25.34",
           sum_price: "120.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "gmcgrah5@ucoz.ru",
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
         {
           rank: "ด.ต.",
@@ -1262,10 +1298,10 @@ export default {
           price: "152",
           difference_price: "25.34",
           sum_price: "177.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "jkirkby6@answers.com",
-          room_type: "ห้องครอบครัว 2",
+          room_type: "family_2",
         },
         {
           rank: "ส.ต.อ.",
@@ -1283,10 +1319,10 @@ export default {
           price: "95",
           difference_price: "25.34",
           sum_price: "120.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "fillyes7@hubpages.com",
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
         {
           rank: "ร.ต.ท.",
@@ -1304,10 +1340,10 @@ export default {
           price: "95",
           difference_price: "25.34",
           sum_price: "120.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "mlarmet8@mail.ru",
-          room_type: "ห้องโสด",
+          room_type: "single",
         },
         {
           rank: "ด.ต.",
@@ -1325,10 +1361,10 @@ export default {
           price: "19",
           difference_price: "25.34",
           sum_price: "44.34",
-          status: "ว่าง",
+          room_status: "empty",
           permission: "user",
           email: "tgainseford9@sun.com",
-          room_type: "ห้องครอบครัว 1",
+          room_type: "family_1",
         },
       ];
     },
@@ -1456,10 +1492,10 @@ export default {
     clearForm() {
       this.$refs.formNewdata.reset();
     },
-    // color of status
-    getColor(status) {
-      if (status == "ไม่ว่าง") return "red";
-      if (status == "ว่าง") return "agree";
+    // color of room_status
+    getColor(room_status) {
+      if (room_status == "not_empty") return "red";
+      if (room_status == "empty") return "agree";
       else return "#ffffff";
     },
     // Check selectItems column
