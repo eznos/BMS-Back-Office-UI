@@ -1,77 +1,95 @@
 <template>
   <v-app id="app">
     <v-container fill-height fill-width>
-      <v-layout align-center justify-center>
-        <div class="mx-auto">
-          <v-card
-            color="#F4ffff"
-            elevation="10"
-            width="550px"
-            max-height="550px"
-            class="pa-4 text-center rounded-xl"
-          >
-            <div class="style-card">
-              <!-- <v-spacer></v-spacer> -->
-              <v-card-title class="justify-center" dark>
-                <v-img
-                  src="../../assets/police3.png"
-                  max-width="200px"
-                  max-height="200px"
-                ></v-img>
-              </v-card-title>
-              <v-card-text :style="{ padding: 0 }">
-                <v-form>
-                  <v-text-field
-                    id="username"
-                    prepend-icon="mdi-face-man"
-                    name="login"
-                    label="ชื่อผู้ใช้งาน"
-                    type="text"
-                    autofocus
-                  ></v-text-field>
-                  <v-text-field
-                    id="password"
-                    prepend-icon="mdi-lock"
-                    name="password"
-                    label="รหัสผ่าน"
-                    type="password"
-                    :rules="rules.Password_Format"
-                  ></v-text-field>
-                </v-form>
-                <div class="btn-register-forget">
-                  <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
-                    >ลืมรหัสผ่าน</v-btn
-                  >
-                  <v-btn text dark color="rgb(131,49,51)" to="/register"
-                    >ลงทะเบียน</v-btn
-                  >
-                </div>
-              </v-card-text>
-              <v-card-actions class="row-btn">
-                <v-row>
-                  <v-col>
-                    <v-btn block color="primary" to="/overview">
-                      <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-actions>
-            </div>
-          </v-card>
-        </div>
-      </v-layout>
+      <div class="mx-auto">
+        <v-card
+          color="#F4ffff"
+          elevation="10"
+          width="550px"
+          max-height="550px"
+          class="pa-4 text-center rounded-xl"
+        >
+          <div class="style-card">
+            <!-- <v-spacer></v-spacer> -->
+            <v-card-title class="justify-center" dark>
+              <v-img
+                src="../../assets/police3.png"
+                max-width="200px"
+                max-height="200px"
+              ></v-img>
+            </v-card-title>
+            <v-card-text :style="{ padding: 0 }">
+              <v-form ref="formLogin" lazy-validation>
+                <v-alert
+                  v-if="!isLogin"
+                  outlined
+                  type="error"
+                  class="alert-login"
+                >
+                  {{ loginFail }}
+                </v-alert>
+                <v-text-field
+                  class="text_fields"
+                  v-model="username"
+                  prepend-icon="mdi-face-man"
+                  name="login"
+                  label="ชื่อผู้ใช้งาน"
+                  type="text"
+                  autofocus
+                  :rules="rules.usernameRules"
+                  v-on:keyup="checkEnterPressedToSubmit"
+                ></v-text-field>
+                <v-text-field
+                  v-model="password"
+                  prepend-icon="mdi-lock"
+                  :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                  @click:append="showPassword = !showPassword"
+                  :type="showPassword ? 'text' : 'password'"
+                  name="password"
+                  label="รหัสผ่าน"
+                  :rules="rules.Password_Format"
+                  v-on:keyup="checkEnterPressedToSubmit"
+                ></v-text-field>
+              </v-form>
+              <div class="btn-register-forget">
+                <v-btn text dark color="rgb(131,49,51)" to="/forgetpass"
+                  >ลืมรหัสผ่าน</v-btn
+                >
+                <v-btn text dark color="rgb(131,49,51)" to="/register"
+                  >ลงทะเบียน</v-btn
+                >
+              </div>
+            </v-card-text>
+            <v-card-actions class="row-btn">
+              <v-row>
+                <v-col>
+                  <v-btn block color="primary" @click="submit">
+                    <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-card-actions>
+          </div>
+        </v-card>
+      </div>
     </v-container>
   </v-app>
 </template>
 
 <script>
+import { apiUrl } from "../../utils/url";
+import axios from "axios";
+
 export default {
   name: "Login",
-  props: {
-    source: String,
-  },
   data: () => ({
+    showPassword: false,
+    username: "",
+    password: "",
+    loginFail: "",
+    isLogin: true,
     rules: {
+      usernameRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
       Password_Format: [
         (val) =>
           (val || "").length >= 6 ||
@@ -79,6 +97,44 @@ export default {
       ],
     },
   }),
+  created() {},
+  methods: {
+    async checkEnterPressedToSubmit(e) {
+      if (e.keyCode === 13) this.submit();
+    },
+    async submit() {
+      if (this.$refs.formLogin.validate()) {
+        this.loginWithAPI(this.username, this.password);
+      }
+    },
+    async loginWithAPI(username, password) {
+      let payload = {
+        username: username.trim(),
+        password: password.trim(),
+      };
+      axios
+        .post(apiUrl + "/v1/auth/login", payload)
+        .then((response) => {
+          let data = response.data;
+          if (data.status === "success") {
+            // simple login
+            window.location = "overview";
+            console.log("success");
+          } else {
+            console.log("not");
+          }
+        })
+        .catch((error) => {
+          if (error.response.data.status === "unauthorized") {
+            this.loginFail = "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
+            this.isLogin = false;
+          } else {
+            console.log("notthing");
+            this.isLogin = false;
+          }
+        });
+    },
+  },
 };
 </script>
 
@@ -98,5 +154,11 @@ export default {
   padding: 0;
   margin-top: 30px;
   margin-bottom: 15px;
+}
+.alert-login {
+  padding: 0;
+}
+.text_fields {
+  margin-bottom: 30px;
 }
 </style>
