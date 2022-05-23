@@ -51,19 +51,20 @@
         <v-flex class="mt-5">
           <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
             <h2>
-              {{ firstname != null ? firstname.substring(0, 1) : null }}
-              {{ lastname != null ? lastname.substring(0, 1) : null }}
+              {{ first_name != null ? first_name.substring(0, 1) : null }}
+              {{ last_name != null ? last_name.substring(0, 1) : null }}
             </h2>
           </v-avatar>
           <v-avatar v-if="profileImage" size="100">
-            <img src="" alt="" />
+            <img v-bind:src="imageSrc" alt="" />
           </v-avatar>
+
           <!-- <p class="white--text subheading mt-1 text-center">Username</p> -->
         </v-flex>
         <v-flex class="mt-3">
           <p class="white--text subheading mt-1 text-center">ผู้เข้าใช้งาน</p>
           <p class="white--text subheading mt-1 text-center">
-            {{ rank }} {{ firstname }} {{ lastname }}
+            {{ rank }} {{ first_name }} {{ last_name }}
           </p>
         </v-flex>
 
@@ -97,15 +98,17 @@
 <script>
 // import { mapState } from "vuex";
 // import Popup from "./Popup.vue";
+
 export default {
   name: "Toolbar",
   data: () => ({
     drawer: true,
     dialog: false,
     profileImage: "",
-    firstname: "พิชญ์พิสิฐฏ์เสฏ ",
-    lastname: "สกธินชารินทร์พธา",
-    rank: "พล.ต.อ.",
+    first_name: "",
+    last_name: "",
+    rank: "",
+    scr: "",
     // แถบเมนู
     links: [
       // { icon: "dashboard", text: "Dashboard", route: "/dashboard" },
@@ -175,6 +178,11 @@ export default {
       },
     ],
   }),
+  computed: {
+    imageSrc() {
+      return this.profileImage;
+    },
+  },
   components: {
     // Popup,
     // ...mapState({
@@ -189,15 +197,24 @@ export default {
     //   }
     // }
   },
+  created() {
+    this.getUserData();
+    this.getImageURL();
+  },
   methods: {
-    // switchTheme() {
-    //   if (this.theme === this.themes[0]) {
-    //     this.theme = this.themes[1];
-    //   } else if (this.theme === this.themes[1]) {
-    //     this.theme = this.themes[0];
-    //   }
-    //   localStorage.setItem("theme", this.theme);
-    // }
+    getUserData() {
+      var rank = localStorage.getItem("rank");
+      var first_name = localStorage.getItem("first_name");
+      var last_name = localStorage.getItem("last_name");
+      this.rank = rank;
+      this.first_name = first_name;
+      this.last_name = last_name;
+    },
+    getImageURL() {
+      var ImageURL = localStorage.getItem("ImageURL");
+      this.profileImage = ImageURL;
+      console.log(this.imageSrc);
+    },
   },
 };
 </script>

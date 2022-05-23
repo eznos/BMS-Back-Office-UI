@@ -87,6 +87,7 @@ export default {
     username: "",
     password: "",
     loginFail: "",
+    fristName: "",
     isLogin: true,
     rules: {
       usernameRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
@@ -117,9 +118,22 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status === "success") {
+            this.rank = data.result.rank;
+            this.fristName = data.result.first_name;
+            this.lastName = data.result.last_name;
+            this.image = data.result.profile_image_url;
+
+            localStorage.setItem("rank", this.rank);
+            localStorage.setItem("first_name", this.fristName);
+            localStorage.setItem("last_name", this.lastName);
+            localStorage.setItem("ImageURL", this.image);
+            this.$router.push({
+              name: "overview",
+              params: { fristName: data.result.first_name },
+            });
             // simple login
-            window.location = "overview";
-            console.log("success");
+
+            // console.log(data.result.profile_image_url);
           } else {
             console.log("not");
           }
