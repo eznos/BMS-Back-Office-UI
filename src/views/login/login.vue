@@ -62,14 +62,9 @@
             </v-card-text>
             <v-card-actions class="row-btn">
               <v-row>
-                <!-- <v-col>
-                  <v-btn block color="primary" @click="submit">
-                    <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
-                  </v-btn>
-                </v-col> -->
                 <v-col>
                   <v-btn block color="primary" @click="submit">
-                    <v-icon>mdi-login</v-icon>เข้าสู่ระบบ..
+                    <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
                   </v-btn>
                 </v-col>
               </v-row>
@@ -92,7 +87,6 @@ export default {
     username: "",
     password: "",
     loginFail: "",
-    apiKey: "",
     isLogin: true,
     rules: {
       usernameRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
@@ -113,57 +107,13 @@ export default {
         this.loginWithAPI(this.username, this.password);
       }
     },
-    // async test() {
-    //   var data = {
-    //     username: this.username,
-    //     password: this.password,
-    //   };
-    //   var headerAPI = {
-    //     method: "post",
-    //     url: "http://localhost:3000/v1/auth/login",
-    //     headers: {
-    //       "x-api-key": "xxx-api-key",
-    //       "Content-Type": "application/json",
-    //     },
-    //     data: data,
-    //   };
 
-    //   axios(headerAPI)
-    //     .then(function (response) {
-    //       let data = response.data;
-    //       if (data.status === "success") {
-    //         // await this.$store.commit("SET_USERS_DATA", data.result);
-    //         // await this.$store.dispatch("storeUsersToLocalStorage", data.result);
-    //         if (data.result.role === "admin") {
-    //           // window.location = "overview";
-    //           console.log(data.result);
-    //         }
-    //       }
-    //       console.log(response.data.result.role);
-    //     })
-    //     .catch(function (error) {
-    //       if (
-    //         error.data.status_code === "401"
-    //       ) {
-    //         this.loginFail = "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
-    //         this.isLogin = false;
-    //         console.log(error.response.data.error_message);
-    //       } else {
-    //         this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
-    //         this.isLogin = false;
-    //         console.log(error.response.data.error_message);
-    //         console.log(error.response.header);
-    //       }
-    //     });
-    // },
     async loginWithAPI(username, password) {
       let payload = {
         username: username.trim(),
         password: password.trim(),
       };
       let headerAPI = {
-        // method: "post",
-        // url: "http://localhost:3000/v1/auth/login",
         headers: {
           "x-api-key": "xxx-api-key",
           "Content-Type": "application/json",
@@ -175,14 +125,11 @@ export default {
         .then(async (response) => {
           let data = response.data;
           if (data.status === "success") {
-            // await this.$store.commit("SET_USERS_DATA", response.data.result);
-            // await this.$store.dispatch("storeUsersToLocalStorage", data.result);
-            this.userData = data.result;
             this.rank = data.result.rank;
             this.fristName = data.result.first_name;
             this.lastName = data.result.last_name;
             this.image = data.result.profile_image_url;
-            localStorage.setItem("user_data", this.userData);
+
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);
@@ -197,18 +144,18 @@ export default {
             console.log(this.userData);
           }
         })
-
         .catch((error) => {
+          console.log(error);
           if (
             error.response.data.error_message === "invalid username or password"
           ) {
             this.loginFail = "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
             this.isLogin = false;
-            // console.log(error.response.data.error_message);
+            console.log(error.response.data.error_message);
           } else {
             this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
             this.isLogin = false;
-            // console.log(error.response.data.error_message);
+            console.log(error.response.data.error_message);
             // console.log(error.response.header);
           }
         });
