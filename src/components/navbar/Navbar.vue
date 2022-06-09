@@ -27,12 +27,13 @@
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </template>
-        <v-list flat>
+        <!-- <v-list flat>
           <v-list-item
             v-for="link in items"
             :key="link.text"
             router
             :to="link.route"
+            :click="link.click"
             active-class="border"
             :dialog="link.dialog"
           >
@@ -41,7 +42,32 @@
             </v-list-item-action>
             <v-list-item-title>{{ link.text }}</v-list-item-title>
           </v-list-item>
-        </v-list>
+        </v-list> -->
+        <v-card>
+          <v-list>
+            <v-list-item>
+              <v-list-item-avatar>
+                <img v-bind:src="imageSrc" />
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>
+                  {{ first_name }} {{ last_name }}</v-list-item-title
+                >
+                <v-list-item-subtitle>{{ role }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+
+          <v-list>
+            <v-btn class="button-menu" to="/edit" tile block color="green">
+              แก้ไขข้อมูลส่วนตัว
+            </v-btn>
+            <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
+
+            <v-btn tile block @click="logout" color="red"> ออกจากระบบ </v-btn>
+            <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
+          </v-list>
+        </v-card>
       </v-menu>
     </v-app-bar>
     <!-- จบ -->
@@ -80,6 +106,7 @@
           :key="link.text"
           router
           :to="link.route"
+         
           active-class="border"
           dialog
         >
@@ -108,6 +135,7 @@ export default {
     first_name: "",
     last_name: "",
     rank: "",
+    role: "",
     scr: "",
     // แถบเมนู
     links: [
@@ -149,27 +177,13 @@ export default {
         text: "แผนที่",
         route: "/map",
       },
-      // {
-      //   icon: " mdi-heart-broken",
-      //   text: "Lab หน้าผู้ใช้",
-      //   route: "/lab",
-      // },
-      // {
-      //   icon: " mdi-heart-broken",
-      //   text: "ดูสถานะหอพัก",
-      //   route: "/lab2",
-      // },
-      // {
-      //   icon: " mdi-heart-broken",
-      //   text: "lab3",
-      //   route: "/testtable",
-      // },
     ],
     items: [
       {
         icon: " mdi-logout",
         text: "ออกจากระบบ",
         route: "/login",
+        click: "logout",
       },
       {
         icon: " mdi-clipboard-edit",
@@ -184,28 +198,23 @@ export default {
     },
   },
   components: {
-    // Popup,
-    // ...mapState({
-    //   themes: state => state.themes.themes
-    // }),
-    // theme: {
-    //   get() {
-    //     return this.$store.state.themes.theme;
-    //   },
-    //   set(newTheme) {
-    //     this.$store.commit("setTheme", newTheme);
-    //   }
-    // }
+
   },
   created() {
     this.getUserData();
     this.getImageURL();
   },
   methods: {
+    logout() {
+      localStorage.clear();
+      window.location = "/login";
+    },
     getUserData() {
       var rank = localStorage.getItem("rank");
       var first_name = localStorage.getItem("first_name");
       var last_name = localStorage.getItem("last_name");
+      var role = localStorage.getItem("role");
+      this.role = role;
       this.rank = rank;
       this.first_name = first_name;
       this.last_name = last_name;
@@ -213,7 +222,6 @@ export default {
     getImageURL() {
       var ImageURL = localStorage.getItem("ImageURL");
       this.profileImage = ImageURL;
-      console.log(this.imageSrc);
     },
   },
 };
@@ -228,5 +236,8 @@ export default {
 }
 .background2 {
   background-image: linear-gradient(180deg, #572021 13%, #833133 66%);
+}
+.button-menu {
+  margin-bottom: 10px;
 }
 </style>

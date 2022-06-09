@@ -2,36 +2,36 @@
 
   <v-app id="main" :style="{background: $vuetify.theme.themes[theme].background}" class="myFont" >
     <template v-if="$route.path.includes('login')">
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </template>
     <template v-else-if="$route.path.includes('forgetpass')">
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </template>
     <template v-else-if="$route.path.includes('recovery')">
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </template>
     <template v-else-if="$route.path.includes('newpassword')">
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </template>
     <template v-else-if="$route.path.includes('register')">
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
     </template>
 
     <template v-else>
       <Navbar />
-      <v-content class="ma-4">
+      <v-main class="ma-4">
         <router-view></router-view>
-      </v-content>
+      </v-main>
       <Footer />
     </template>
   </v-app>
