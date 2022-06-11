@@ -19,28 +19,32 @@
                 กรอกอีเมลเพื่อรับ Recovery Code ที่ใช้ในการยืนยันการลืมรหัส
               </v-card-subtitle>
               <v-card-text :style="{ padding: 0 }">
-                <v-form ref="emailform" lazy-validation>
-                  <v-alert
-                    v-if="!isChangePassword"
-                    outlined
-                    type="error"
-                    class="alert-login"
-                  >
-                    {{ changePasswordFail }}
-                  </v-alert>
+                <v-alert
+                  v-if="!isChangePassword"
+                  outlined
+                  type="error"
+                  class="alert-login"
+                >
+                  {{ changePasswordFail }}
+                </v-alert>
+                <v-form
+                  ref="emailform"
+                  lazy-validation
+                  @submit.prevent="submitEmail"
+                >
                   <v-container>
                     <v-row>
                       <v-col cols="12" xl="12">
                         <v-text-field
                           v-model="email"
                           prepend-icon="email"
-                          :rules="[rules.email.regex]"
+                          :rules="[rules.emailrule.regex]"
                           label="อีเมล"
                           type="email"
                           required
                           autofocus
-                          v-on:keyup="checkEnterPressedToSubmit"
-                        ></v-text-field>
+                        >
+                        </v-text-field>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -91,7 +95,7 @@ export default {
       changePasswordFail: "",
       isChangePassword: true,
       rules: {
-        email: {
+        emailrule: {
           required: (v) => !!v || "กรุณาใส่อีเมล",
           regex: (v) =>
             /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(
@@ -103,12 +107,9 @@ export default {
   },
   computed: {},
   methods: {
-    async checkEnterPressedToSubmit(e) {
-      if (e.keyCode === 13) this.submitEmail();
-    },
     async submitEmail() {
       if (this.$refs.emailform.validate()) {
-        this.sendEmailtoForget();
+        this.sendEmailtoForget(this.email);
       }
     },
     async sendEmailtoForget() {

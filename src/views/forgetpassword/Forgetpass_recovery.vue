@@ -222,7 +222,7 @@ export default {
           if (error.response.data.status == "unprocessable_entity") {
             this.snackbar = true;
             this.snackbarColor = "warning";
-            this.text = "อีเมลไม่ถูกต้อง กรุณากรองใหม่ในหน้ากรอกอีเมล";
+            this.text = "เลข recovery code ไม่ถูกต้อง";
           } else {
             this.snackbar = true;
             this.snackbarColor = "red";
@@ -230,7 +230,7 @@ export default {
           }
         });
     },
-    reSendOTP() {
+    async reSendOTP() {
       this.recoveryCode = null;
       this.timerCount = 20;
       var config = {
@@ -241,11 +241,11 @@ export default {
         },
       };
       axios(config)
-        .then((response) => {
-          let data = response;
-          if (data.status == "204") {
-            console.log("suss");
-          }
+        .then(() => {
+          // let data = response;
+          // if (data.status == "204") {
+          //   console.log("suss");
+          // }
         })
         .catch((error) => {
           // console.log(error);
