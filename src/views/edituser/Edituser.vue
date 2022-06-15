@@ -825,7 +825,7 @@ export default {
   },
   methods: {
     submit() {
-      this.$refs.observer.validate();
+      this.$refs.formEdit.validate();
     },
     // upload image and preview
     handleImageButtonClick() {

@@ -50,12 +50,22 @@
                           required
                         ></v-select>
                       </v-col>
-                      <!-- name -->
+                      <!-- fname -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
-                          v-model="name"
+                          v-model="fristName"
                           label="ชื่อ"
                           required
+                          :rules="rules.zonesBuildingsRoom"
+                        ></v-text-field
+                      ></v-col>
+                      <!-- lastname -->
+                      <v-col cols="12" md="6" lg="6">
+                        <v-text-field
+                          v-model="lastName"
+                          label="นามสกุล"
+                          required
+                          :rules="rules.zonesBuildingsRoom"
                         ></v-text-field
                       ></v-col>
                       <!-- email -->
@@ -77,18 +87,17 @@
                           required
                         ></v-text-field
                       ></v-col>
-                      <!-- sex -->
+                      <!-- gender -->
                       <v-col cols="12" md="6" lg="6">
                         <v-select
                           label="เพศ"
-                          :items="sexs"
-                          v-model="sex"
+                          :items="genders"
+                          v-model="gender"
                           required
                           :rules="rules.zonesBuildingsRoom"
                         >
                         </v-select>
                       </v-col>
-
                       <!-- user -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
@@ -122,6 +131,8 @@
                           label="รูปประจำตัว"
                           show-size
                           counter
+                          @change="getImageURL"
+                          v-model="image"
                         ></v-file-input>
                       </v-col>
                     </v-row>
@@ -140,7 +151,7 @@
                 outlined
                 large
                 :disabled="!valid"
-                to="/login"
+                @click="submitRegister"
               >
                 ยืนยันการลงทะเบียน
               </v-btn>
@@ -161,31 +172,42 @@
                 @click="clearForm"
                 color="warning"
               >
-                ล้างข้อมูลที่กรอก</v-btn
+                ล้างข้อมูล</v-btn
               >
             </div>
           </v-card-actions>
         </v-card>
+        <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="2500">
+          {{ text }}
+        </v-snackbar>
       </v-layout>
     </v-container>
   </v-app>
 </template>
 <script>
+import { apiUrl } from "../../utils/url";
+import axios from "axios";
 export default {
   components: {},
   data: () => ({
     valid: false,
+    imageURL: null,
+    image: null,
     showpassword: false,
     on: {},
     attrs: {},
-    name: "",
+    fristName: "",
+    lastName: "",
     email: "",
     phoneNumber: "",
-    sex: "",
+    gender: "",
     rank: "",
     affiliation: "",
     username: "",
     password: "",
+    text: "",
+    snackbar: false,
+    snackbarColor: "",
     ranks: [
       "พล.ต.อ.",
       "พล.ต.ท.",
@@ -203,7 +225,7 @@ export default {
       "ส.ต.ต.",
     ],
     affiliations: ["สยศ.ตร.", "สกบ.", "สกพ.", "สงป"],
-    sexs: ["ชาย", "หญิง", "ทางเลือก"],
+    genders: ["ชาย", "หญิง", "ไม่ระบบุ"],
     rules: {
       email: {
         required: (v) => !!v || "กรุณาใส่อีเมล",
@@ -220,11 +242,11 @@ export default {
       },
       username: [
         (v) => !!v || "กรุณากรอกข้อมูล",
-        (v) => (v && v.length >= 6) || "ชื่อผู้ใช้ต้องมีมากกว่า 6 ตัวอักษร",
+        (v) => (v && v.length >= 4) || "ชื่อผู้ใช้ต้องมีมากกว่า 6 ตัวอักษร",
       ],
       password: [
         (v) => !!v || "กรุณากรอกข้อมูล",
-        (v) => (v && v.length >= 8) || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
+        (v) => (v && v.length >= 6) || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
       ],
       Avatar: [
         (value) =>
@@ -234,23 +256,70 @@ export default {
       zonesBuildingsRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
-
-  setup() {},
-  watch: {
-    loader() {
-      const l = this.loader;
-      this[l] = !this[l];
-      setTimeout(() => (this[l] = false), 2000);
-      this.loader = null;
-    },
-  },
-
-  computed: {},
   methods: {
+    async submitRegister() {
+      if (this.$refs.formRegister.validate()) {
+        this.confirmRegister(
+          this.gender,
+          this.rank,
+          this.phoneNumber,
+          this.email,
+          this.affiliation,
+          this.fristName,
+          this.lastName,
+          this.username,
+          this.password,
+          this.imageURL
+        );
+      }
+    },
+    async confirmRegister() {
+      let payload = {
+        rank: this.rank,
+        profile_url: this.imageURL,
+        phone_number: this.phoneNumber,
+        gender: this.gender,
+        first_name: this.fristName,
+        last_name: this.lastName,
+        affiliation: this.affiliation,
+        username: this.username,
+        password: this.password,
+        email: this.email,
+      };
+      let headerAPI = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "Content-Type": "application/json",
+        },
+        payload: payload,
+      };
+      axios
+        // this api ?
+        .post(apiUrl + "/v1/auth/register", payload, headerAPI)
+        .then((response) => {
+          console.log(response.data);
+          // window.location = "/login";
+        })
+        .catch((error) => {
+          if (error.response.data.status == "unprocessable_entity") {
+            this.snackbar = true;
+            this.snackbarColor = "warning";
+            this.text = "เลข recovery code ไม่ถูกต้อง";
+          } else {
+            this.snackbar = true;
+            this.snackbarColor = "red";
+            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+          }
+        });
+    },
     clearForm() {
       this.$refs.formRegister.resetValidation();
       this.$refs.formRegister.reset();
       this.showpassword = false;
+    },
+    getImageURL() {
+      if (!this.image) return;
+      this.imageURL = URL.createObjectURL(this.image);
     },
   },
 };

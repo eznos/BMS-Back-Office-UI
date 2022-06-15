@@ -60,6 +60,7 @@
               class="filter"
               :items="buildings"
               clearable
+              :disabled="!zoneFilterValue"
             >
             </v-autocomplete>
           </v-col>

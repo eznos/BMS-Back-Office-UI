@@ -129,7 +129,6 @@ export default {
             this.fristName = data.result.first_name;
             this.lastName = data.result.last_name;
             this.image = data.result.profile_image_url;
-
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);
@@ -139,9 +138,7 @@ export default {
                 name: "overview",
                 params: { userId: data.result.user_id },
               });
-              console.log(data.result);
             }
-            console.log(this.userData);
           }
         })
         .catch((error) => {
@@ -156,7 +153,6 @@ export default {
             this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
             this.isLogin = false;
             console.log(error.response.data.error_message);
-            // console.log(error.response.header);
           }
         });
     },

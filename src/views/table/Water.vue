@@ -74,6 +74,7 @@
               class="filter"
               :items="buildings"
               clearable
+              :disabled="!zoneFilterValue"
             >
             </v-autocomplete>
           </v-col>
@@ -253,7 +254,11 @@
                   @click="differencePriceCalculate = false"
                   >ยกเลิก</v-btn
                 >
-                <v-btn color="agree" :disabled="!valid" text @click="validateDiffprice"
+                <v-btn
+                  color="agree"
+                  :disabled="!valid"
+                  text
+                  @click="validateDiffprice"
                   >ยืนยันข้อมูล</v-btn
                 >
               </v-card-actions>
@@ -507,11 +512,7 @@
                 <v-btn color="warning" text @click="exportExcelwater = false">
                   ยกเลิก
                 </v-btn>
-                <v-btn
-                  color="agree"
-                  text
-                  @click="exportExcelwater = false"
-                >
+                <v-btn color="agree" text @click="exportExcelwater = false">
                   ยืนยัน
                 </v-btn>
               </v-card-actions>

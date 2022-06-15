@@ -300,7 +300,7 @@
                         color="agree"
                         :disabled="!valid"
                         text
-                        @click="save"
+                        @click="validateForm"
                       >
                         ยืนยัน
                       </v-btn>
@@ -1441,6 +1441,11 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+    },
+    async validateForm() {
+      if (this.$refs.formNewdata.validate()) {
+        this.save();
+      }
     },
     // add user
     save() {

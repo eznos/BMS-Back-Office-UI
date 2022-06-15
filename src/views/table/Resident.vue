@@ -153,7 +153,6 @@
                           counter="12"
                           maxlength="12"
                           disabled
-                          :rules="rules.electricNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- electric_meter_no -->
@@ -166,7 +165,6 @@
                           required
                           counter="11"
                           disabled
-                          :rules="rules.electricMeterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- water_no -->
@@ -179,7 +177,6 @@
                           required
                           counter="4"
                           disabled
-                          :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- water_meter_no -->
@@ -192,7 +189,6 @@
                           required
                           counter="4"
                           disabled
-                          :rules="rules.waterNumber"
                         ></v-text-field>
                       </v-col>
                       <!-- room_type -->
@@ -217,7 +213,12 @@
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
-                  <v-btn color="agree" :disabled="!valid" text @click="save">
+                  <v-btn
+                    color="agree"
+                    :disabled="!valid"
+                    text
+                    @click="validateForm"
+                  >
                     ยืนยัน
                   </v-btn>
                 </v-form>
@@ -1252,6 +1253,12 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
+    },
+    // validate before save
+    async validateForm() {
+      if (this.$refs.formAdduser.validate()) {
+        this.save();
+      }
     },
     save() {
       if (this.editedIndex > -1) {
