@@ -26,8 +26,7 @@
     "vue-router": "^3.2.0",
     "vue2-google-maps": "^0.10.7",
     "vuelidate": "^0.7.7",
-    "vuetify": "^2.4.0",
-    "vuex": "^4.0.2"
+    "vuetify": "^2.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
