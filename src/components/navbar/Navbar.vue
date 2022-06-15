@@ -21,7 +21,7 @@
       </v-menu>
 
       <!-- แถบเมนู logout -->
-      <v-menu bottom left>
+      <v-menu bottom left class="background2">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-logout-variant</v-icon>
@@ -43,8 +43,8 @@
             <v-list-item-title>{{ link.text }}</v-list-item-title>
           </v-list-item>
         </v-list> -->
-        <v-card>
-          <v-list>
+        <v-card color="red">
+          <v-list >
             <v-list-item>
               <v-list-item-avatar>
                 <img v-bind:src="imageSrc" />
@@ -106,7 +106,6 @@
           :key="link.text"
           router
           :to="link.route"
-         
           active-class="border"
           dialog
         >
@@ -197,9 +196,7 @@ export default {
       return this.profileImage;
     },
   },
-  components: {
-
-  },
+  components: {},
   created() {
     this.getUserData();
     this.getImageURL();
@@ -239,5 +236,8 @@ export default {
 }
 .button-menu {
   margin-bottom: 10px;
+}
+.user-card{
+    background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
 }
 </style>
