@@ -4,12 +4,12 @@ import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
 import router from "./router";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
-import Vuelidate from "vuelidate";
+
 import * as VueGoogleMaps from "vue2-google-maps";
 import { initializeApp } from "firebase/app";
 
 Vue.config.productionTip = false;
-Vue.use(Vuelidate);
+
 
 // Vue.use(Vuex);
 Vue.use(VueGoogleMaps, {
