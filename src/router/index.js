@@ -4,7 +4,6 @@ import Login from "../views/login/login.vue";
 import Register from "../views/register/Register.vue";
 import Forgetpassword from "../views/forgetpassword/Forgetpass.vue";
 import Forgetpassword_recoverycode from "../views/forgetpassword/Forgetpass_recovery.vue";
-// import Forgetpassword_newpassword from "../views/forgetpassword/Forgerpass_newpassword.vue";
 import Overviews from "../views/overview/Overviews.vue";
 import Resident from "../views/table/Resident.vue";
 import Electric from "../views/table/Electric.vue";
@@ -17,10 +16,9 @@ import Maps from "../views/map/Map.vue";
 Vue.use(VueRouter);
 
 const routes = [
-  
   {
     path: "/",
-    redirect: '/login'
+    redirect: "/login",
   },
 
   {
@@ -43,50 +41,70 @@ const routes = [
     name: "ForgetpasswordRecoverycode",
     component: Forgetpassword_recoverycode,
   },
-  // {
-  //   path: "/newpassword",
-  //   name: "Forgetpassword_newpassword",
-  //   component: Forgetpassword_newpassword,
-  // },
   {
     path: "/overview",
     name: "overview",
     component: Overviews,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
+
   {
     path: "/residents",
     name: "resident",
     component: Resident,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/electricbill",
     name: "Electrics",
     component: Electric,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/waterbill",
     name: "Water",
     component: Water,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/edit",
     name: "Edituser",
     component: Edit_user,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/building",
     name: "Builing",
     component: Building,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/map",
     name: "Map",
     component: Maps,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
   {
     path: "/manageuser",
     name: "Manage_user",
     component: Manage_user,
+    meta: {
+      requiresAuthAdmin: true,
+    },
   },
 ];
 
@@ -94,43 +112,45 @@ const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes,
-  
 });
 
-// for what ????
-// router.beforeEach(async (to, next) => {
-//   let currentUser = JSON.parse(window.localStorage.getItem("current_user"));
-//   let requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
-//   let requiresAuthAdmin = to.matched.some(
-//     (record) => record.meta.requiresAuthAdmin
-//   );
-//   if ((requiresAuth || requiresAuthAdmin) && !currentUser) {
-//     next("/");
-//   } else if (requiresAuth || requiresAuthAdmin) {
-//     if (currentUser) {
-//       if (currentUser.role === "admin") {
-//         if (requiresAuth) {
-//           next();
-//         } else {
-//           next("/");
-//         }
-//       }
-//     }
+router.beforeEach(async (to, from, next) => {
+  let currentUser = window.localStorage.getItem("role");
+  let requiresAuthAdmin = to.matched.some(
+    (record) => record.meta.requiresAuthAdmin
+  );
+  if (requiresAuthAdmin && !currentUser) {
+    next("/");
+  } else if (requiresAuthAdmin) {
+    if (currentUser) {
+      if (currentUser.role === "admin") {
+        next();
+      } else {
+        next();
+      }
+    }
+  } else {
+    next();
+  }
+});
+
+// const userPermissions = window.localStorage.getItem("role");
+// router.beforeEach((to, from, next) => {
+//   if (userPermissions == "admin") {
+//     next();
+//   } else {
+//     next({ name: "login" });
 //   }
-//    else {
-//     if (
-//       currentUser &&
-//       (to.name === "SignIn" ||
-//         to.name === "ForgetPassword" ||
-//         to.name === "ChangePassword")
-//     ) {
-//       if (currentUser.role === "User") {
-//         next({ path: "/user/report/" + currentUser.user_id });
-//       } else {
-//         next("/user-list");
-//       }
-//     } else {
-//       next();
+
+//   next();
+// });
+
+// for what ????
+// router.beforeEach(async ( next) => {
+//   let currentUser = JSON.parse(window.localStorage.getItem("role"));
+//   if (currentUser) {
+//     if (currentUser.role === "admin") {
+//       next("/");
 //     }
 //   }
 // });

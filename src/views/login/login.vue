@@ -129,14 +129,16 @@ export default {
             this.fristName = data.result.first_name;
             this.lastName = data.result.last_name;
             this.image = data.result.profile_image_url;
+            this.role = data.result.role;
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);
             localStorage.setItem("ImageURL", this.image);
+            localStorage.setItem("role", this.role);
             if (data.result.role === "admin") {
               this.$router.push({
                 name: "overview",
-                params: { userId: data.result.user_id },
+                params: { name: this.role },
               });
             }
           }
