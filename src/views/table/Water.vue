@@ -31,7 +31,7 @@
         <!-- filter -->
         <v-row justify="space-between" class="px-3">
           <!-- Filter for  name-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-text-field
               v-model="search"
               prepend-icon="mdi-magnify"
@@ -42,7 +42,7 @@
             ></v-text-field>
           </v-col>
           <!-- Filter for waterGroup-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="waterGroupfilterValue"
               label="ค้นหาด้วยด้วยสายมิเตอร์"
@@ -54,7 +54,7 @@
             </v-autocomplete>
           </v-col>
           <!-- Filter for  zone-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="zoneFilterValue"
               prepend-icon="mdi-map-legend"
@@ -66,7 +66,7 @@
             </v-autocomplete>
           </v-col>
           <!-- Filter for  building-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="buildingFilterValue"
               prepend-icon="mdi-office-building"
@@ -79,7 +79,7 @@
             </v-autocomplete>
           </v-col>
           <!-- filter by date -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-menu
               v-model="menuDatefilter"
               :close-on-content-click="false"
@@ -110,7 +110,7 @@
             </v-menu>
           </v-col>
           <!-- Filter for  status-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               v-model="stateFilterValue"
               :items="statuses"

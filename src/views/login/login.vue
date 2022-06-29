@@ -5,11 +5,11 @@
         <v-card
           color="#F4ffff"
           elevation="10"
-          width="550px"
-          max-height="550px"
-          class="pa-4 text-center rounded-xl"
+          max-width="800px"
+          max-height="600px"
+          class="pa-4 rounded-xl"
         >
-          <div class="style-card">
+          <div class="style-card mx-auto">
             <!-- <v-spacer></v-spacer> -->
             <v-card-title class="justify-center" dark>
               <v-img
@@ -125,16 +125,18 @@ export default {
         .then(async (response) => {
           let data = response.data;
           if (data.status === "success") {
-            this.rank = data.result.rank;
+            // this.rank = data.result.rank;
             this.fristName = data.result.first_name;
             this.lastName = data.result.last_name;
             this.image = data.result.profile_image_url;
             this.role = data.result.role;
-            localStorage.setItem("rank", this.rank);
-            localStorage.setItem("first_name", this.fristName);
-            localStorage.setItem("last_name", this.lastName);
-            localStorage.setItem("ImageURL", this.image);
-            localStorage.setItem("role", this.role);
+            this.affiliation = data.result.affiliation;
+            sessionStorage.setItem("rank", this.rank);
+            sessionStorage.setItem("first_name", this.fristName);
+            sessionStorage.setItem("last_name", this.lastName);
+            sessionStorage.setItem("ImageURL", this.image);
+            sessionStorage.setItem("role", this.role);
+            sessionStorage.setItem("affiliation", this.affiliation);
             if (data.result.role === "admin") {
               this.$router.push({
                 name: "overview",

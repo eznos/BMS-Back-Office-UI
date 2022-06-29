@@ -279,7 +279,7 @@
         <!-- filter -->
         <v-row justify="space-between" class="px-3">
           <!-- Filter for  name-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-text-field
               v-model="search"
               prepend-icon="mdi-magnify"
@@ -290,7 +290,7 @@
             ></v-text-field>
           </v-col>
           <!-- filter for zone -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               class="filter"
               prepend-icon="mdi-map-marker"
@@ -302,8 +302,9 @@
             </v-autocomplete>
           </v-col>
           <!-- filter for building -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
+              :disabled="!zoneFilterValue"
               class="filter"
               prepend-icon="mdi-office-building"
               v-model="buildingFilterValue"

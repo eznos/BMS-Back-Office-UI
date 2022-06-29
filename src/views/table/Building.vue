@@ -23,14 +23,14 @@
           >mdi-format-list-bulleted-triangle</v-icon
         >
         &nbsp;&nbsp;
-        <h3>ตัวค้นหา</h3>
+        <h3>เครื่องมือค้นหา</h3>
         <v-spacer></v-spacer>
       </v-card-title>
       <v-form ref="formFilter">
         <!-- filter -->
         <v-row class="px-3">
           <!-- search -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-text-field
               v-model="search"
               prepend-icon="mdi-magnify"
@@ -41,7 +41,7 @@
             ></v-text-field>
           </v-col>
           <!-- search -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="waterGroupFilterValue"
               prepend-icon="mdi-water-circle"
@@ -54,7 +54,7 @@
             </v-autocomplete>
           </v-col>
           <!-- Filter for  zone-->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="zoneFilterValue"
               prepend-icon="mdi-map-marker-radius"
@@ -67,7 +67,7 @@
             </v-autocomplete>
           </v-col>
           <!-- search by building -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
               v-model="buildFilterValue"
               prepend-icon="mdi-office-building-marker"
@@ -75,12 +75,13 @@
               label="ค้นหาด้วยอาคาร"
               clearable
               class="filter"
+              :disabled="!zoneFilterValue"
               :items="buildings"
             >
             </v-autocomplete>
           </v-col>
           <!-- search by type -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               v-model="typeFilterValue"
               prepend-icon="mdi-shape-outline"
@@ -92,7 +93,7 @@
             </v-select>
           </v-col>
           <!-- search by room_status -->
-          <v-col cols="12" xs="12" sm="12" md="3" lg="4">
+          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               v-model="statusFilterValue"
               prepend-icon="mdi-list-status"

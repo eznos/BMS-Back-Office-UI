@@ -44,7 +44,7 @@
           </v-list-item>
         </v-list> -->
         <v-card color="red">
-          <v-list >
+          <v-list>
             <v-list-item>
               <v-list-item-avatar>
                 <img v-bind:src="imageSrc" />
@@ -75,17 +75,17 @@
       <!-- avatar  -->
       <v-layout column align-center>
         <v-flex class="mt-5">
-          <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
-            <h2>
-              {{ first_name != null ? first_name.substring(0, 1) : null }}
-              {{ last_name != null ? last_name.substring(0, 1) : null }}
-            </h2>
-          </v-avatar>
-          <v-avatar v-if="profileImage" size="100">
-            <img v-bind:src="imageSrc" alt="" />
-          </v-avatar>
-
-          <!-- <p class="white--text subheading mt-1 text-center">Username</p> -->
+          <router-link to="/edit">
+            <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
+              <h2>
+                {{ first_name != null ? first_name.substring(0, 1) : null }}
+                {{ last_name != null ? last_name.substring(0, 1) : null }}
+              </h2>
+            </v-avatar>
+            <v-avatar v-if="profileImage" size="100">
+              <img v-bind:src="imageSrc" alt="" />
+            </v-avatar>
+          </router-link>
         </v-flex>
         <v-flex class="mt-3">
           <p class="white--text subheading mt-1 text-center">ผู้เข้าใช้งาน</p>
@@ -93,13 +93,9 @@
             {{ rank }} {{ first_name }} {{ last_name }}
           </p>
         </v-flex>
-
-        <!-- <v-flex class="mt-4 mb-4">
-                <Popup />
-            </v-flex> -->
       </v-layout>
       <!-- แถบเมนูด้านข้าง -->
-      <v-list flat>
+      <v-list>
         <v-list-item
           v-for="link in links"
           color="#FF695D"
@@ -107,7 +103,6 @@
           router
           :to="link.route"
           active-class="border"
-          dialog
         >
           <v-list-item-action>
             <v-icon>{{ link.icon }}</v-icon>
@@ -203,21 +198,21 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.clear();
+      sessionStorage.clear();
       window.location = "/login";
     },
     getUserData() {
-      var rank = localStorage.getItem("rank");
-      var first_name = localStorage.getItem("first_name");
-      var last_name = localStorage.getItem("last_name");
-      var role = localStorage.getItem("role");
+      var rank = sessionStorage.getItem("rank");
+      var first_name = sessionStorage.getItem("first_name");
+      var last_name = sessionStorage.getItem("last_name");
+      var role = sessionStorage.getItem("role");
       this.role = role;
       this.rank = rank;
       this.first_name = first_name;
       this.last_name = last_name;
     },
     getImageURL() {
-      var ImageURL = localStorage.getItem("ImageURL");
+      var ImageURL = sessionStorage.getItem("ImageURL");
       this.profileImage = ImageURL;
     },
   },
@@ -237,7 +232,7 @@ export default {
 .button-menu {
   margin-bottom: 10px;
 }
-.user-card{
-    background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
+.user-card {
+  background-image: linear-gradient(45deg, #572021 13%, #833133 66%);
 }
 </style>

@@ -115,7 +115,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  let currentUser = window.localStorage.getItem("role");
+  let currentUser = sessionStorage.getItem("role");
   let requiresAuthAdmin = to.matched.some(
     (record) => record.meta.requiresAuthAdmin
   );
@@ -133,28 +133,5 @@ router.beforeEach(async (to, from, next) => {
     next();
   }
 });
-
-// const userPermissions = window.localStorage.getItem("role");
-// router.beforeEach((to, from, next) => {
-//   if (userPermissions == "admin") {
-//     next();
-//   } else {
-//     next({ name: "login" });
-//   }
-
-//   next();
-// });
-
-// for what ????
-// router.beforeEach(async ( next) => {
-//   let currentUser = JSON.parse(window.localStorage.getItem("role"));
-//   if (currentUser) {
-//     if (currentUser.role === "admin") {
-//       next("/");
-//     }
-//   }
-// });
-// set หน้าแรกที่เข้า
-// router.replace("/login");
 
 export default router;
