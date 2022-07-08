@@ -125,7 +125,7 @@ export default {
         .then(async (response) => {
           let data = response.data;
           if (data.status === "success") {
-            // this.rank = data.result.rank;
+            this.rank = data.result.rank;
             this.fristName = data.result.first_name;
             this.lastName = data.result.last_name;
             this.image = data.result.profile_image_url;
