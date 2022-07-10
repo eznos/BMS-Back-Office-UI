@@ -207,11 +207,9 @@
   </v-app>
 </template>
 <script>
-import { storage } from "../../utils/firebase";
+import { storageRef } from "../../utils/firebase";
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
-
-const STORAGE_REF = storage.ref();
 
 export default {
   components: {},
@@ -332,7 +330,7 @@ export default {
         var storagePath = "users/profile-image";
         var imageName = self.$uuid.v4() + ".jpg";
 
-        let imageRef = STORAGE_REF.child(storagePath).child(imageName);
+        let imageRef = storageRef.child(storagePath).child(imageName);
         let uploadTask = imageRef.putString(profileImage, "data_url", {
           contentType: "image/jpeg",
         });
