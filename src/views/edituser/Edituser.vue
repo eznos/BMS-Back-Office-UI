@@ -182,7 +182,13 @@
               ล้างข้อมูล
             </v-btn>
             <!-- cancel form -->
-            <v-btn class="mr-4" to="/login" width="200px" large color="error">
+            <v-btn
+              class="mr-4"
+              @click="$router.go(-1)"
+              width="200px"
+              large
+              color="error"
+            >
               ยกเลิกการลงทะเบียน
             </v-btn>
             <!-- submit form -->
@@ -215,6 +221,7 @@ export default {
     loader: null,
     avatar: null,
     profileImage: "",
+    CurrentUserimage: "",
     rank: "",
     affiliation: "",
     firstname: "",
@@ -823,6 +830,7 @@ export default {
       }
     },
   },
+
   methods: {
     submit() {
       this.$refs.formEdit.validate();
@@ -838,11 +846,14 @@ export default {
       reader.onload = (e) => {
         this.profileImage = e.target.result;
         this.isUploadProfileImage = true;
+        // this.Userimage = e.target.result;
+        // localStorage.setItem("ImageURL", this.Userimage);
       };
     },
     clear() {
       this.$refs.formEdit.reset();
       this.profileImage = "";
+      // localStorage.removeItem("ImageURL");
     },
     validate() {
       this.$refs.formEdit.validate();

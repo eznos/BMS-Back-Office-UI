@@ -347,6 +347,9 @@
 </template>
 
 <script>
+import { apiUrl } from "../../utils/url";
+import axios from "axios";
+
 export default {
   data: () => ({
     el: "#app",
@@ -1048,6 +1051,20 @@ export default {
     this.initialize();
   },
   methods: {
+    // get data from mockup api
+    getInfoDataCard() {
+      axios
+        .get(apiUrl + "/v1/table/resident")
+        .then((response) => {
+          let data = response.data;
+          if (data.status === "success") {
+            this.total = data.result.total;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     // mock data in table
     initialize() {
       this.residentTable = [

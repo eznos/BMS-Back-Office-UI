@@ -416,6 +416,7 @@
 </template>
 
 <script>
+
 export default {
   data: () => ({
     el: "#app",
@@ -1134,6 +1135,7 @@ export default {
     this.initialize();
   },
   methods: {
+    
     initialize() {
       this.buildingTable = [
         {
@@ -1378,7 +1380,6 @@ export default {
       // partially contains the searched word.
       return value.toLowerCase().includes(this.NamefilterValue.toLowerCase());
     },
-
     waterGroupFilter(value) {
       if (!this.waterGroupFilterValue) {
         return true;
@@ -1523,6 +1524,7 @@ export default {
         this.dialog = false;
       }
     },
+    
   },
 };
 </script>

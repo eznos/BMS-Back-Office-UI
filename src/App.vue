@@ -36,6 +36,7 @@
 </template>
 
 <script>
+
 import Navbar from "../src/components/navbar/Navbar.vue";
 import Footer from "../src/components/footer/Footer.vue";
 export default {
