@@ -207,10 +207,11 @@
   </v-app>
 </template>
 <script>
-
-import firebase from 'firebase';
+import { storage } from "../../utils/firebase";
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
+
+const STORAGE_REF = storage.ref();
 
 export default {
   components: {},
@@ -301,20 +302,20 @@ export default {
   }),
   methods: {
     create() {
-      const post = {
-        photo: this.img1,
-        caption: this.caption,
-      };
-      firebase
-        .database()
-        .ref("PhotoGallery")
-        .push(post)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      // const post = {
+      //   photo: this.img1,
+      //   caption: this.caption,
+      // };
+      // firebase
+      //   .database()
+      //   .ref("PhotoGallery")
+      //   .push(post)
+      //   .then((response) => {
+      //     console.log(response);
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
     },
     click1() {
       this.$refs.input1.click();
@@ -325,29 +326,35 @@ export default {
       this.imageData = event.target.files[0];
       this.onUpload();
     },
-    onUpload() {
-      this.img1 = null;
-      const storageRef = firebase
-        .storage()
-        .ref(`${this.imageData.name}`)
-        .put(this.imageData);
-      storageRef.on(
-        `state_changed`,
-        (snapshot) => {
-          this.uploadValue =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        },
-        (error) => {
-          console.log(error.message);
-        },
-        () => {
-          this.uploadValue = 100;
-          storageRef.snapshot.ref.getDownloadURL().then((url) => {
-            this.img1 = url;
-            console.log(this.img1);
-          });
-        }
-      );
+    async uploadProfileImageToStorage(profileImage) {
+      let self = this;
+      return new Promise(function (resolve, reject) {
+        var storagePath = "users/profile-image";
+        var imageName = self.$uuid.v4() + ".jpg";
+
+        let imageRef = STORAGE_REF.child(storagePath).child(imageName);
+        let uploadTask = imageRef.putString(profileImage, "data_url", {
+          contentType: "image/jpeg",
+        });
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(progress)
+          },
+          function error(err) {
+            reject(err);
+          },
+          function complete() {
+            uploadTask.snapshot.ref
+              .getDownloadURL()
+              .then(function (downloadURL) {
+                resolve(downloadURL);
+              });
+          }
+        );
+      });
     },
     async submitRegister() {
       if (this.$refs.formRegister.validate()) {
