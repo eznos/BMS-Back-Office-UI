@@ -123,39 +123,78 @@
                         ></v-text-field>
                       </v-col>
                       <!-- avatar -->
-                      <v-col cols="12" md="6" lg="6">
-                        <!-- <v-file-input
-                          :rules="rules.Avatar"
-                          accept="image/png, image/jpeg, image/bmp"
-                          placeholder="เลือกรูปประจำตัว"
-                          label="รูปประจำตัว"
-                          show-size
-                          counter
-                          @change="getImageURL"
-                          v-model="image"
-                        ></v-file-input> -->
-                        <div>
-                          <div>
-                            <v-btn @click="click1">choose photo</v-btn>
-                            <input
-                              type="file"
-                              ref="input1"
-                              style="display: none"
-                              @change="previewImage"
-                              accept="image/*"
-                            />
-                          </div>
-                          <div v-if="imageData != null">
-                            <img
-                              class="preview"
-                              height="268"
-                              width="356"
-                              :src="img1"
-                            />
-                            <br />
-                          </div>
-                        </div>
-                        <v-btn color="pink" @click="create">upload</v-btn>
+                      <!-- avatar upload and preview -->
+                      <v-col cols="12" sm="12" md="2" lg="2">
+                        <v-hover v-slot="{ hover }">
+                          <v-card
+                            color="#DFDDDD"
+                            height="142"
+                            max-width="230"
+                            tile
+                            class="px-3 mb-2 uploadimg"
+                          >
+                            <v-row
+                              style="height: 100%"
+                              justify="center"
+                              align="center"
+                            >
+                              <v-avatar
+                                v-if="!profileImage"
+                                tile
+                                height="142"
+                                width="230"
+                                color="#DFDDDD"
+                              >
+                                <h2>
+                                  {{
+                                    firstname != null
+                                      ? firstname.substring(0, 1)
+                                      : null
+                                  }}
+                                  {{
+                                    lastname != null
+                                      ? lastname.substring(0, 1)
+                                      : null
+                                  }}
+                                </h2>
+                              </v-avatar>
+                              <v-img
+                                v-if="profileImage !== ''"
+                                :src="profileImage"
+                                height="142"
+                                width="230"
+                              >
+                              </v-img>
+                              <v-expand-transition>
+                                <div
+                                  v-if="hover"
+                                  class="d-flex v-card--reveal"
+                                  style="height: 100%"
+                                >
+                                  <div>
+                                    <v-btn
+                                      fab
+                                      color="#F5F5F5"
+                                      class="mr-2"
+                                      @click="handleImageButtonClick"
+                                    >
+                                      <v-icon size="30"
+                                        >mdi-file-image-outline</v-icon
+                                      >
+                                    </v-btn>
+                                    <input
+                                      type="file"
+                                      ref="image"
+                                      @change="onImageSelected"
+                                      style="display: none"
+                                      accept="image/png, image/jpeg"
+                                    />
+                                  </div>
+                                </div>
+                              </v-expand-transition>
+                            </v-row>
+                          </v-card>
+                        </v-hover>
                       </v-col>
                     </v-row>
                   </v-container>
@@ -220,6 +259,8 @@ export default {
     valid: false,
     imageURL: null,
     image: null,
+    avatar: null,
+    profileImage: "",
     showpassword: false,
     on: {},
     attrs: {},
@@ -322,7 +363,7 @@ export default {
       this.uploadValue = 0;
       this.img1 = null;
       this.imageData = event.target.files[0];
-      this.onUpload();
+      this.uploadProfileImageToStorage();
     },
     async uploadProfileImageToStorage(profileImage) {
       let self = this;
@@ -338,8 +379,9 @@ export default {
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(progress)
+            var progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(progress);
           },
           function error(err) {
             reject(err);
@@ -408,6 +450,21 @@ export default {
             this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
           }
         });
+    },
+    // upload image and preview
+    handleImageButtonClick() {
+      this.$refs.image.click();
+    },
+    onImageSelected(event) {
+      var file = event.target.files[0];
+      var reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (e) => {
+        this.profileImage = e.target.result;
+        this.isUploadProfileImage = true;
+        // this.Userimage = e.target.result;
+        // localStorage.setItem("ImageURL", this.Userimage);
+      };
     },
     clearForm() {
       this.$refs.formRegister.resetValidation();
