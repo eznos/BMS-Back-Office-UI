@@ -1,11 +1,9 @@
 <template>
   <v-app id="app">
-    <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
     <v-container fill-height fill-width>
       <v-layout align-center justify-center>
         <v-card class="mx-auto" color="#F4ffff" elevation="10" width="90%">
           <v-card-title>
-            <!-- <h1 class="h1c">ลงทะเบียน</h1> -->
             <div class="content background-main">
               <v-row justify="space-between" class="px-3">
                 <!-- title -->
@@ -50,16 +48,16 @@
                           required
                         ></v-select>
                       </v-col>
-                      <!-- fname -->
+                      <!-- firstNane-->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
-                          v-model="fristName"
+                          v-model="firstName"
                           label="ชื่อ"
                           required
                           :rules="rules.zonesBuildingsRoom"
                         ></v-text-field
                       ></v-col>
-                      <!-- lastname -->
+                      <!-- lastName -->
                       <v-col cols="12" md="6" lg="6">
                         <v-text-field
                           v-model="lastName"
@@ -122,7 +120,6 @@
                           @click:append="showpassword = !showpassword"
                         ></v-text-field>
                       </v-col>
-                      <!-- avatar -->
                       <!-- avatar upload and preview -->
                       <v-col cols="12" sm="12" md="2" lg="2">
                         <v-hover v-slot="{ hover }">
@@ -147,13 +144,13 @@
                               >
                                 <h2>
                                   {{
-                                    firstname != null
-                                      ? firstname.substring(0, 1)
+                                    firstName != null
+                                      ? firstName.substring(0, 1)
                                       : null
                                   }}
                                   {{
-                                    lastname != null
-                                      ? lastname.substring(0, 1)
+                                    lastName != null
+                                      ? lastName.substring(0, 1)
                                       : null
                                   }}
                                 </h2>
@@ -246,25 +243,20 @@
   </v-app>
 </template>
 <script>
-import { storageRef } from "../../utils/firebase";
+import { storage } from "../../utils/firebase";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { apiUrl } from "../../utils/url";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 export default {
   components: {},
   data: () => ({
-    caption: "",
-    img1: "",
-    imageData: null,
     valid: false,
-    imageURL: null,
-    image: null,
-    avatar: null,
     profileImage: "",
+    imageURL: "",
     showpassword: false,
-    on: {},
-    attrs: {},
-    fristName: "",
+    firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
@@ -340,106 +332,61 @@ export default {
     },
   }),
   methods: {
-    create() {
-      // const post = {
-      //   photo: this.img1,
-      //   caption: this.caption,
-      // };
-      // firebase
-      //   .database()
-      //   .ref("PhotoGallery")
-      //   .push(post)
-      //   .then((response) => {
-      //     console.log(response);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-    },
-    click1() {
-      this.$refs.input1.click();
-    },
-    previewImage(event) {
-      this.uploadValue = 0;
-      this.img1 = null;
-      this.imageData = event.target.files[0];
-      this.uploadProfileImageToStorage();
-    },
-    async uploadProfileImageToStorage(profileImage) {
-      let self = this;
-      return new Promise(function (resolve, reject) {
-        var storagePath = "users/profile-image";
-        var imageName = self.$uuid.v4() + ".jpg";
-
-        let imageRef = storageRef.child(storagePath).child(imageName);
-        let uploadTask = imageRef.putString(profileImage, "data_url", {
-          contentType: "image/jpeg",
-        });
-
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            var progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(progress);
-          },
-          function error(err) {
-            reject(err);
-          },
-          function complete() {
-            uploadTask.snapshot.ref
-              .getDownloadURL()
-              .then(function (downloadURL) {
-                resolve(downloadURL);
-              });
-          }
-        );
-      });
-    },
     async submitRegister() {
       if (this.$refs.formRegister.validate()) {
-        this.confirmRegister(
-          this.gender,
-          this.rank,
-          this.phoneNumber,
-          this.email,
-          this.affiliation,
-          this.fristName,
-          this.lastName,
-          this.username,
-          this.password,
-          this.imageURL
+        // TODO: upload profile image to firebase storage
+        this.imageURL = await this.uploadProfileImageToStorage(
+          this.profileImage
         );
+        console.log("File available at", this.imageURL);
+
+        // TODO: remove when imprement business
+        const data = {
+          rank: this.rank,
+          profile_url: this.imageURL,
+          phone_number: this.phoneNumber,
+          gender: this.gender,
+          first_name: this.firstName,
+          last_name: this.lastName,
+          affiliation: this.affiliation,
+          username: this.username,
+          password: this.password,
+          email: this.email,
+        };
+
+        console.log(data);
+
+         // TODO: request register to mock api
+        // this.callAPIRegister()
       }
     },
-    async confirmRegister() {
-      let payload = {
+    async callAPIRegister() {
+      // TODO: request with mock api
+      const data = {
         rank: this.rank,
         profile_url: this.imageURL,
         phone_number: this.phoneNumber,
         gender: this.gender,
-        first_name: this.fristName,
+        first_name: this.firstName,
         last_name: this.lastName,
         affiliation: this.affiliation,
         username: this.username,
         password: this.password,
         email: this.email,
       };
-      let headerAPI = {
+      const config = {
         headers: {
           "x-api-key": "xxx-api-key",
           "Content-Type": "application/json",
         },
-        payload: payload,
       };
       axios
-        // this api ?
-        .post(apiUrl + "/v1/auth/register", payload, headerAPI)
+        .post(apiUrl + "/v1/auth/register", data, config)
         .then((response) => {
           console.log(response.data);
-          // window.location = "/login";
         })
         .catch((error) => {
+          // TODO: revise handler
           if (error.response.data.status == "unprocessable_entity") {
             this.snackbar = true;
             this.snackbarColor = "warning";
@@ -451,7 +398,21 @@ export default {
           }
         });
     },
-    // upload image and preview
+    async uploadProfileImageToStorage(profileImage) {
+      const metadata = { contentType: "image/jpeg" };
+      const imageName = uuidv4() + ".jpg";
+      const storageRef = ref(storage, `profile-image/${imageName}`);
+
+      return new Promise(function (resolve) {
+        uploadString(storageRef, profileImage, "data_url", metadata).then(
+          (snapshot) => {
+            getDownloadURL(snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    },
     handleImageButtonClick() {
       this.$refs.image.click();
     },
@@ -461,19 +422,13 @@ export default {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         this.profileImage = e.target.result;
-        this.isUploadProfileImage = true;
-        // this.Userimage = e.target.result;
-        // localStorage.setItem("ImageURL", this.Userimage);
       };
     },
     clearForm() {
+      // TODO: recheck this function
       this.$refs.formRegister.resetValidation();
       this.$refs.formRegister.reset();
       this.showpassword = false;
-    },
-    getImageURL() {
-      if (!this.image) return;
-      this.imageURL = URL.createObjectURL(this.image);
     },
   },
 };
