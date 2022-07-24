@@ -79,11 +79,13 @@
                   <!-- rank -->
                   <v-col cols="12" sm="4" md="6" lg="2">
                     <v-autocomplete
+                      item-text="name"
+                      item-value="id"
                       v-model="rank"
                       :items="ranks"
                       label="ยศ"
                       required
-                      :rules="rules.nameRules"
+                      :rules="rules.nomalRules"
                       autofocus
                       clearable
                       prepend-icon="mdi-chevron-triple-up"
@@ -93,9 +95,11 @@
                   <!-- affi -->
                   <v-col cols="12" sm="4" md="6" lg="2">
                     <v-autocomplete
+                      item-text="name"
+                      item-value="id"
                       v-model="affiliation"
                       :items="affiliations"
-                      :rules="rules.nameRules"
+                      :rules="rules.nomalRules"
                       label="สังกัด"
                       required
                       prepend-icon="mdi-format-list-group"
@@ -155,8 +159,9 @@
                       item-color="red"
                       :items="genders"
                       label="เพศ"
-                      item-text="text"
                       item-value="value"
+                      item-text="name"
+                      item-id="id"
                     >
                     </v-select>
                   </v-col>
@@ -198,7 +203,7 @@
               width="200px"
               large
               :disabled="!valid"
-              @click="validate"
+              @click="submit"
             >
               ยืนยันการลงทะเบียน
             </v-btn>
@@ -209,6 +214,14 @@
   </v-app>
 </template>
 <script>
+import { storage } from "../../utils/firebase";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { apiUrl } from "../../utils/url";
+import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import ranks from "../../json/rank.json";
+import affiliations from "../../json/affiliations.json";
+import genders from "../../json/genders.json";
 export default {
   components: {},
   data: () => ({
@@ -223,567 +236,23 @@ export default {
     profileImage: "",
     CurrentUserimage: "",
     rank: "",
+    ranks: ranks,
     affiliation: "",
     firstname: "",
     lastname: "",
+    imageURL: "",
     defaultGender: {
       text: "ไม่ระบุ",
       value: "",
     },
-    genders: [
-      {
-        text: "ชาย",
-        value: "male",
-      },
-      {
-        text: "หญิง",
-        value: "female",
-      },
-      {
-        text: "ไม่ระบุ",
-        value: "",
-      },
-    ],
+    genders: genders,
     tel: "",
     email: "",
     phone_number: "",
     zone: null,
     building: null,
     room: null,
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
-    affiliations: [
-      "ผบช.ภ.3",
-      "สนง.ผบช.ภ.3",
-      "สนง.รอง ผบช.ภ.3",
-      "ภ.3(ส่วนกลาง)",
-      "บก.สส.ภ.3",
-      "ภ.จว.นม.",
-      "สภ.เมืองนครราชสีมา",
-      "บก.อก.ภ.3",
-      "ศพฐ.3",
-      "ปฏิบัติราชการ",
-      "ประจำ",
-      "สำรอง",
-      "ภ.3",
-      "ศฝร.ภ.3",
-    ],
-    // zone and building
-    zonesBuildings: {
-      เขตส่วนกลาง: [
-        "2/11",
-        "2/12",
-        "2/13",
-        "2/14",
-        "2/15",
-        "2/16",
-        "2/17",
-        "2/18",
-      ],
-      เขตสุระ: [
-        "2/20",
-        "2/21",
-        "2/22",
-        "2/23",
-        "2/24",
-        "2/25",
-        "2/26",
-        "2/27",
-        "2/28",
-        "2/29",
-        "2/31",
-        "2/32",
-        "2/33",
-        "2/34",
-        "2/35",
-        "2/36",
-        "2/37",
-        "2/38",
-        "2/39",
-        "2/40",
-        "2/41",
-      ],
-      เขตอังฏดาง: ["2/19"],
-    },
-    // building and room
-    buildingsRooms: {
-      "2/11": [
-        "97",
-        "99",
-        "101",
-        "103",
-        "105",
-        "107",
-        "109",
-        "111",
-        "113",
-        "115",
-        "117",
-        "119",
-      ],
-      "2/12": [
-        "73",
-        "75",
-        "77",
-        "79",
-        "81",
-        "83",
-        "85",
-        "87",
-        "89",
-        "91",
-        "93",
-        "95",
-      ],
-      "2/13": [
-        "108",
-        "110",
-        "112",
-        "114",
-        "116",
-        "118",
-        "120",
-        "122",
-        "124",
-        "126",
-        "128",
-        "130",
-      ],
-      "2/14": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-      ],
-      "2/15": [
-        "121",
-        "123",
-        "125",
-        "127",
-        "129",
-        "131",
-        "133",
-        "135",
-        "137",
-        "139",
-        "141",
-        "143",
-        "145",
-        "147",
-        "149",
-        "151",
-        "153",
-        "155",
-        "157",
-        "159",
-        "161",
-        "163",
-        "165",
-        "167",
-        "169",
-        "171",
-        "173",
-        "175",
-      ],
-      "2/16": [
-        "177",
-        "179",
-        "181",
-        "183",
-        "185",
-        "187",
-        "189",
-        "191",
-        "193",
-        "195",
-        "197",
-        "199",
-        "201",
-        "203",
-        "205",
-        "207",
-        "209",
-        "211",
-        "213",
-        "215",
-        "217",
-        "219",
-        "221",
-        "223",
-        "225",
-      ],
-      "2/17": [
-        "132",
-        "134",
-        "136",
-        "138",
-        "140",
-        "142",
-        "144",
-        "146",
-        "148",
-        "150",
-        "152",
-        "154",
-        "156",
-        "158",
-        "160",
-        "162",
-        "164",
-        "166",
-        "168",
-        "170",
-        "172",
-        "174",
-        "176",
-        "178",
-        "180",
-        "182",
-        "184",
-        "186",
-      ],
-      "2/18": [
-        "50",
-        "52",
-        "54",
-        "56",
-        "58",
-        "60",
-        "62",
-        "64",
-        "66",
-        "68",
-        "70",
-        "72",
-        "74",
-        "76",
-        "78",
-        "80",
-        "82",
-        "84",
-        "86",
-        "88",
-        "90",
-        "92",
-        "94",
-        "96",
-        "98",
-        "100",
-        "102",
-        "104",
-      ],
-      "2/19": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-        "109",
-        "110",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-        "209",
-        "210",
-        "211",
-        "212",
-        "213",
-        "214",
-        "215",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "307",
-        "308",
-        "309",
-        "310",
-        "311",
-        "312",
-        "313",
-        "314",
-        "315",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "407",
-        "408",
-        "409",
-        "410",
-        "411",
-        "412",
-        "413",
-        "414",
-        "415",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-        "507",
-        "508",
-        "509",
-        "510",
-        "511",
-        "512",
-        "513",
-        "514",
-        "515",
-      ],
-      "2/20": ["1", "2"],
-      "2/21": ["3", "4"],
-      "2/22": ["5", "6"],
-      "2/23": ["7", "8"],
-      "2/24": ["9", "10"],
-      "2/25": ["11", "12"],
-      "2/26": ["13", "14"],
-      "2/27": ["15", "16"],
-      "2/28": ["17", "18"],
-      "2/29": ["19", "20"],
-      "2/31": ["79", "80", "81", "82", "83", "84", "85", "86", "87", "88"],
-      "2/32": ["89", "90", "91", "92", "93", "94", "95", "96", "97", "98"],
-      "2/33": [
-        "99",
-        "100",
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-      ],
-      "2/34": [
-        "109",
-        "110",
-        "111",
-        "112",
-        "113",
-        "114",
-        "115",
-        "116",
-        "117",
-        "118",
-      ],
-      "2/35": [
-        "119",
-        "120",
-        "121",
-        "122",
-        "123",
-        "124",
-        "125",
-        "126",
-        "127",
-        "128",
-      ],
-      "2/36": [
-        "129",
-        "130",
-        "131",
-        "132",
-        "133",
-        "134",
-        "135",
-        "136",
-        "137",
-        "138",
-      ],
-      "2/37": [
-        "139",
-        "140",
-        "141",
-        "142",
-        "143",
-        "144",
-        "145",
-        "146",
-        "147",
-        "148",
-      ],
-      "2/38": [
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "31",
-        "32",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "44",
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50",
-      ],
-      "2/39": [
-        "149",
-        "150",
-        "151",
-        "152",
-        "153",
-        "154",
-        "155",
-        "156",
-        "157",
-        "158",
-        "159",
-        "160",
-        "161",
-        "162",
-        "163",
-        "164",
-        "165",
-        "166",
-        "167",
-        "168",
-        "169",
-        "170",
-        "171",
-        "172",
-        "173",
-        "174",
-        "175",
-        "176",
-        "177",
-        "178",
-      ],
-      "2/40": [
-        "179",
-        "180",
-        "181",
-        "182",
-        "183",
-        "184",
-        "185",
-        "186",
-        "187",
-        "188",
-        "189",
-        "190",
-        "191",
-        "192",
-        "193",
-        "194",
-        "195",
-        "196",
-        "197",
-        "198",
-        "199",
-        "200",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-      ],
-      "2/41": [
-        "212",
-        "213",
-        "214",
-        "215",
-        "216",
-        "217",
-        "218",
-        "219",
-        "220",
-        "221",
-        "222",
-        "223",
-        "224",
-        "225",
-        "226",
-        "227",
-        "228",
-        "229",
-        "230",
-        "231",
-        "232",
-        "233",
-        "234",
-        "235",
-        "236",
-        "237",
-        "238",
-        "239",
-        "240",
-      ],
-    },
+    affiliations: affiliations,
     rules: {
       nameRules: [
         (v) => !!v || "กรุณากรอกข้อมูล",
@@ -802,6 +271,7 @@ export default {
           /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
           "เบอร์โทรศัพท์ม่ถูกต้อง",
       },
+      nomalRules: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
     emailRules: [
       (v) => !!v || "กรุณากรอกอีเมล",
@@ -810,30 +280,69 @@ export default {
   }),
   setup() {},
   watch: {},
-  computed: {
-    zones() {
-      return Object.keys(this.zonesBuildings);
-    },
-    buildings() {
-      // autocomplete in form
-      if (!this.zone) {
-        return ["ไม่มีข้อมูล"];
-      } else {
-        return this.zonesBuildings[this.zone];
-      }
-    },
-    rooms() {
-      if (!this.building) {
-        return ["ไม่มีข้อมูล"];
-      } else {
-        return this.buildingsRooms[this.building];
-      }
-    },
-  },
+  computed: {},
 
   methods: {
     submit() {
-      this.$refs.formEdit.validate();
+      if (this.$refs.formEdit.validate()) {
+        this.imageURL = this.uploadProfileImageToStorage(this.profileImage);
+
+        // TODO: request register to mock api
+        // this.callAPIRegister()
+      }
+    },
+    async uploadProfileImageToStorage(profileImage) {
+      const metadata = { contentType: "image/jpeg" };
+      const imageName = uuidv4() + ".jpg";
+      const storageRef = ref(storage, `profile-image/${imageName}`);
+
+      return new Promise(function (resolve) {
+        uploadString(storageRef, profileImage, "data_url", metadata).then(
+          (snapshot) => {
+            getDownloadURL(snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    },
+    async callAPIRegister() {
+      // TODO: request with mock api
+      const data = {
+        rank: this.rank,
+        profile_url: this.imageURL,
+        phone_number: this.phoneNumber,
+        gender: this.gender,
+        first_name: this.firstName,
+        last_name: this.lastName,
+        affiliation: this.affiliation,
+        username: this.username,
+        password: this.password,
+        email: this.email,
+      };
+      const config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "Content-Type": "application/json",
+        },
+      };
+      axios
+        .post(apiUrl + "/v1/auth/register", data, config)
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((error) => {
+          // TODO: revise handler
+          if (error.response.data.status == "unprocessable_entity") {
+            this.snackbar = true;
+            this.snackbarColor = "warning";
+            this.text = "เลข recovery code ไม่ถูกต้อง";
+          } else {
+            this.snackbar = true;
+            this.snackbarColor = "red";
+            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+          }
+        });
     },
     // upload image and preview
     handleImageButtonClick() {
