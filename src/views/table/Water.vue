@@ -118,8 +118,8 @@
               label="ค้นหาด้วยด้วยสถานะ"
               class="filter"
               clearable
-              item-text="statusText"
-              item-value="statusValue"
+              item-text="name"
+              item-value="value"
             ></v-select>
           </v-col>
           <!-- btn filter -->
@@ -284,6 +284,8 @@
                           required
                           :rules="rules.buildingRoom"
                           disabled
+                          item-text="name"
+                          item-value="value"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -317,6 +319,8 @@
                           clearable
                           :rules="rules.buildingRoom"
                           disabled
+                          item-text="name"
+                          item-value="value"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -416,8 +420,8 @@
                           label="สถานะ"
                           required
                           :rules="rules.buildingRoom"
-                          item-text="statusText"
-                          item-value="statusValue"
+                          item-text="name"
+                          item-value="value"
                         >
                         </v-select>
                       </v-col>
@@ -562,6 +566,8 @@
 </template>
 
 <script>
+import statuses from "../../json/statuses.json";
+import ranks from "../../json/rank.json"
 export default {
   data: () => ({
     el: "#app",
@@ -580,22 +586,7 @@ export default {
     meterZone: null,
     numberOfroom: "",
     rank: null,
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
+    ranks: ranks,
     modal: false,
     meter_group: null,
     meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
@@ -1116,24 +1107,7 @@ export default {
     dateFilterValue: "",
     date: "",
     stateFilterValue: "",
-    statuses: [
-      {
-        statusText: "ร่าง",
-        statusValue: "draft",
-      },
-      {
-        statusText: "กำลังดำเนินการ",
-        statusValue: "in_progess",
-      },
-      {
-        statusText: "คำนวนแล้ว",
-        statusValue: "calculated",
-      },
-      {
-        statusText: "Export แล้ว",
-        statusValue: "exported",
-      },
-    ],
+    statuses: statuses,
     waterTable: [],
     editedIndex: -1,
     editedItem: {

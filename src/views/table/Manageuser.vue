@@ -71,6 +71,8 @@
                         required
                         :rules="rules.name"
                         disabled
+                        item-text="name"
+                        item-value="value"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -82,6 +84,8 @@
                         :rules="rules.name"
                         disabled
                         label="สังกัด"
+                        item-text="name"
+                        item-value="value"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -110,7 +114,7 @@
                         label="เพศ"
                         required
                         :rules="rules.name"
-                        item-text="text"
+                        item-text="name"
                         item-value="value"
                         disabled
                       >
@@ -140,8 +144,8 @@
                         :items="roles"
                         required
                         :rules="rules.name"
-                        item-text="roleText"
-                        item-value="roleValue"
+                        item-text="name"
+                        item-value="value"
                         disabled
                       >
                       </v-select>
@@ -202,8 +206,8 @@
               :items="roles"
               clearable
               class="filter"
-              item-text="roleText"
-              item-value="roleValue"
+              item-text="name"
+              item-value="value"
             >
             </v-select>
           </v-col>
@@ -247,6 +251,10 @@
 </template>
 
 <script>
+import roles from "../../json/role.json";
+import genders from "../../json/genders.json";
+import ranks from "../../json/rank.json";
+import affiliations from "../../json/affiliations.json";
 export default {
   data: () => ({
     el: "#app",
@@ -257,67 +265,15 @@ export default {
     selectItems: false,
     dialog: false,
     menu: false,
-    roles: [
-      {
-        roleText: "เจ้าหน้าที่",
-        roleValue: "admin",
-      },
-      {
-        roleText: "ผู้ใช้งาน",
-        roleValue: "user",
-      },
-    ],
-    genders: [
-      {
-        text: "ชาย",
-        value: "male",
-      },
-      {
-        text: "หญิง",
-        value: "female",
-      },
-      {
-        text: "ไม่ระบุ",
-        value: "",
-      },
-    ],
+    roles: roles,
+    genders: genders,
     search: "",
     dialogDelete: false,
     // Filter models.
     NamefilterValue: "",
     roleFilterValue: "",
-    affiliations: [
-      "ผบช.ภ.3",
-      "สนง.ผบช.ภ.3",
-      "สนง.รอง ผบช.ภ.3",
-      "ภ.3(ส่วนกลาง)",
-      "บก.สส.ภ.3",
-      "ภ.จว.นม.",
-      "สภ.เมืองนครราชสีมา",
-      "บก.อก.ภ.3",
-      "ศพฐ.3",
-      "ปฏิบัติราชการ",
-      "ประจำ",
-      "สำรอง",
-      "ภ.3",
-      "ศฝร.ภ.3",
-    ],
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
+    affiliations: affiliations,
+    ranks: ranks,
     selected: [],
     itemsPerPage: 5,
     userTable: [],
