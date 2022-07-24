@@ -1,11 +1,15 @@
 <template>
   <v-app id="app">
-    <!-- <h1>&ensp; &ensp; ลงทะเบียน</h1> -->
     <v-container fill-height fill-width>
       <v-layout align-center justify-center>
-        <v-card class="mx-auto" color="#F4ffff" elevation="10" width="90%">
+        <v-card
+          class="mx-auto"
+          color="#F4ffff"
+          elevation="10"
+          max-height="90%"
+          max-width="100%"
+        >
           <v-card-title>
-            <!-- <h1 class="h1c">ลงทะเบียน</h1> -->
             <div class="content background-main">
               <v-row justify="space-between" class="px-3">
                 <!-- title -->
@@ -24,181 +28,160 @@
               </v-row>
             </div>
           </v-card-title>
-          <v-card-text>
+          <v-card-text class="card-text-register">
             <v-form ref="formRegister" v-model="valid" lazy-validation>
-              <v-row>
-                <v-col col="12">
-                  <v-container>
-                    <v-row>
-                      <!-- rank -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-select
-                          v-model="rank"
-                          :items="ranks"
-                          :rules="rules.zonesBuildingsRoom"
-                          label="ยศ"
-                          required
-                        ></v-select>
-                      </v-col>
-                      <!-- affiliation -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-select
-                          v-model="affiliation"
-                          :items="affiliations"
-                          :rules="rules.zonesBuildingsRoom"
-                          label="สังกัด"
-                          required
-                        ></v-select>
-                      </v-col>
-                      <!-- fname -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          v-model="fristName"
-                          label="ชื่อ"
-                          required
-                          :rules="rules.zonesBuildingsRoom"
-                        ></v-text-field
-                      ></v-col>
-                      <!-- lastname -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          v-model="lastName"
-                          label="นามสกุล"
-                          required
-                          :rules="rules.zonesBuildingsRoom"
-                        ></v-text-field
-                      ></v-col>
-                      <!-- email -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          label="อีเมล"
-                          :rules="[rules.email.regex]"
-                          v-model="email"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                      <!-- phoneNumber -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          :rules="[rules.phoneNumber.regex]"
-                          v-model="phoneNumber"
-                          :counter="10"
-                          label="เบอร์โทร"
-                          required
-                        ></v-text-field
-                      ></v-col>
-                      <!-- gender -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-select
-                          label="เพศ"
-                          :items="genders"
-                          v-model="gender"
-                          required
-                          :rules="rules.zonesBuildingsRoom"
+              <v-row align="center" justify="center">
+                <v-container>
+                  <v-row>
+                    <!-- rank -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-select
+                        item-text="name"
+                        item-value="id"
+                        v-model="rank"
+                        :items="ranks"
+                        :rules="rules.zonesBuildingsRoom"
+                        label="ยศ"
+                        required
+                      ></v-select>
+                    </v-col>
+                    <!-- affiliation -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-select
+                        item-text="name"
+                        item-value="id"
+                        v-model="affiliation"
+                        :items="affiliations"
+                        :rules="rules.zonesBuildingsRoom"
+                        label="สังกัด"
+                        required
+                      ></v-select>
+                    </v-col>
+                    <!-- firstNane-->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        v-model="firstName"
+                        label="ชื่อ"
+                        required
+                        :rules="rules.zonesBuildingsRoom"
+                      ></v-text-field
+                    ></v-col>
+                    <!-- lastName -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        v-model="lastName"
+                        label="นามสกุล"
+                        required
+                        :rules="rules.zonesBuildingsRoom"
+                      ></v-text-field
+                    ></v-col>
+                    <!-- email -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        label="อีเมล"
+                        :rules="[rules.email.regex]"
+                        v-model="email"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <!-- phoneNumber -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        :rules="[rules.phoneNumber.regex]"
+                        v-model="phoneNumber"
+                        :counter="10"
+                        label="เบอร์โทร"
+                        required
+                      ></v-text-field
+                    ></v-col>
+                    <!-- gender -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-select
+                        label="เพศ"
+                        :items="genders"
+                        v-model="gender"
+                        required
+                        :rules="rules.zonesBuildingsRoom"
+                      >
+                      </v-select>
+                    </v-col>
+                    <!-- user -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        :rules="rules.username"
+                        v-model="username"
+                        label="ชื่อผู้ใช้งาน"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <!-- password -->
+                    <v-col cols="12" md="6" lg="6">
+                      <v-text-field
+                        v-model="password"
+                        :append-icon="showpassword ? 'mdi-eye' : 'mdi-eye-off'"
+                        :type="showpassword ? 'text' : 'password'"
+                        required
+                        name="input-10-1"
+                        :rules="rules.password"
+                        label="รหัสผ่านใหม่"
+                        @click:append="showpassword = !showpassword"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- avatar upload and preview -->
+                    <v-col cols="12" md="6" lg="6" align="center">
+                      <v-hover v-slot="{ hover }">
+                        <v-card
+                          color="#DFDDDD"
+                          height="142"
+                          max-width="230"
+                          tile
+                          class="px-3 mb-2 uploadimg"
                         >
-                        </v-select>
-                      </v-col>
-                      <!-- user -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          :rules="rules.username"
-                          v-model="username"
-                          label="ชื่อผู้ใช้งาน"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                      <!-- password -->
-                      <v-col cols="12" md="6" lg="6">
-                        <v-text-field
-                          v-model="password"
-                          :append-icon="
-                            showpassword ? 'mdi-eye' : 'mdi-eye-off'
-                          "
-                          :type="showpassword ? 'text' : 'password'"
-                          required
-                          name="input-10-1"
-                          :rules="rules.password"
-                          label="รหัสผ่านใหม่"
-                          @click:append="showpassword = !showpassword"
-                        ></v-text-field>
-                      </v-col>
-                      <!-- avatar -->
-                      <!-- avatar upload and preview -->
-                      <v-col cols="12" sm="12" md="2" lg="2">
-                        <v-hover v-slot="{ hover }">
-                          <v-card
-                            color="#DFDDDD"
-                            height="142"
-                            max-width="230"
-                            tile
-                            class="px-3 mb-2 uploadimg"
+                          <v-row
+                            style="height: 100%"
+                            justify="center"
+                            align="center"
                           >
-                            <v-row
-                              style="height: 100%"
-                              justify="center"
-                              align="center"
+                            <v-img
+                              v-if="profileImage !== ''"
+                              :src="profileImage"
+                              height="142"
+                              width="230"
                             >
-                              <v-avatar
-                                v-if="!profileImage"
-                                tile
-                                height="142"
-                                width="230"
-                                color="#DFDDDD"
+                            </v-img>
+                            <v-expand-transition>
+                              <div
+                                v-if="hover"
+                                class="d-flex v-card--reveal"
+                                style="height: 100%"
                               >
-                                <h2>
-                                  {{
-                                    firstname != null
-                                      ? firstname.substring(0, 1)
-                                      : null
-                                  }}
-                                  {{
-                                    lastname != null
-                                      ? lastname.substring(0, 1)
-                                      : null
-                                  }}
-                                </h2>
-                              </v-avatar>
-                              <v-img
-                                v-if="profileImage !== ''"
-                                :src="profileImage"
-                                height="142"
-                                width="230"
-                              >
-                              </v-img>
-                              <v-expand-transition>
-                                <div
-                                  v-if="hover"
-                                  class="d-flex v-card--reveal"
-                                  style="height: 100%"
-                                >
-                                  <div>
-                                    <v-btn
-                                      fab
-                                      color="#F5F5F5"
-                                      class="mr-2"
-                                      @click="handleImageButtonClick"
+                                <div>
+                                  <v-btn
+                                    fab
+                                    color="#F5F5F5"
+                                    class="mr-2"
+                                    @click="handleImageButtonClick"
+                                  >
+                                    <v-icon size="30"
+                                      >mdi-file-image-outline</v-icon
                                     >
-                                      <v-icon size="30"
-                                        >mdi-file-image-outline</v-icon
-                                      >
-                                    </v-btn>
-                                    <input
-                                      type="file"
-                                      ref="image"
-                                      @change="onImageSelected"
-                                      style="display: none"
-                                      accept="image/png, image/jpeg"
-                                    />
-                                  </div>
+                                  </v-btn>
+                                  <input
+                                    type="file"
+                                    ref="image"
+                                    @change="onImageSelected"
+                                    style="display: none"
+                                    accept="image/png, image/jpeg"
+                                  />
                                 </div>
-                              </v-expand-transition>
-                            </v-row>
-                          </v-card>
-                        </v-hover>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-col>
+                              </div>
+                            </v-expand-transition>
+                          </v-row>
+                        </v-card>
+                      </v-hover>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </v-row>
             </v-form>
           </v-card-text>
@@ -238,33 +221,30 @@
             </div>
           </v-card-actions>
         </v-card>
-        <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="2500">
-          {{ text }}
-        </v-snackbar>
       </v-layout>
+      <v-snackbar v-model="snackbar" :color="snackbarColor" :timeout="2500">
+        {{ text }}
+      </v-snackbar>
     </v-container>
   </v-app>
 </template>
 <script>
-import { storageRef } from "../../utils/firebase";
+import { storage } from "../../utils/firebase";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { apiUrl } from "../../utils/url";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import ranks from "../../json/rank.json";
+import affiliations from "../../json/affiliations.json";
 
 export default {
   components: {},
   data: () => ({
-    caption: "",
-    img1: "",
-    imageData: null,
     valid: false,
-    imageURL: null,
-    image: null,
-    avatar: null,
     profileImage: "",
+    imageURL: "",
     showpassword: false,
-    on: {},
-    attrs: {},
-    fristName: "",
+    firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
@@ -276,38 +256,8 @@ export default {
     text: "",
     snackbar: false,
     snackbarColor: "",
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
-    affiliations: [
-      "ผบช.ภ.3",
-      "สนง.ผบช.ภ.3",
-      "สนง.รอง ผบช.ภ.3",
-      "ภ.3(ส่วนกลาง)",
-      "บก.สส.ภ.3",
-      "ภ.จว.นม.",
-      "สภ.เมืองนครราชสีมา",
-      "บก.อก.ภ.3",
-      "ศพฐ.3",
-      "ปฏิบัติราชการ",
-      "ประจำ",
-      "สำรอง",
-      "ภ.3",
-      "ศฝร.ภ.3",
-    ],
+    ranks: ranks,
+    affiliations: affiliations,
     genders: ["ชาย", "หญิง", "ไม่ระบบุ"],
     rules: {
       email: {
@@ -340,106 +290,44 @@ export default {
     },
   }),
   methods: {
-    create() {
-      // const post = {
-      //   photo: this.img1,
-      //   caption: this.caption,
-      // };
-      // firebase
-      //   .database()
-      //   .ref("PhotoGallery")
-      //   .push(post)
-      //   .then((response) => {
-      //     console.log(response);
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-    },
-    click1() {
-      this.$refs.input1.click();
-    },
-    previewImage(event) {
-      this.uploadValue = 0;
-      this.img1 = null;
-      this.imageData = event.target.files[0];
-      this.uploadProfileImageToStorage();
-    },
-    async uploadProfileImageToStorage(profileImage) {
-      let self = this;
-      return new Promise(function (resolve, reject) {
-        var storagePath = "users/profile-image";
-        var imageName = self.$uuid.v4() + ".jpg";
-
-        let imageRef = storageRef.child(storagePath).child(imageName);
-        let uploadTask = imageRef.putString(profileImage, "data_url", {
-          contentType: "image/jpeg",
-        });
-
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            var progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(progress);
-          },
-          function error(err) {
-            reject(err);
-          },
-          function complete() {
-            uploadTask.snapshot.ref
-              .getDownloadURL()
-              .then(function (downloadURL) {
-                resolve(downloadURL);
-              });
-          }
-        );
-      });
-    },
     async submitRegister() {
       if (this.$refs.formRegister.validate()) {
-        this.confirmRegister(
-          this.gender,
-          this.rank,
-          this.phoneNumber,
-          this.email,
-          this.affiliation,
-          this.fristName,
-          this.lastName,
-          this.username,
-          this.password,
-          this.imageURL
+        // TODO: upload profile image to firebase storage
+        this.imageURL = await this.uploadProfileImageToStorage(
+          this.profileImage
         );
+
+        // TODO: request register to mock api
+        // this.callAPIRegister()
       }
     },
-    async confirmRegister() {
-      let payload = {
+    async callAPIRegister() {
+      // TODO: request with mock api
+      const data = {
         rank: this.rank,
         profile_url: this.imageURL,
         phone_number: this.phoneNumber,
         gender: this.gender,
-        first_name: this.fristName,
+        first_name: this.firstName,
         last_name: this.lastName,
         affiliation: this.affiliation,
         username: this.username,
         password: this.password,
         email: this.email,
       };
-      let headerAPI = {
+      const config = {
         headers: {
           "x-api-key": "xxx-api-key",
           "Content-Type": "application/json",
         },
-        payload: payload,
       };
       axios
-        // this api ?
-        .post(apiUrl + "/v1/auth/register", payload, headerAPI)
+        .post(apiUrl + "/v1/auth/register", data, config)
         .then((response) => {
           console.log(response.data);
-          // window.location = "/login";
         })
         .catch((error) => {
+          // TODO: revise handler
           if (error.response.data.status == "unprocessable_entity") {
             this.snackbar = true;
             this.snackbarColor = "warning";
@@ -451,7 +339,21 @@ export default {
           }
         });
     },
-    // upload image and preview
+    async uploadProfileImageToStorage(profileImage) {
+      const metadata = { contentType: "image/jpeg" };
+      const imageName = uuidv4() + ".jpg";
+      const storageRef = ref(storage, `profile-image/${imageName}`);
+
+      return new Promise(function (resolve) {
+        uploadString(storageRef, profileImage, "data_url", metadata).then(
+          (snapshot) => {
+            getDownloadURL(snapshot.ref).then((downloadURL) => {
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    },
     handleImageButtonClick() {
       this.$refs.image.click();
     },
@@ -461,19 +363,14 @@ export default {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         this.profileImage = e.target.result;
-        this.isUploadProfileImage = true;
-        // this.Userimage = e.target.result;
-        // localStorage.setItem("ImageURL", this.Userimage);
       };
     },
     clearForm() {
+      // TODO: recheck this function
       this.$refs.formRegister.resetValidation();
       this.$refs.formRegister.reset();
       this.showpassword = false;
-    },
-    getImageURL() {
-      if (!this.image) return;
-      this.imageURL = URL.createObjectURL(this.image);
+      this.profileImage = null;
     },
   },
 };
@@ -481,5 +378,9 @@ export default {
 <style scoped>
 .h1c {
   font-size: 30px;
+}
+.card-text-register {
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 </style>
