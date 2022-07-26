@@ -198,22 +198,22 @@ export default {
   },
   methods: {
     logout() {
-      sessionStorage.clear();
       localStorage.clear();
+      // localStorage.clear();
       window.location = "/login";
     },
     getUserData() {
-      var rank = sessionStorage.getItem("rank");
-      var first_name = sessionStorage.getItem("first_name");
-      var last_name = sessionStorage.getItem("last_name");
-      var role = sessionStorage.getItem("role");
+      var rank = localStorage.getItem("rank");
+      var first_name = localStorage.getItem("first_name");
+      var last_name = localStorage.getItem("last_name");
+      var role = localStorage.getItem("role");
       this.role = role;
       this.rank = rank;
       this.first_name = first_name;
       this.last_name = last_name;
     },
     getImageURL() {
-      var ImageURL = sessionStorage.getItem("ImageURL");
+      var ImageURL = localStorage.getItem("ImageURL");
       this.profileImage = ImageURL;
     },
   },

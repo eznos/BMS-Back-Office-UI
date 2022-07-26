@@ -131,12 +131,12 @@ export default {
             this.image = data.result.profile_image_url;
             this.role = data.result.role;
             this.affiliation = data.result.affiliation;
-            sessionStorage.setItem("rank", this.rank);
-            sessionStorage.setItem("first_name", this.fristName);
-            sessionStorage.setItem("last_name", this.lastName);
-            sessionStorage.setItem("ImageURL", this.image);
-            sessionStorage.setItem("role", this.role);
-            sessionStorage.setItem("affiliation", this.affiliation);
+            localStorage.setItem("rank", this.rank);
+            localStorage.setItem("first_name", this.fristName);
+            localStorage.setItem("last_name", this.lastName);
+            localStorage.setItem("ImageURL", this.image);
+            localStorage.setItem("role", this.role);
+            localStorage.setItem("affiliation", this.affiliation);
             if (data.result.role === "admin") {
               this.$router.push({
                 name: "overview",

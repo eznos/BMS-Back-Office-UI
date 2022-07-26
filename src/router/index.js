@@ -115,7 +115,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-  let currentUser = sessionStorage.getItem("role");
+  let currentUser = localStorage.getItem("role");
   let requiresAuthAdmin = to.matched.some(
     (record) => record.meta.requiresAuthAdmin
   );
