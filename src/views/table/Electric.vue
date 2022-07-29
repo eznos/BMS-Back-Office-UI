@@ -98,13 +98,13 @@
           <!-- Filter for  status-->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
+              item-text="name"
+              item-value="value"
               v-model="statusFilterValue"
               :items="statuses"
               prepend-icon="mdi-list-status"
               label="ค้นหาด้วยสถานะ"
               class="filter"
-              item-text="statusText"
-              item-value="statusValue"
               clearable
             ></v-select>
           </v-col>
@@ -163,6 +163,8 @@
                       <!-- rank -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
+                          item-text="name"
+                          item-value="value"
                           v-model="editedItem.rank"
                           label="ยศ"
                           required
@@ -283,8 +285,8 @@
                           label="สถานะ"
                           required
                           :rules="rules.buildingRoom"
-                          item-text="statusText"
-                          item-value="statusValue"
+                          item-text="name"
+                          item-value="value"
                           clearable
                         >
                         </v-select>
@@ -445,6 +447,8 @@
 </template>
 
 <script>
+import statuses from "../../json/statuses.json";
+import ranks from "../../json/rank.json";
 export default {
   data: () => ({
     el: "#app",
@@ -467,22 +471,7 @@ export default {
     menuExportExcel: false,
     search: "",
     rank: "",
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
+    ranks: ranks,
     building: null,
     room_no: null,
     dialogDelete: false,
@@ -493,24 +482,7 @@ export default {
     dateFilterValue: "",
     statusFilterValue: "",
     date: new Date().toISOString().substr(0, 7),
-    statuses: [
-      {
-        statusText: "ร่าง",
-        statusValue: "draft",
-      },
-      {
-        statusText: "กำลังดำเนินการ",
-        statusValue: "in_progess",
-      },
-      // {
-      //   statusText: "คำนวนแล้ว",
-      //   statusValue: "calculated",
-      // },
-      {
-        statusText: "Export แล้ว",
-        statusValue: "exported",
-      },
-    ],
+    statuses: statuses,
     electricTable: [],
     editedIndex: -1,
     editedItem: {

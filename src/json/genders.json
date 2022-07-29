@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "name": "ชาย",
+        "value": "male"
+    },
+    {
+        "id": 2,
+        "name": "หญิง",
+        "value": "female"
+    },
+    {
+        "id": 3,
+        "name": "ไม่ระบุ",
+        "value": "n/a"
+    }
+]

@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "name": "ร่าง",
+        "value": "draft"
+    },
+    {
+        "id": 2,
+        "name": "กำลังดำเนินการ",
+        "value": "in_progess"
+    },
+    {
+        "id": 3,
+        "name": "Export แล้ว",
+        "value": "exported"
+    },
+    {
+        "id": 4,
+        "name": "คำนวนแล้ว",
+        "value": "calculated"
+    }
+
+]

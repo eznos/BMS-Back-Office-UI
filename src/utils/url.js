@@ -1,3 +1,3 @@
-const apiUrl = "https://mbs-mockoon.herokuapp.com";
+const apiUrl = "http://localhost:3000";
 
 export { apiUrl };

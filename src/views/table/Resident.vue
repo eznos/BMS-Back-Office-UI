@@ -70,6 +70,8 @@
                           :rules="rules.nameRules"
                           clearable
                           :items="ranks"
+                          item-text="name"
+                          item-value="value"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -102,6 +104,8 @@
                           label="สายของมิเตอร์น้ำ"
                           :rules="rules.zonesBuildingsRoom"
                           clearable
+                          item-text="name"
+                          item-value="value"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -200,7 +204,7 @@
                           clearable
                           required
                           :rules="rules.zonesBuildingsRoom"
-                          item-text="text"
+                          item-text="name"
                           item-value="value"
                         >
                         </v-select>
@@ -349,7 +353,9 @@
 <script>
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
-
+import ranks from "../../json/rank.json";
+import water_groups from "../../json/waterGroups.json";
+import room_types from "../../json/roomTypes.json";
 export default {
   data: () => ({
     el: "#app",
@@ -368,43 +374,15 @@ export default {
     dialogDelete: false,
     exportExcelResident: false,
     meterGroup: "",
-    meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
-    room_types: [
-      {
-        text: "ห้องโสด",
-        value: "single",
-      },
-      {
-        text: "ห้องครอบครัว 1",
-        value: "family_1",
-      },
-      {
-        text: "ห้องครอบครัว 2",
-        value: "family_2",
-      },
-    ],
+    meterGroups: water_groups,
+    room_types: room_types,
     // Filter models.
     NamefilterValue: "",
     zoneFilterValue: "",
     buildingFilterValue: "",
     roomFilterValue: "",
     rank: "",
-    ranks: [
-      "พล.ต.อ.",
-      "พล.ต.ท.",
-      "พล.ต.ต.",
-      "พ.ต.อ.",
-      "พ.ต.ท.",
-      "พ.ต.ต.",
-      "ร.ต.อ.",
-      "ร.ต.ท.",
-      "ร.ต.ต.",
-      "ด.ต.",
-      "จ.ส.ต.",
-      "ส.ต.อ.",
-      "ส.ต.ท.",
-      "ส.ต.ต.",
-    ],
+    ranks: ranks,
     zonesBuildings: {
       เขตส่วนกลาง: [
         "2/11",
