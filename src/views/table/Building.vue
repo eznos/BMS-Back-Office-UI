@@ -433,9 +433,12 @@ import room_types from "../../json/roomTypes.json";
 import zones from "../../json/zones.json";
 import buildingsRooms from "../../json/buildingsRooms.json";
 import buildingsCenterRooms from "../../json/buildingsCenterRooms.json";
+import zonesBuildingsRoom from "../../json/zonesBuildings.json";
+
 export default {
   data: () => ({
     el: "#app",
+    zonesBuildingsRoom: zonesBuildingsRoom,
     valid: true,
     modal: false,
     dialog: false,
@@ -579,40 +582,78 @@ export default {
       ];
     },
     zones() {
-      const array1 = zones;
-      // const before = JSON.parse(zonesBuildings);
-      const map1 = array1.map((x) => x.name);
-      // console.log(JSON.parse(zonesBuildings));
-      // const map2 = array1.map((x) => x.buildings[0]);
-      // console.log(map2);
-      return map1;
+      const zones = zonesBuildingsRoom;
+      const zonedata = zones.map((x) => x.zone);
+      return zonedata;
     },
     buildings() {
-      const array4 = buildingsCenterRooms;
-      const map3 = array4.map((x) => x.rooms);
-      let text = "";
-      for (let i in map3.rooms) {
-        text += map3.rooms[i] + ", ";
-      }
       if (this.zoneFilterValue == "เขตส่วนกลาง") {
-        // console.log(array4.map((x) => x.rooms));
-          console.log(text);
-        return map3;
-        
-      } else {
-        return ["asd"];
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
       }
-      // if (this.zoneFilterValue) {
-      //   return this.zonesBuildings[this.zoneFilterValue];
-      // }
-
-      // if (!this.editedItem.zone) {
-      //   return ["ไม่มีข้อมูล"];
-      // } else {
-      //   return this.zonesBuildings[this.editedItem.zone];
-      // }
+      if (this.zoneFilterValue == "เขตอังฏดาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        return buildingAngtadang;
+      }
+      if (this.zoneFilterValue == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        return buildingSuranarai;
+      }
+      if (this.editedItem.zone == "เขตส่วนกลาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.zone == "เขตอังฏดาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        return buildingAngtadang;
+      }
+      if (this.editedItem.zone == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        return buildingSuranarai;
+      } else {
+        return ["ไม่มีข้อมูล"];
+      }
     },
     rooms() {
+      if (this.editedItem.building == "2/11") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/12") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/13") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+
+      if (this.editedItem.building == "2/14") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/19") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+
       if (this.buildFilterValue) {
         return this.buildingsRooms[this.buildFilterValue];
       }

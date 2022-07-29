@@ -141,7 +141,6 @@
           </v-col>
         </v-row>
       </div>
-      {{ this.ecjan }}
     </div>
     <!-- chart -->
     <div class="pa-3 content background-main">
@@ -196,114 +195,7 @@ import axios from "axios";
 export default {
   mounted() {
     this.chartElectric();
-     this.chartWater();
-    // var chart = new Chart(water, {
-    //   type: "bar",
-    //   data: {
-    //     labels: [
-    //       "มกราคม",
-    //       "กุมภาพันธ์",
-    //       "มีนาคม",
-    //       "เมษายน",
-    //       "พฤษภาคม ",
-    //       "มิถุนายน ",
-    //       "กรกฎาคม",
-    //       "สิงหาคม",
-    //       "กันยายน",
-    //       "ตุลาคม",
-    //       "พฤศจิกายน",
-    //       "ธันวาคม",
-    //     ],
-    //     datasets: [
-    //       {
-    //         label: "ส่วนกลาง",
-    //         data: [
-    //           this.wcjan,
-    //           this.wcfeb,
-    //           this.wcmar,
-    //           this.wcapr,
-    //           this.wcmay,
-    //           this.wcjun,
-    //           this.wcjul,
-    //           this.wcaug,
-    //           this.wcsep,
-    //           this.wcoct,
-    //           this.wcnov,
-    //           this.wcdec,
-    //         ],
-    //         backgroundColor: "#8CFFD5",
-    //         borderWidth: 1,
-    //       },
-    //       {
-    //         label: "มหาชัย",
-    //         data: [
-    //           this.wsjan,
-    //           this.wsfeb,
-    //           this.wsmar,
-    //           this.wsapr,
-    //           this.wsmay,
-    //           this.wsjun,
-    //           this.wsjul,
-    //           this.wsaug,
-    //           this.wssep,
-    //           this.wsoct,
-    //           this.wsnov,
-    //           this.wsdec,
-    //         ],
-    //         backgroundColor: "#F86D6D",
-    //       },
-    //       {
-    //         label: "อัษฎางค์",
-    //         data: [
-    //           this.wajan,
-    //           this.wafeb,
-    //           this.wamar,
-    //           this.waapr,
-    //           this.wamay,
-    //           this.wajun,
-    //           this.wajul,
-    //           this.waaug,
-    //           this.wasep,
-    //           this.waoct,
-    //           this.wanov,
-    //           this.wadec,
-    //         ],
-    //         backgroundColor: "#2E36F0",
-    //       },
-    //     ],
-    //   },
-    //   options: {
-    //     responsive: true,
-    //     maintainAspectRatio: false,
-    //     layout: {
-    //       padding: 15,
-    //     },
-    //     legend: {
-    //       locale: "th-TH",
-    //       position: "top", // place legend on the right side of chart
-    //       plugins: {
-    //         labels: {
-    //           font: {
-    //             size: 20,
-    //             family: "Sarabun",
-    //           },
-    //         },
-    //       },
-    //     },
-    //     scales: {
-    //       xAxes: [
-    //         {
-    //           stacked: true, // this should be set to make the bars stacked
-    //         },
-    //       ],
-    //       yAxes: [
-    //         {
-    //           stacked: true, // this also..
-    //         },
-    //       ],
-    //     },
-    //   },
-    // });
+    this.chartWater();
   },
   data() {
     return {
@@ -320,20 +212,147 @@ export default {
     this.getInfoDataCard();
   },
   methods: {
-
-
-
-
     getInfoDataCard() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
       axios
-        .get(apiUrl + "/v1/dashboard/info-card")
+        .get(apiUrl + "/v1/overviews", config)
         .then((response) => {
           let data = response.data;
           if (data.status === "success") {
-            this.total = data.result.total;
-            this.empty = data.result.empty;
-            this.move_in = data.result.move_in;
-            this.move_out = data.result.move_out;
+            this.total = data.result.summary.residents.total;
+            this.empty = data.result.summary.rooms.empty;
+            this.move_in = data.result.summary.residents.move_in_last_month;
+            this.move_out = data.result.summary.residents.move_out_last_month;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    chartWater() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      axios
+        .get(apiUrl + "/v1/overviews", config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            return new Chart(water, {
+              type: "bar",
+              data: {
+                labels: [
+                  "มกราคม",
+                  "กุมภาพันธ์",
+                  "มีนาคม",
+                  "เมษายน",
+                  "พฤษภาคม ",
+                  "มิถุนายน ",
+                  "กรกฎาคม",
+                  "สิงหาคม",
+                  "กันยายน",
+                  "ตุลาคม",
+                  "พฤศจิกายน",
+                  "ธันวาคม",
+                ],
+                datasets: [
+                  {
+                    label: "ส่วนกลาง",
+                    data: [
+                      data.result.summary.billings.water.zones.center.jan,
+                      data.result.summary.billings.water.zones.center.feb,
+                      data.result.summary.billings.water.zones.center.mar,
+                      data.result.summary.billings.water.zones.center.apr,
+                      data.result.summary.billings.water.zones.center.may,
+                      data.result.summary.billings.water.zones.center.jun,
+                      data.result.summary.billings.water.zones.center.jul,
+                      data.result.summary.billings.water.zones.center.aug,
+                      data.result.summary.billings.water.zones.center.sep,
+                      data.result.summary.billings.water.zones.center.oct,
+                      data.result.summary.billings.water.zones.center.nov,
+                      data.result.summary.billings.water.zones.center.dec,
+                    ],
+                    backgroundColor: "#8CFFD5",
+                    borderWidth: 1,
+                  },
+                  {
+                    label: "มหาชัย",
+                    data: [
+                      data.result.summary.billings.water.zones.suranarai.jan,
+                      data.result.summary.billings.water.zones.suranarai.feb,
+                      data.result.summary.billings.water.zones.suranarai.mar,
+                      data.result.summary.billings.water.zones.suranarai.apr,
+                      data.result.summary.billings.water.zones.suranarai.may,
+                      data.result.summary.billings.water.zones.suranarai.jun,
+                      data.result.summary.billings.water.zones.suranarai.jul,
+                      data.result.summary.billings.water.zones.suranarai.aug,
+                      data.result.summary.billings.water.zones.suranarai.sep,
+                      data.result.summary.billings.water.zones.suranarai.oct,
+                      data.result.summary.billings.water.zones.suranarai.nov,
+                      data.result.summary.billings.water.zones.suranarai.dec,
+                    ],
+                    backgroundColor: "#F86D6D",
+                  },
+                  {
+                    label: "อัษฎางค์",
+                    data: [
+                      data.result.summary.billings.water.zones.angtadang.jan,
+                      data.result.summary.billings.water.zones.angtadang.feb,
+                      data.result.summary.billings.water.zones.angtadang.mar,
+                      data.result.summary.billings.water.zones.angtadang.apr,
+                      data.result.summary.billings.water.zones.angtadang.may,
+                      data.result.summary.billings.water.zones.angtadang.jun,
+                      data.result.summary.billings.water.zones.angtadang.jul,
+                      data.result.summary.billings.water.zones.angtadang.aug,
+                      data.result.summary.billings.water.zones.angtadang.sep,
+                      data.result.summary.billings.water.zones.angtadang.oct,
+                      data.result.summary.billings.water.zones.angtadang.nov,
+                      data.result.summary.billings.water.zones.angtadang.dec,
+                    ],
+                    backgroundColor: "#2E36F0",
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "th-TH",
+                layout: {
+                  padding: 15,
+                },
+                legend: {
+                  position: "top", // place legend on the right side of chart
+                  plugins: {
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Sarabun",
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  xAxes: [
+                    {
+                      stacked: true, // this should be set to make the bars stacked
+                    },
+                  ],
+                  yAxes: [
+                    {
+                      stacked: true, // this also..
+                    },
+                  ],
+                },
+              },
+            });
           }
         })
         .catch((error) => {
@@ -341,241 +360,149 @@ export default {
         });
     },
     chartElectric() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
       axios
-        .get(apiUrl + "/v1/dashboard/electric")
+        .get(apiUrl + "/v1/overviews", config)
         .then((response) => {
           let data = response.data;
-          // console.log(data);
-          // this.ecjan = data.center.jan;
-          return new Chart(electric, {
-            type: "bar",
-            data: {
-              labels: [
-                "มกราคม",
-                "กุมภาพันธ์",
-                "มีนาคม",
-                "เมษายน",
-                "พฤษภาคม ",
-                "มิถุนายน ",
-                "กรกฎาคม",
-                "สิงหาคม",
-                "กันยายน",
-                "ตุลาคม",
-                "พฤศจิกายน",
-                "ธันวาคม",
-              ],
-              // header chart
-              // data[0] = labels[0] (data for first bar - 'Standing costs') | data[1] = labels[1] (data for second bar - 'Running costs')
-              // put 0, if there is no data for the particular bar
-              datasets: [
-                {
-                  label: "ส่วนกลาง",
-                  data: [
-                    data.center.jan,
-                    data.center.feb,
-                    data.center.mar,
-                    data.center.apr,
-                    data.center.may,
-                    data.center.jun,
-                    data.center.jul,
-                    data.center.aug,
-                    data.center.sep,
-                    data.center.oct,
-                    data.center.nov,
-                    data.center.dec,
-                  ],
-                  backgroundColor: "#8CFFD5",
-                  borderWidth: 1,
-                },
-                {
-                  label: "มหาชัย",
-                  data: [
-                    data.suranarai.jan,
-                    data.suranarai.feb,
-                    data.suranarai.mar,
-                    data.suranarai.apr,
-                    data.suranarai.may,
-                    data.suranarai.jun,
-                    data.suranarai.jul,
-                    data.suranarai.aug,
-                    data.suranarai.sep,
-                    data.suranarai.oct,
-                    data.suranarai.nov,
-                    data.suranarai.dec,
-                  ],
-                  backgroundColor: "#F86D6D",
-                },
-                {
-                  label: "อัษฎางค์",
-                  data: [
-                    data.angtadang.jan,
-                    data.angtadang.feb,
-                    data.angtadang.mar,
-                    data.angtadang.apr,
-                    data.angtadang.may,
-                    data.angtadang.jun,
-                    data.angtadang.jul,
-                    data.angtadang.aug,
-                    data.angtadang.sep,
-                    data.angtadang.oct,
-                    data.angtadang.nov,
-                    data.angtadang.dec,
-                  ],
-                  backgroundColor: "#2E36F0",
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              locale: "th-TH",
-              layout: {
-                padding: 15,
+          if (data.status == "success") {
+            return new Chart(electric, {
+              type: "bar",
+              data: {
+                labels: [
+                  "มกราคม",
+                  "กุมภาพันธ์",
+                  "มีนาคม",
+                  "เมษายน",
+                  "พฤษภาคม ",
+                  "มิถุนายน ",
+                  "กรกฎาคม",
+                  "สิงหาคม",
+                  "กันยายน",
+                  "ตุลาคม",
+                  "พฤศจิกายน",
+                  "ธันวาคม",
+                ],
+                datasets: [
+                  {
+                    label: "ส่วนกลาง",
+                    data: [
+                      data.result.summary.billings.electricity.zones.center.jan,
+                      data.result.summary.billings.electricity.zones.center.feb,
+                      data.result.summary.billings.electricity.zones.center.mar,
+                      data.result.summary.billings.electricity.zones.center.apr,
+                      data.result.summary.billings.electricity.zones.center.may,
+                      data.result.summary.billings.electricity.zones.center.jun,
+                      data.result.summary.billings.electricity.zones.center.jul,
+                      data.result.summary.billings.electricity.zones.center.aug,
+                      data.result.summary.billings.electricity.zones.center.sep,
+                      data.result.summary.billings.electricity.zones.center.oct,
+                      data.result.summary.billings.electricity.zones.center.nov,
+                      data.result.summary.billings.electricity.zones.center.dec,
+                    ],
+                    backgroundColor: "#8CFFD5",
+                    borderWidth: 1,
+                  },
+                  {
+                    label: "มหาชัย",
+                    data: [
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .jan,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .feb,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .mar,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .apr,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .may,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .jun,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .jul,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .aug,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .sep,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .oct,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .nov,
+                      data.result.summary.billings.electricity.zones.suranarai
+                        .dec,
+                    ],
+                    backgroundColor: "#F86D6D",
+                  },
+                  {
+                    label: "อัษฎางค์",
+                    data: [
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .jan,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .feb,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .mar,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .apr,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .may,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .jun,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .jul,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .aug,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .sep,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .oct,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .nov,
+                      data.result.summary.billings.electricity.zones.angtadang
+                        .dec,
+                    ],
+                    backgroundColor: "#2E36F0",
+                  },
+                ],
               },
-              legend: {
-                position: "top", // place legend on the right side of chart
-                plugins: {
-                  labels: {
-                    font: {
-                      size: 20,
-                      family: "Sarabun",
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "th-TH",
+                layout: {
+                  padding: 15,
+                },
+                legend: {
+                  position: "top", // place legend on the right side of chart
+                  plugins: {
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Sarabun",
+                      },
                     },
                   },
                 },
-              },
-              scales: {
-                xAxes: [
-                  {
-                    stacked: true, // this should be set to make the bars stacked
-                  },
-                ],
-                yAxes: [
-                  {
-                    stacked: true, // this also..
-                  },
-                ],
-              },
-            },
-          });
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-     chartWater() {
-      axios
-        .get(apiUrl + "/v1/dashboard/water")
-        .then((response) => {
-          let data = response.data;
-          // console.log(data);
-          // this.ecjan = data.center.jan;
-          return new Chart(water, {
-            type: "bar",
-            data: {
-              labels: [
-                "มกราคม",
-                "กุมภาพันธ์",
-                "มีนาคม",
-                "เมษายน",
-                "พฤษภาคม ",
-                "มิถุนายน ",
-                "กรกฎาคม",
-                "สิงหาคม",
-                "กันยายน",
-                "ตุลาคม",
-                "พฤศจิกายน",
-                "ธันวาคม",
-              ],
-              datasets: [
-                {
-                  label: "ส่วนกลาง",
-                  data: [
-                    data.center.jan,
-                    data.center.feb,
-                    data.center.mar,
-                    data.center.apr,
-                    data.center.may,
-                    data.center.jun,
-                    data.center.jul,
-                    data.center.aug,
-                    data.center.sep,
-                    data.center.oct,
-                    data.center.nov,
-                    data.center.dec,
-                  ],
-                  backgroundColor: "#8CFFD5",
-                  borderWidth: 1,
-                },
-                {
-                  label: "มหาชัย",
-                  data: [
-                    data.suranarai.jan,
-                    data.suranarai.feb,
-                    data.suranarai.mar,
-                    data.suranarai.apr,
-                    data.suranarai.may,
-                    data.suranarai.jun,
-                    data.suranarai.jul,
-                    data.suranarai.aug,
-                    data.suranarai.sep,
-                    data.suranarai.oct,
-                    data.suranarai.nov,
-                    data.suranarai.dec,
-                  ],
-                  backgroundColor: "#F86D6D",
-                },
-                {
-                  label: "อัษฎางค์",
-                  data: [
-                    data.angtadang.jan,
-                    data.angtadang.feb,
-                    data.angtadang.mar,
-                    data.angtadang.apr,
-                    data.angtadang.may,
-                    data.angtadang.jun,
-                    data.angtadang.jul,
-                    data.angtadang.aug,
-                    data.angtadang.sep,
-                    data.angtadang.oct,
-                    data.angtadang.nov,
-                    data.angtadang.dec,
-                  ],
-                  backgroundColor: "#2E36F0",
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              locale: "th-TH",
-              layout: {
-                padding: 15,
-              },
-              legend: {
-                position: "top", // place legend on the right side of chart
-                plugins: {
-                  labels: {
-                    font: {
-                      size: 20,
-                      family: "Sarabun",
+                scales: {
+                  xAxes: [
+                    {
+                      stacked: true, // this should be set to make the bars stacked
                     },
-                  },
+                  ],
+                  yAxes: [
+                    {
+                      stacked: true, // this also..
+                    },
+                  ],
                 },
               },
-              scales: {
-                xAxes: [
-                  {
-                    stacked: true, // this should be set to make the bars stacked
-                  },
-                ],
-                yAxes: [
-                  {
-                    stacked: true, // this also..
-                  },
-                ],
-              },
-            },
-          });
+            });
+          }
         })
         .catch((error) => {
           console.log(error);

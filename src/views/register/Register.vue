@@ -37,7 +37,7 @@
                     <v-col cols="12" md="6" lg="6">
                       <v-select
                         item-text="name"
-                        item-value="id"
+                        item-value="value"
                         v-model="rank"
                         :items="ranks"
                         :rules="rules.zonesBuildingsRoom"
@@ -49,7 +49,7 @@
                     <v-col cols="12" md="6" lg="6">
                       <v-select
                         item-text="name"
-                        item-value="id"
+                        item-value="name"
                         v-model="affiliation"
                         :items="affiliations"
                         :rules="rules.zonesBuildingsRoom"
@@ -81,6 +81,7 @@
                         label="อีเมล"
                         :rules="[rules.email.regex]"
                         v-model="email"
+                        type="email"
                         required
                       ></v-text-field>
                     </v-col>
@@ -99,6 +100,8 @@
                       <v-select
                         label="เพศ"
                         :items="genders"
+                        item-text="name"
+                        item-value="value"
                         v-model="gender"
                         required
                         :rules="rules.zonesBuildingsRoom"
@@ -236,9 +239,8 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import ranks from "../../json/rank.json";
 import affiliations from "../../json/affiliations.json";
-
+import genders from "../../json/genders.json";
 export default {
-  components: {},
   data: () => ({
     valid: false,
     profileImage: "",
@@ -258,7 +260,7 @@ export default {
     snackbarColor: "",
     ranks: ranks,
     affiliations: affiliations,
-    genders: ["ชาย", "หญิง", "ไม่ระบบุ"],
+    genders: genders,
     rules: {
       email: {
         required: (v) => !!v || "กรุณาใส่อีเมล",
@@ -285,25 +287,20 @@ export default {
         (value) =>
           !value || value.size < 2000000 || "รูปประจำตัวขนาดไม่เกิน 2 MB",
       ],
-
       zonesBuildingsRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
   methods: {
     async submitRegister() {
       if (this.$refs.formRegister.validate()) {
-        // TODO: upload profile image to firebase storage
         this.imageURL = await this.uploadProfileImageToStorage(
           this.profileImage
         );
-
-        // TODO: request register to mock api
-        // this.callAPIRegister()
+        this.callAPIRegister();
       }
     },
     async callAPIRegister() {
-      // TODO: request with mock api
-      const data = {
+      const datas = {
         rank: this.rank,
         profile_url: this.imageURL,
         phone_number: this.phoneNumber,
@@ -318,21 +315,19 @@ export default {
       const config = {
         headers: {
           "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
           "Content-Type": "application/json",
         },
       };
       axios
-        .post(apiUrl + "/v1/auth/register", data, config)
-        .then((response) => {
-          console.log(response.data);
+        .post(apiUrl + "/v1/auth/registers", datas, config)
+        .then(async () => {
+          this.$router.push({
+            name: "Login",
+          });
         })
         .catch((error) => {
-          // TODO: revise handler
-          if (error.response.data.status == "unprocessable_entity") {
-            this.snackbar = true;
-            this.snackbarColor = "warning";
-            this.text = "เลข recovery code ไม่ถูกต้อง";
-          } else {
+          if (error.response.data.error_message == "unauthorized") {
             this.snackbar = true;
             this.snackbarColor = "red";
             this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
@@ -343,7 +338,6 @@ export default {
       const metadata = { contentType: "image/jpeg" };
       const imageName = uuidv4() + ".jpg";
       const storageRef = ref(storage, `profile-image/${imageName}`);
-
       return new Promise(function (resolve) {
         uploadString(storageRef, profileImage, "data_url", metadata).then(
           (snapshot) => {
@@ -366,7 +360,6 @@ export default {
       };
     },
     clearForm() {
-      // TODO: recheck this function
       this.$refs.formRegister.resetValidation();
       this.$refs.formRegister.reset();
       this.showpassword = false;
