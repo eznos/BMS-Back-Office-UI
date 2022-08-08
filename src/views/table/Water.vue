@@ -50,6 +50,8 @@
               :items="meterGroups"
               class="filter"
               clearable
+              item-text="name"
+              item-value="name"
             >
             </v-autocomplete>
           </v-col>
@@ -61,6 +63,8 @@
               label="ค้นหาด้วยด้วยเขต"
               class="filter"
               :items="zones"
+              item-text="zone"
+              item-value="id"
               clearable
             >
             </v-autocomplete>
@@ -148,19 +152,7 @@
         >
         &nbsp;&nbsp;
         <h3>ตารางค่าน้ำประปา</h3>
-        <!-- delete as selected -->
-        <v-btn
-          color="error"
-          width="140"
-          v-bind="attrs"
-          v-on="on"
-          class="button-filter pt-5 pb-5"
-          :disabled="!selectItems"
-          @click="deleteItemSelected"
-        >
-          <v-icon>mdi-delete-sweep</v-icon>
-          &nbsp; ลบข้อมูลที่เลือก
-        </v-btn>
+
         <!-- button -->
         <v-spacer></v-spacer>
         <div>
@@ -192,13 +184,15 @@
                     <!-- meter group -->
                     <v-col cols="4">
                       <v-select
-                        v-model="waterGroupfilterValue"
+                        v-model="waterGroupCalculate"
                         label="สายของมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
                         required
                         :items="meterGroups"
+                        item-text="name"
+                        item-value="id"
                         ref="input"
-                        disabled
+                        v-on:keyup="checkEnterPressedToSubmit"
                       >
                       </v-select>
                     </v-col>
@@ -206,16 +200,17 @@
                     <v-col cols="4">
                       <v-text-field
                         v-model.number="meterZone"
+                        required
                         label="ค่าน้ำจากมิเตอร์ใหญ่"
                         prepend-icon="mdi-car-speed-limiter"
                         @keypress="isNumber($event)"
-                        ref="input"
-                        disabled
+                        :rules="rules.buildingRoom"
+                        v-on:keyup="checkEnterPressedToSubmit"
                       >
                       </v-text-field>
                     </v-col>
                     <!-- sum of meter -->
-                    <v-col cols="4">
+                    <!-- <v-col cols="4">
                       <v-text-field
                         v-model.number="meterSum"
                         label="ค่าน้ำที่จดได้"
@@ -227,22 +222,7 @@
                         ref="input"
                       >
                       </v-text-field>
-                    </v-col>
-                    <!-- difference price -->
-                    <v-col cols="12">
-                      <div v-if="difference >= 0">
-                        <h3>
-                          ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
-                          {{ this.waterGroupfilterValue }}
-                        </h3>
-                      </div>
-                      <div v-else>
-                        <h3 class="negative-value">
-                          ค่าน้ำส่วนต่าง {{ difference }} บาท ในสายของ
-                          {{ this.waterGroupfilterValue }}
-                        </h3>
-                      </div>
-                    </v-col>
+                    </v-col> -->
                   </v-row>
                 </v-form>
               </v-card-text>
@@ -312,7 +292,7 @@
                       <!-- meter group -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
-                          v-model="editedItem.meter_group"
+                          v-model="editedItem.water_zone"
                           :items="meterGroups"
                           label="สายของมิเตอร์น้ำ"
                           required
@@ -373,7 +353,7 @@
                       <!-- water meter -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.water_meter_no"
+                          v-model="editedItem.meter_no"
                           label="เลขมิเตอร์น้ำ"
                           @keypress="isNumber($event)"
                           required
@@ -385,7 +365,7 @@
                       <!-- water unit -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.water_unit"
+                          v-model="editedItem.unit"
                           label="หน่วยน้ำ"
                           @keypress="isNumber($event)"
                           required
@@ -406,9 +386,9 @@
                       </v-col>
                       <!-- water price Diff -->
                       <v-col cols="12" sm="6" md="4">
-                        <v-text-field v-model="editedItem.difference" disabled>
+                        <v-text-field v-model="editedItem.price_diff" disabled>
                           <template v-slot:label>
-                            ค่าน้ำส่วนนต่างเป็น {{ difference }}
+                            ค่าน้ำส่วนนต่างเป็น {{ price_diff }}
                           </template>
                         </v-text-field>
                       </v-col>
@@ -435,7 +415,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editedItem.date_pay"
+                              v-model="editedItem.billing_cycle"
                               label="รอบบิล"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -444,7 +424,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editedItem.date_pay"
+                            v-model="editedItem.billing_cycle"
                             type="month"
                             locale="th-TH"
                           >
@@ -455,7 +435,9 @@
                             <v-btn
                               text
                               color="agree"
-                              @click="$refs.dialog.save(editedItem.date_pay)"
+                              @click="
+                                $refs.dialog.save(editedItem.billing_cycle)
+                              "
                             >
                               ยืนยัน
                             </v-btn>
@@ -478,23 +460,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" max-width="75%" persistent>
-            <v-card>
-              <v-card-title class="text-h5"
-                >ต้องการลบผู้ใช้น้ำคนนี้หรือไม่?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
-                <v-btn color="agree" text @click="deleteItemConfirm"
-                  >ยืนยัน</v-btn
-                >
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <!-- export excel to email -->
+          <!-- export excel -->
           <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
@@ -516,7 +482,7 @@
                 <v-btn color="warning" text @click="exportExcelwater = false">
                   ยกเลิก
                 </v-btn>
-                <v-btn color="agree" text @click="exportExcelwater = false">
+                <v-btn color="agree" text @click="getbillingsID">
                   ยืนยัน
                 </v-btn>
               </v-card-actions>
@@ -529,21 +495,21 @@
         <v-data-table
           v-model="selected"
           :headers="headers"
-          :items="waterTable"
+          :items="waterTables"
           item-key="first_name"
           :items-per-page="5"
           class="elevation-1 pa-6 th-1"
           :search="search"
+          :loading="loadTable"
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
         >
-          <!-- color status on datatable  -->
-          <template v-slot:[`item.price`]="{ item }">
-            <v-chip :color="getColor(item.price)">
-              {{ item.price }}
+          <template v-slot:[`waterTable.price`]="{ waterTable }">
+            <v-chip :color="getColor(waterTable.price)">
+              {{ waterTable.price }}
             </v-chip>
           </template>
           <template v-slot:[`item.status`]="{ item }">
@@ -556,20 +522,35 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-            <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
           </template>
         </v-data-table>
         <!-- end data-table -->
       </v-card-text>
+
+      <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+        <div class="text-center">
+          {{ statusAction }}
+        </div>
+      </v-snackbar>
     </v-card>
   </v-app>
 </template>
 
 <script>
 import statuses from "../../json/statuses.json";
-import ranks from "../../json/rank.json"
+import ranks from "../../json/rank.json";
+import axios from "axios";
+import { apiUrl } from "../../utils/url";
+import zonesBuildingsRoom from "../../json/zonesBuildings.json";
+import water_groups from "../../json/waterGroups.json";
 export default {
   data: () => ({
+    zonesBuildingsRoom: zonesBuildingsRoom,
+    loadTable: true,
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     el: "#app",
     sortBy: "first_name",
     menuDatefilter: false,
@@ -579,536 +560,37 @@ export default {
     selected: [],
     attrs: {},
     on: {},
-    selectedRows: [],
     selectItems: false,
     valid: true,
     meterSum: null,
     meterZone: null,
     numberOfroom: "",
     rank: null,
+    price_diff: null,
     ranks: ranks,
     modal: false,
     meter_group: null,
-    meterGroups: ["ป.1", "ป.83", "ป.84", "ป.212", "ป.391"],
+    meterGroups: water_groups,
     dialog: false,
     emailtarget: "",
-    dateExport: new Date().toISOString().substr(0, 7),
+    date_now: new Date().toISOString().substr(0, 10),
     differencePriceCalculate: false,
     importExcel: false,
     exportExcelwater: false,
     menu: false,
-    zonesBuildings: {
-      เขตส่วนกลาง: [
-        "2/11",
-        "2/12",
-        "2/13",
-        "2/14",
-        "2/15",
-        "2/16",
-        "2/17",
-        "2/18",
-      ],
-      เขตสุรนารายณ์: [
-        "2/20",
-        "2/21",
-        "2/22",
-        "2/23",
-        "2/24",
-        "2/25",
-        "2/26",
-        "2/27",
-        "2/28",
-        "2/29",
-        "2/31",
-        "2/32",
-        "2/33",
-        "2/34",
-        "2/35",
-        "2/36",
-        "2/37",
-        "2/38",
-        "2/39",
-        "2/40",
-        "2/41",
-      ],
-      เขตอัษฎางค์: ["2/19"],
-    },
-    buildingsRooms: {
-      "2/11": [
-        "97",
-        "99",
-        "101",
-        "103",
-        "105",
-        "107",
-        "109",
-        "111",
-        "113",
-        "115",
-        "117",
-        "119",
-      ],
-      "2/12": [
-        "73",
-        "75",
-        "77",
-        "79",
-        "81",
-        "83",
-        "85",
-        "87",
-        "89",
-        "91",
-        "93",
-        "95",
-      ],
-      "2/13": [
-        "108",
-        "110",
-        "112",
-        "114",
-        "116",
-        "118",
-        "120",
-        "122",
-        "124",
-        "126",
-        "128",
-        "130",
-      ],
-      "2/14": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-      ],
-      "2/15": [
-        "121",
-        "123",
-        "125",
-        "127",
-        "129",
-        "131",
-        "133",
-        "135",
-        "137",
-        "139",
-        "141",
-        "143",
-        "145",
-        "147",
-        "149",
-        "151",
-        "153",
-        "155",
-        "157",
-        "159",
-        "161",
-        "163",
-        "165",
-        "167",
-        "169",
-        "171",
-        "173",
-        "175",
-      ],
-      "2/16": [
-        "177",
-        "179",
-        "181",
-        "183",
-        "185",
-        "187",
-        "189",
-        "191",
-        "193",
-        "195",
-        "197",
-        "199",
-        "201",
-        "203",
-        "205",
-        "207",
-        "209",
-        "211",
-        "213",
-        "215",
-        "217",
-        "219",
-        "221",
-        "223",
-        "225",
-      ],
-      "2/17": [
-        "132",
-        "134",
-        "136",
-        "138",
-        "140",
-        "142",
-        "144",
-        "146",
-        "148",
-        "150",
-        "152",
-        "154",
-        "156",
-        "158",
-        "160",
-        "162",
-        "164",
-        "166",
-        "168",
-        "170",
-        "172",
-        "174",
-        "176",
-        "178",
-        "180",
-        "182",
-        "184",
-        "186",
-      ],
-      "2/18": [
-        "50",
-        "52",
-        "54",
-        "56",
-        "58",
-        "60",
-        "62",
-        "64",
-        "66",
-        "68",
-        "70",
-        "72",
-        "74",
-        "76",
-        "78",
-        "80",
-        "82",
-        "84",
-        "86",
-        "88",
-        "90",
-        "92",
-        "94",
-        "96",
-        "98",
-        "100",
-        "102",
-        "104",
-      ],
-      "2/19": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-        "109",
-        "110",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-        "209",
-        "210",
-        "211",
-        "212",
-        "213",
-        "214",
-        "215",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "307",
-        "308",
-        "309",
-        "310",
-        "311",
-        "312",
-        "313",
-        "314",
-        "315",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "407",
-        "408",
-        "409",
-        "410",
-        "411",
-        "412",
-        "413",
-        "414",
-        "415",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-        "507",
-        "508",
-        "509",
-        "510",
-        "511",
-        "512",
-        "513",
-        "514",
-        "515",
-      ],
-      "2/20": ["1", "2"],
-      "2/21": ["3", "4"],
-      "2/22": ["5", "6"],
-      "2/23": ["7", "8"],
-      "2/24": ["9", "10"],
-      "2/25": ["11", "12"],
-      "2/26": ["13", "14"],
-      "2/27": ["15", "16"],
-      "2/28": ["17", "18"],
-      "2/29": ["19", "20"],
-      "2/31": ["79", "80", "81", "82", "83", "84", "85", "86", "87", "88"],
-      "2/32": ["89", "90", "91", "92", "93", "94", "95", "96", "97", "98"],
-      "2/33": [
-        "99",
-        "100",
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-      ],
-      "2/34": [
-        "109",
-        "110",
-        "111",
-        "112",
-        "113",
-        "114",
-        "115",
-        "116",
-        "117",
-        "118",
-      ],
-      "2/35": [
-        "119",
-        "120",
-        "121",
-        "122",
-        "123",
-        "124",
-        "125",
-        "126",
-        "127",
-        "128",
-      ],
-      "2/36": [
-        "129",
-        "130",
-        "131",
-        "132",
-        "133",
-        "134",
-        "135",
-        "136",
-        "137",
-        "138",
-      ],
-      "2/37": [
-        "139",
-        "140",
-        "141",
-        "142",
-        "143",
-        "144",
-        "145",
-        "146",
-        "147",
-        "148",
-      ],
-      "2/38": [
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "31",
-        "32",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "44",
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50",
-      ],
-      "2/39": [
-        "149",
-        "150",
-        "151",
-        "152",
-        "153",
-        "154",
-        "155",
-        "156",
-        "157",
-        "158",
-        "159",
-        "160",
-        "161",
-        "162",
-        "163",
-        "164",
-        "165",
-        "166",
-        "167",
-        "168",
-        "169",
-        "170",
-        "171",
-        "172",
-        "173",
-        "174",
-        "175",
-        "176",
-        "177",
-        "178",
-      ],
-      "2/40": [
-        "179",
-        "180",
-        "181",
-        "182",
-        "183",
-        "184",
-        "185",
-        "186",
-        "187",
-        "188",
-        "189",
-        "190",
-        "191",
-        "192",
-        "193",
-        "194",
-        "195",
-        "196",
-        "197",
-        "198",
-        "199",
-        "200",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-      ],
-      "2/41": [
-        "212",
-        "213",
-        "214",
-        "215",
-        "216",
-        "217",
-        "218",
-        "219",
-        "220",
-        "221",
-        "222",
-        "223",
-        "224",
-        "225",
-        "226",
-        "227",
-        "228",
-        "229",
-        "230",
-        "231",
-        "232",
-        "233",
-        "234",
-        "235",
-        "236",
-        "237",
-        "238",
-        "239",
-        "240",
-      ],
-    },
     search: "",
-    dialogDelete: false,
     // Filter models
     NamefilterValue: "",
     waterGroupfilterValue: "",
+    waterGroupCalculate: "",
     buildingFilterValue: "",
     zoneFilterValue: "",
     dateFilterValue: "",
     date: "",
     stateFilterValue: "",
     statuses: statuses,
-    waterTable: [],
+    billingsIDs: "",
+    waterTables: [],
     editedIndex: -1,
     editedItem: {
       first_name: "",
@@ -1118,7 +600,7 @@ export default {
       water_no: "",
       water_meter_no: "",
       difference_price: "",
-      date_pay: new Date().toISOString().substr(0, 7),
+      billing_cycle: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
       first_name: "",
@@ -1129,7 +611,7 @@ export default {
       water_meter_no: "",
       difference_price: "",
       sum_price: "",
-      date_pay: new Date().toISOString().substr(0, 7),
+      billing_cycle: new Date().toISOString().substr(0, 7),
       status: "draft",
     },
     rules: {
@@ -1185,7 +667,7 @@ export default {
         },
         {
           text: "สายของมิเตอร์",
-          value: "meter_group",
+          value: "water_zone",
           filter: this.groupFilter,
         },
         {
@@ -1203,16 +685,16 @@ export default {
         },
         {
           text: "เลขมิเตอร์น้ำ",
-          value: "water_meter_no",
+          value: "water_no",
         },
         {
           text: "รอบบิล",
-          value: "date_pay",
+          value: "billing_cycle",
           filter: this.dateFilter,
         },
         {
           text: "จำนวนหน่วย",
-          value: "water_unit",
+          value: "unit",
         },
         {
           text: "ค่าน้ำ",
@@ -1220,11 +702,11 @@ export default {
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value: "difference_price",
+          value: "price_diff",
         },
         {
           text: "ค่าน้ำรวม",
-          value: "sum_price",
+          value: "total_pay",
         },
         {
           text: "สถานะ",
@@ -1251,25 +733,224 @@ export default {
     },
     // autocomplete  [] {} () <>
     zones() {
-      return Object.keys(this.zonesBuildings);
+      const zones = zonesBuildingsRoom;
+      const zonedata = zones.map((x) => x.zone);
+      return zonedata;
     },
     buildings() {
-      // for filter
-      if (this.zoneFilterValue) {
-        return this.zonesBuildings[this.zoneFilterValue];
+      if (this.zoneFilterValue == "เขตส่วนกลาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
       }
-      // autocomplete in form
-      if (!this.editedItem.zone) {
-        return ["ไม่มีข้อมูล"];
+      if (this.zoneFilterValue == "เขตอัษฎางค์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.room);
+        return buildingAngtadang;
+      }
+      if (this.zoneFilterValue == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.room);
+        return buildingSuranarai;
+      }
+      if (this.editedItem.zone == "เขตส่วนกลาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.zone == "เขตอัษฎางค์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.room);
+        return buildingAngtadang;
+      }
+      if (this.editedItem.zone == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.room);
+        return buildingSuranarai;
       } else {
-        return this.zonesBuildings[this.editedItem.zone];
+        return ["ไม่มีข้อมูล"];
       }
     },
     rooms() {
-      if (!this.editedItem.building) {
-        return ["ไม่มีข้อมูล"];
+      if (this.editedItem.building == "2/11") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/12") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/13") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/14") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/15") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/16") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/17") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/18") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/19") {
+        const buildingcenters =
+          zonesBuildingsRoom[1].buildingangtadang[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/20") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/21") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/22") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/23") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/24") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/25") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/26") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/27") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/28") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/29") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/31") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/32") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/33") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/34") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/35") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/36") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/37") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/38") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/39") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/40") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/41") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.room);
+        return buildingCenter;
       } else {
-        return this.buildingsRooms[this.editedItem.building];
+        return ["ไม่มีข้อมูล"];
       }
     },
     priceOfwater: function () {
@@ -1286,206 +967,156 @@ export default {
     dialog(val) {
       val || this.close();
     },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
   },
-  // mock data
-  created() {
-    this.initialize();
+
+  created() {},
+
+  mounted() {
+    this.getWaterData();
   },
+
   methods: {
-    // mock data in table
-    initialize() {
-      this.waterTable = [
-        {
-          rank: "พล.ต.อ.",
-          first_name: "ชัชชาช้า",
-          last_name: "ชัชชาวาน",
-          zone: "เขตสุรนารายณ์",
-          building: "2/20",
-          room: "2",
-          meter_group: "ป.1",
-          water_no: "1234",
-          water_meter_no: "1234",
-          date_pay: "2022-03",
-          water_unit: "1",
-          price: "30",
-          difference_price: "50",
-          sum_price: "80",
-          status: "draft",
+    // get water data from api
+    getWaterData() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "ด.ต.หญิง",
-          first_name: "ภัทรพร",
-          last_name: "ศรีโอภาส",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "103",
-          meter_group: "ป.1",
-          water_no: "4567",
-          water_meter_no: "4567",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          status: "exported",
+      };
+      // var date = "?date=2022-07-29" + this.date_now;
+      var date = "?date=2022-07-29";
+      return axios
+        .get(apiUrl + "/v1/billings/water" + date, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.waterTables = data.result.billings;
+            this.loadTable = false;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // color of price
+    getColor(price) {
+      if (price == 0) return "red";
+      else return "#ffffff";
+    },
+    // color for status
+    getColorForStatus(status) {
+      if (status == "draft") return "yellow";
+      if (status == "in_progess") return "red";
+      if (status == "calculated") return "gray";
+      else return "green";
+    },
+    // show delete as selected button
+    enterSelect(values) {
+      if (values.length >= 1) {
+        return (this.selectItems = true);
+        // alert("selected all");
+      } else {
+        return (this.selectItems = false);
+      }
+    },
+    // enter diff price
+    async checkEnterPressedToSubmit(e) {
+      if (e.keyCode === 13) this.validateDiffprice();
+    },
+    // validate diff price
+    validateDiffprice() {
+      if (this.$refs.formDiffPrice.validate()) {
+        this.calculateWaterPrice(this.meterZone);
+      }
+    },
+    // calculate Price diff with api
+    calculateWaterPrice(meterZone) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "ด.ต.",
-          first_name: "อมร ",
-          last_name: "ภูมพฤกษ์",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "107",
-          meter_group: "ป.1",
-          water_no: "7540",
-          water_meter_no: "7540",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "57",
-          difference_price: "25.34",
-          sum_price: "82.34",
-          status: "draft",
+      };
+      let price = { price: meterZone };
+      const zoneID = this.waterGroupCalculate;
+      return axios
+        .post(apiUrl + "/v1/calculate/" + zoneID, price, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.waterGroupCalculate = "";
+            this.meterZone = "";
+            this.differencePriceCalculate = false;
+            this.statusAction = "คำวนวนค่าน้ำส่วนต่าง สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction =
+              "คำวนวนค่าน้ำส่วนต่าง ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+          }
+          if (error.response.data.status === "unprocessable_entity") {
+            this.statusAction =
+              "คำวนวนค่าน้ำส่วนต่าง ไม่สำเร็จ กรุณาเลือกสายมิเตอร์ที่ยังไม่คำนวน";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+          }
+          this.differencePriceCalculate = false;
+        });
+    },
+    // get selected id
+    getbillingsID() {
+      if (this.selectItems == true) {
+        let billingsIDs = [];
+        for (var i = 0; i < this.selected.length; i++) {
+          billingsIDs.push(this.selected[i].id);
+        }
+        this.exportWater(billingsIDs);
+      }
+    },
+    // export with api
+    exportWater(billingsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "ด.ต.",
-          first_name: "อดุล ",
-          last_name: "วงศ์ทอง",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "202",
-          meter_group: "ป.1",
-          water_no: "9856",
-          water_meter_no: "9856",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "draft",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "จรัส ",
-          last_name: "สิมฤทธิ์",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "206",
-          meter_group: "ป.1",
-          water_no: "3214",
-          water_meter_no: "3214",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "calculated",
-        },
-        {
-          rank: "ส.ต.อ.",
-          first_name: "ธิชากร ",
-          last_name: "ผินดอน",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "305",
-          meter_group: "ป.83",
-          water_no: "5467",
-          water_meter_no: "5467",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "76",
-          difference_price: "25.34",
-          sum_price: "101.34",
-          status: "calculated",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "รุ่ง ",
-          last_name: "โฉมกิ่ง",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "402",
-          meter_group: "ป.1",
-          water_no: "8520",
-          water_meter_no: "8520",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "calculated",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อนุชา ",
-          last_name: "ฝากชัยภูมิ",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "413",
-          meter_group: "ป.1",
-          water_no: "7845",
-          water_meter_no: "7845",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "152",
-          difference_price: "25.34",
-          sum_price: "177.34",
-          status: "calculated",
-        },
-        {
-          rank: "ส.ต.อ.",
-          first_name: "รัฐพนย์ ",
-          last_name: "เรื่องเรือ",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "504",
-          meter_group: "ป.1",
-          water_no: "3568",
-          water_meter_no: "3568",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "calculated",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "อิทธิพล",
-          last_name: "เพ็ญเติมพันธ์",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "514",
-          meter_group: "ป.1",
-          water_no: "5568",
-          water_meter_no: "5568",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "calculated",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "ไพโรจน์",
-          last_name: "ทนปรางค์",
-          zone: "เขตอัษฎางค์",
-          building: "2/19",
-          room: "515",
-          meter_group: "ป.1",
-          water_no: "1123",
-          water_meter_no: "1123",
-          date_pay: "2021-06",
-          water_unit: "1",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          status: "calculated",
-        },
-      ];
+      };
+      const billings_id = { billings_id: billingsIDs };
+      return axios
+        .post(apiUrl + "/v1/billings/water/exports", billings_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.exportExcelwater = false;
+            this.statusAction = "Export สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message ===
+            "some record does not have calculated status"
+          ) {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
     },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
@@ -1527,29 +1158,9 @@ export default {
       return value == this.dateFilterValue;
     },
     editItem(item) {
-      this.editedIndex = this.waterTable.indexOf(item);
+      this.editedIndex = this.waterTables.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-    deleteItem(item) {
-      this.editedIndex = this.waterTable.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      this.waterTable.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-    // delete as selected
-    deleteItemSelected() {
-      if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
-        for (var i = 0; i < this.selected.length; i++) {
-          const index = this.waterTable.indexOf(this.selected[i]);
-          this.waterTable.splice(index, 1);
-          this.selected.length == 0;
-        }
-        this.dialog = false;
-      }
     },
     close() {
       this.dialog = false;
@@ -1558,18 +1169,11 @@ export default {
         this.editedIndex = -1;
       });
     },
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.waterTable[this.editedIndex], this.editedItem);
+        Object.assign(this.waterTables[this.editedIndex], this.editedItem);
       } else {
-        this.waterTable.push(this.editedItem);
+        this.waterTables.push(this.editedItem);
       }
       this.close();
     },
@@ -1602,38 +1206,6 @@ export default {
         evt.preventDefault();
       } else {
         return true;
-      }
-    },
-    validateDiffprice() {
-      this.$refs.formDiffPrice.validate();
-    },
-    KeyboardEvent() {
-      window.addEventListener("keydown", (event) => {
-        if (event.code === "Enter") {
-          // do your stuff
-          this.exportExcelwater = false;
-        }
-      });
-    },
-    // color of price
-    getColor(price) {
-      if (price == 0) return "red";
-      else return "#ffffff";
-    },
-    // color for status
-    getColorForStatus(status) {
-      if (status == "draft") return "yellow";
-      if (status == "in_progess") return "red";
-      if (status == "calculated") return "gray";
-      else return "green";
-    },
-    // show delete as selected button
-    enterSelect(values) {
-      if (values.length >= 1) {
-        return (this.selectItems = true);
-        // alert("selected all");
-      } else {
-        return (this.selectItems = false);
       }
     },
   },
