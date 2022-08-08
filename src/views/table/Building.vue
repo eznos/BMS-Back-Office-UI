@@ -278,7 +278,7 @@
                               clearable
                               required
                               :rules="rules.zonesBuildingsRoom"
-                              item-text="text"
+                              item-text="name"
                               item-value="value"
                             >
                             </v-select>
@@ -430,9 +430,6 @@
 import room_statuses from "../../json/roomStatuses.json";
 import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
-import zones from "../../json/zones.json";
-import buildingsRooms from "../../json/buildingsRooms.json";
-import buildingsCenterRooms from "../../json/buildingsCenterRooms.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 
 export default {
@@ -462,10 +459,7 @@ export default {
     water_meter_no: "",
     room_type: "",
     room_status: "",
-    zonesBuildings: zones,
-    buildingsRooms: buildingsRooms,
     water_groups: water_groups,
-    buildingsCenterRooms: buildingsCenterRooms,
     room_types: room_types,
     room_statuses: room_statuses,
     search: "",
@@ -590,37 +584,37 @@ export default {
       if (this.zoneFilterValue == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
-      if (this.zoneFilterValue == "เขตอังฏดาง") {
+      if (this.zoneFilterValue == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        const buildingAngtadang = buildingAngtadangs.map((x) =>x.room);
         return buildingAngtadang;
       }
       if (this.zoneFilterValue == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        const buildingSuranarai = buildingSuranarais.map((x) =>x.room);
         return buildingSuranarai;
       }
       if (this.editedItem.zone == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
-      if (this.editedItem.zone == "เขตอังฏดาง") {
+      if (this.editedItem.zone == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        const buildingAngtadang = buildingAngtadangs.map((x) =>x.room);
         return buildingAngtadang;
       }
       if (this.editedItem.zone == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        const buildingSuranarai = buildingSuranarais.map((x) =>x.room);
         return buildingSuranarai;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -629,38 +623,177 @@ export default {
     rooms() {
       if (this.editedItem.building == "2/11") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/12") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/13") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
-
       if (this.editedItem.building == "2/14") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/15") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/16") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/17") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/18") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/19") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingcenters =
+          zonesBuildingsRoom[1].buildingangtadang[0].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
         return buildingCenter;
       }
-
-      if (this.buildFilterValue) {
-        return this.buildingsRooms[this.buildFilterValue];
+      if (this.editedItem.building == "2/20") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
       }
-      if (!this.editedItem.building) {
-        return ["ไม่มีข้อมูล"];
+      if (this.editedItem.building == "2/21") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/22") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/23") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/24") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/25") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/26") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/27") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/28") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/29") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/31") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/32") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/33") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/34") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/35") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/36") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/37") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/38") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/39") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/40") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/41") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+        const buildingCenter = buildingcenters.map((x) =>x.room);
+        return buildingCenter;
       } else {
-        return this.buildingsRooms[this.editedItem.building];
+        return ["ไม่มีข้อมูล"];
       }
     },
   },
