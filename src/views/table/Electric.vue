@@ -48,6 +48,8 @@
               class="filter"
               :items="zones"
               clearable
+              item-text="zone"
+              item-value="id"
             >
             </v-autocomplete>
           </v-col>
@@ -133,19 +135,6 @@
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
         <h3>ตารางค่าไฟฟ้า</h3>
-        <!-- delete as selected -->
-        <v-btn
-          color="error"
-          width="140"
-          v-bind="attrs"
-          v-on="on"
-          class="button-filter pt-5 pb-5"
-          :disabled="!selectItems"
-          @click="deleteItemSelected(selected)"
-        >
-          <v-icon>mdi-delete-sweep</v-icon>
-          &nbsp; ลบข้อมูลที่เลือก
-        </v-btn>
         <v-spacer></v-spacer>
         <div>
           <!-- edit user -->
@@ -352,27 +341,11 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- delete water user -->
-          <v-dialog v-model="dialogDelete" persistent max-width="75%">
-            <v-card>
-              <v-card-title class="text-h5"
-                >ต้องการลบผู้ใช้ไฟฟ้าคนนี้หรือไม่?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
-                <v-btn color="agree" text @click="deleteItemConfirm"
-                  >ยืนยัน</v-btn
-                >
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <!-- export excel to email -->
+          <!-- export -->
           <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="#1572A1"
+                color="#06C3FF"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
                 :disabled="!selectItems"
@@ -412,7 +385,7 @@
           :items-per-page="itemsPerPage"
           class="elevation-1 pa-6"
           :search="search"
-          loading
+          :loading="loadTable"
           loading-text="กำลังโหลด... โปรดรอสักครู่"
           show-select
           :sort-by.sync="sortBy"
@@ -437,11 +410,15 @@
           <!-- editor data -->
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-            <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
           </template>
         </v-data-table>
         <!-- end data-table -->
       </v-card-text>
+      <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+        <div class="text-center">
+          {{ statusAction }}
+        </div>
+      </v-snackbar>
     </v-card>
   </v-app>
 </template>
@@ -449,10 +426,19 @@
 <script>
 import statuses from "../../json/statuses.json";
 import ranks from "../../json/rank.json";
+import zonesBuildingsRoom from "../../json/zonesBuildings.json";
+import axios from "axios";
+import { apiUrl } from "../../utils/url";
 export default {
   data: () => ({
+    zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     valid: true,
+    loadTable: true,
     sortBy: "first_name",
     sortDesc: false,
     modalAddDate: false,
@@ -467,14 +453,11 @@ export default {
     emailtarget: "",
     importExcel: false,
     exportExcelElectric: false,
-    dateExport: new Date().toISOString().substr(0, 7),
-    menuExportExcel: false,
     search: "",
     rank: "",
     ranks: ranks,
     building: null,
     room_no: null,
-    dialogDelete: false,
     // Filter models.
     zoneFilterValue: "",
     buildingFilterValue: "",
@@ -482,6 +465,7 @@ export default {
     dateFilterValue: "",
     statusFilterValue: "",
     date: new Date().toISOString().substr(0, 7),
+    dateNow: new Date().toISOString().substr(0, 10),
     statuses: statuses,
     electricTable: [],
     editedIndex: -1,
@@ -496,512 +480,12 @@ export default {
     },
     defaultItem: {
       first_name: "",
-      zone: "เขตส่วนกลาง",
+      zone: "",
       room_no: "",
       electricity_no: "",
       electricity_meter_no: "",
       status: "draft",
       date_pay: new Date().toISOString().substr(0, 7),
-    },
-    zonesBuildings: {
-      เขตส่วนกลาง: [
-        "2/11",
-        "2/12",
-        "2/13",
-        "2/14",
-        "2/15",
-        "2/16",
-        "2/17",
-        "2/18",
-      ],
-      เขตสุรนารายณ์: [
-        "2/20",
-        "2/21",
-        "2/22",
-        "2/23",
-        "2/24",
-        "2/25",
-        "2/26",
-        "2/27",
-        "2/28",
-        "2/29",
-        "2/31",
-        "2/32",
-        "2/33",
-        "2/34",
-        "2/35",
-        "2/36",
-        "2/37",
-        "2/38",
-        "2/39",
-        "2/40",
-        "2/41",
-      ],
-      เขตอังฏดาง: ["2/19"],
-    },
-    buildingsRooms: {
-      "2/11": [
-        "97",
-        "99",
-        "101",
-        "103",
-        "105",
-        "107",
-        "109",
-        "111",
-        "113",
-        "115",
-        "117",
-        "119",
-      ],
-      "2/12": [
-        "73",
-        "75",
-        "77",
-        "79",
-        "81",
-        "83",
-        "85",
-        "87",
-        "89",
-        "91",
-        "93",
-        "95",
-      ],
-      "2/13": [
-        "108",
-        "110",
-        "112",
-        "114",
-        "116",
-        "118",
-        "120",
-        "122",
-        "124",
-        "126",
-        "128",
-        "130",
-      ],
-      "2/14": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-      ],
-      "2/15": [
-        "121",
-        "123",
-        "125",
-        "127",
-        "129",
-        "131",
-        "133",
-        "135",
-        "137",
-        "139",
-        "141",
-        "143",
-        "145",
-        "147",
-        "149",
-        "151",
-        "153",
-        "155",
-        "157",
-        "159",
-        "161",
-        "163",
-        "165",
-        "167",
-        "169",
-        "171",
-        "173",
-        "175",
-      ],
-      "2/16": [
-        "177",
-        "179",
-        "181",
-        "183",
-        "185",
-        "187",
-        "189",
-        "191",
-        "193",
-        "195",
-        "197",
-        "199",
-        "201",
-        "203",
-        "205",
-        "207",
-        "209",
-        "211",
-        "213",
-        "215",
-        "217",
-        "219",
-        "221",
-        "223",
-        "225",
-      ],
-      "2/17": [
-        "132",
-        "134",
-        "136",
-        "138",
-        "140",
-        "142",
-        "144",
-        "146",
-        "148",
-        "150",
-        "152",
-        "154",
-        "156",
-        "158",
-        "160",
-        "162",
-        "164",
-        "166",
-        "168",
-        "170",
-        "172",
-        "174",
-        "176",
-        "178",
-        "180",
-        "182",
-        "184",
-        "186",
-      ],
-      "2/18": [
-        "50",
-        "52",
-        "54",
-        "56",
-        "58",
-        "60",
-        "62",
-        "64",
-        "66",
-        "68",
-        "70",
-        "72",
-        "74",
-        "76",
-        "78",
-        "80",
-        "82",
-        "84",
-        "86",
-        "88",
-        "90",
-        "92",
-        "94",
-        "96",
-        "98",
-        "100",
-        "102",
-        "104",
-      ],
-      "2/19": [
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-        "109",
-        "110",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-        "209",
-        "210",
-        "211",
-        "212",
-        "213",
-        "214",
-        "215",
-        "301",
-        "302",
-        "303",
-        "304",
-        "305",
-        "306",
-        "307",
-        "308",
-        "309",
-        "310",
-        "311",
-        "312",
-        "313",
-        "314",
-        "315",
-        "401",
-        "402",
-        "403",
-        "404",
-        "405",
-        "406",
-        "407",
-        "408",
-        "409",
-        "410",
-        "411",
-        "412",
-        "413",
-        "414",
-        "415",
-        "501",
-        "502",
-        "503",
-        "504",
-        "505",
-        "506",
-        "507",
-        "508",
-        "509",
-        "510",
-        "511",
-        "512",
-        "513",
-        "514",
-        "515",
-      ],
-      "2/20": ["1", "2"],
-      "2/21": ["3", "4"],
-      "2/22": ["5", "6"],
-      "2/23": ["7", "8"],
-      "2/24": ["9", "10"],
-      "2/25": ["11", "12"],
-      "2/26": ["13", "14"],
-      "2/27": ["15", "16"],
-      "2/28": ["17", "18"],
-      "2/29": ["19", "20"],
-      "2/31": ["79", "80", "81", "82", "83", "84", "85", "86", "87", "88"],
-      "2/32": ["89", "90", "91", "92", "93", "94", "95", "96", "97", "98"],
-      "2/33": [
-        "99",
-        "100",
-        "101",
-        "102",
-        "103",
-        "104",
-        "105",
-        "106",
-        "107",
-        "108",
-      ],
-      "2/34": [
-        "109",
-        "110",
-        "111",
-        "112",
-        "113",
-        "114",
-        "115",
-        "116",
-        "117",
-        "118",
-      ],
-      "2/35": [
-        "119",
-        "120",
-        "121",
-        "122",
-        "123",
-        "124",
-        "125",
-        "126",
-        "127",
-        "128",
-      ],
-      "2/36": [
-        "129",
-        "130",
-        "131",
-        "132",
-        "133",
-        "134",
-        "135",
-        "136",
-        "137",
-        "138",
-      ],
-      "2/37": [
-        "139",
-        "140",
-        "141",
-        "142",
-        "143",
-        "144",
-        "145",
-        "146",
-        "147",
-        "148",
-      ],
-      "2/38": [
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "31",
-        "32",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "44",
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50",
-      ],
-      "2/39": [
-        "149",
-        "150",
-        "151",
-        "152",
-        "153",
-        "154",
-        "155",
-        "156",
-        "157",
-        "158",
-        "159",
-        "160",
-        "161",
-        "162",
-        "163",
-        "164",
-        "165",
-        "166",
-        "167",
-        "168",
-        "169",
-        "170",
-        "171",
-        "172",
-        "173",
-        "174",
-        "175",
-        "176",
-        "177",
-        "178",
-      ],
-      "2/40": [
-        "179",
-        "180",
-        "181",
-        "182",
-        "183",
-        "184",
-        "185",
-        "186",
-        "187",
-        "188",
-        "189",
-        "190",
-        "191",
-        "192",
-        "193",
-        "194",
-        "195",
-        "196",
-        "197",
-        "198",
-        "199",
-        "200",
-        "201",
-        "202",
-        "203",
-        "204",
-        "205",
-        "206",
-        "207",
-        "208",
-      ],
-      "2/41": [
-        "212",
-        "213",
-        "214",
-        "215",
-        "216",
-        "217",
-        "218",
-        "219",
-        "220",
-        "221",
-        "222",
-        "223",
-        "224",
-        "225",
-        "226",
-        "227",
-        "228",
-        "229",
-        "230",
-        "231",
-        "232",
-        "233",
-        "234",
-        "235",
-        "236",
-        "237",
-        "238",
-        "239",
-        "240",
-      ],
     },
     rules: {
       format: [
@@ -1099,33 +583,227 @@ export default {
         },
       ];
     },
+    // autocomplete for filter
     zones() {
-      return Object.keys(this.zonesBuildings);
+      const zones = zonesBuildingsRoom;
+      const zonedata = zones.map((x) => x.zone);
+      return zonedata;
     },
-    // autocomplete
     buildings() {
-      if (this.zoneFilterValue) {
-        return this.zonesBuildings[this.zoneFilterValue];
+      if (this.zoneFilterValue == "เขตส่วนกลาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
+        return buildingCenter;
       }
-      if (!this.editedItem.zone) {
-        return ["ไม่มีข้อมูล"];
+      if (this.zoneFilterValue == "เขตอัษฎางค์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
+        return buildingAngtadang;
+      }
+      if (this.zoneFilterValue == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
+        return buildingSuranarai;
+      }
+      if (this.editedItem.zone == "เขตส่วนกลาง") {
+        const buiding = zonesBuildingsRoom;
+        const buildingcenters = buiding[0].buildingcenter;
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
+        return buildingCenter;
+      }
+      if (this.editedItem.zone == "เขตอัษฎางค์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingAngtadangs = buiding[1].buildingangtadang;
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
+        return buildingAngtadang;
+      }
+      if (this.editedItem.zone == "เขตสุรนารายณ์") {
+        const buiding = zonesBuildingsRoom;
+        const buildingSuranarais = buiding[2].buildingsuranarai;
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
+        return buildingSuranarai;
       } else {
-        return this.zonesBuildings[this.editedItem.zone];
+        return ["ไม่มีข้อมูล"];
       }
     },
     rooms() {
-      if (this.buildingFilterValue) {
-        return this.buildingsRooms[this.buildingFilterValue];
+      if (this.editedItem.building == "2/11") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
       }
-      if (!this.editedItem.building) {
-        return ["ไม่มีข้อมูล"];
+      if (this.editedItem.building == "2/12") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/13") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/14") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/15") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/16") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/17") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/18") {
+        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/19") {
+        const buildingcenters =
+          zonesBuildingsRoom[1].buildingangtadang[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/20") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/21") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/22") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/23") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/24") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/25") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/26") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/27") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/28") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/29") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/31") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/32") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/33") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/34") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/35") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/36") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/37") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/38") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/39") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/40") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
+      }
+      if (this.editedItem.building == "2/41") {
+        const buildingcenters =
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
+        return buildingCenter;
       } else {
-        return this.buildingsRooms[this.editedItem.building];
+        return ["ไม่มีข้อมูล"];
       }
-    },
-    // sumprice not finnnn
-    sumPrice() {
-      return this.editedItem.price * 2 + this.editedItem.price * 0.07;
     },
   },
 
@@ -1133,169 +811,34 @@ export default {
     dialog(val) {
       val || this.close();
     },
-    dialogDelete(val) {
-      val || this.closeDelete();
-    },
   },
-  // mock data
-  created() {
-    this.initialize();
+  created() {},
+  mounted() {
+    this.getElectricData();
   },
   methods: {
-    // mock data in table
-    initialize() {
-      this.electricTable = [
-        {
-          rank: "ด.ต.หญิง",
-          first_name: "อธิวัฒน์ ",
-          last_name: "เจิมสูงเนิน",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "132",
-          meter_group: "9040",
-          electricity_no: "200190919501",
-          electricity_meter_no: "20019091950",
-          date_pay: "2021-06",
-          price: 323.6,
-          unit: "91",
-          status: "draft",
+    // get electric
+    getElectricData() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "จ.ส.ต.",
-          first_name: "ยุพาพร ",
-          last_name: "พวงมะเทศ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "133",
-          meter_group: "9040",
-          electricity_no: "200190955212",
-          electricity_meter_no: "20019095521",
-          date_pay: "2021-06",
-          price: 742.29,
-          unit: "21",
-          status: "draft",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "เทวราช ",
-          last_name: "ดวงทอง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "138",
-          meter_group: "9040",
-          electricity_no: "200190955393",
-          electricity_meter_no: "20019095539",
-          date_pay: "2021-06",
-          price: "0.00",
-          unit: "91",
-          status: "in_progess",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "สุรพงษ์ ",
-          last_name: "ทั่งทอง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "140",
-          meter_group: "9040",
-          electricity_no: "200187439364",
-          electricity_meter_no: "20018743936",
-          date_pay: "2021-06",
-          price: 33.34,
-          unit: "38",
-          status: "in_progess",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "จิรสิทธ์ ",
-          last_name: "ภูอ่าง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "142",
-          meter_group: "9040",
-          electricity_no: "200130597255",
-          electricity_meter_no: "20013059725",
-          date_pay: "2021-06",
-          price: 1068.8,
-          unit: "74",
-          status: "in_progess",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "วุฒิชัย ",
-          last_name: "บุญใบ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "148",
-          meter_group: "9040",
-          electricity_no: "200130599746",
-          electricity_meter_no: "20013059974",
-          date_pay: "2021-06",
-          price: 220.21,
-          unit: "98",
-          status: "in_progess",
-        },
-        {
-          rank: "พ.ต.อ.",
-          first_name: "ธรรมศธรรม ",
-          last_name: "นาคมณี",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "22",
-          meter_group: "9040",
-          electricity_no: "200130694277",
-          electricity_meter_no: "20013069427",
-          date_pay: "2021-06",
-          price: 153.5,
-          unit: "91",
-          status: "in_progess",
-        },
-        {
-          rank: "พ.ต.อ.",
-          first_name: "สุพล ",
-          last_name: "สุราวุฒิ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "23",
-          meter_group: "9040",
-          electricity_no: "200130694548",
-          electricity_meter_no: "20013069454",
-          date_pay: "2021-06",
-          price: 40.9,
-          unit: "61",
-          status: "in_progess",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "พีรันธร ",
-          last_name: "ก้านขุนทด",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "24",
-          meter_group: "9040",
-          electricity_no: "200130695249",
-          electricity_meter_no: "20013069524",
-          date_pay: "2021-06",
-          price: 829.37,
-          unit: "31",
-          status: "in_progess",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อักษร ",
-          last_name: "ทองวิจิตร",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "26",
-          meter_group: "9040",
-          electricity_no: "200130696190",
-          electricity_meter_no: "20013069619",
-          date_pay: "2021-06",
-          price: "0.00",
-          unit: "91",
-          status: "in_progess",
-        },
-      ];
+      };
+      // var date = "?date=" + this.dateNow;
+      var date = "?date=2022-07-29";
+      return axios
+        .get(apiUrl + "/v1/billings/electric" + date, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.electricTable = data.result.billings;
+            this.loadTable = false;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
@@ -1335,24 +878,8 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
-    deleteItem(item) {
-      this.editedIndex = this.electricTable.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-    deleteItemConfirm() {
-      this.electricTable.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
     close() {
       this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-    closeDelete() {
-      this.dialogDelete = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -1427,17 +954,6 @@ export default {
         return (this.selectItems = true);
       } else {
         return (this.selectItems = false);
-      }
-    },
-    // delete as selected
-    deleteItemSelected() {
-      if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
-        for (var i = 0; i < this.selected.length; i++) {
-          const index = this.electricTable.indexOf(this.selected[i]);
-          this.electricTable.splice(index, 1);
-          this.selected.length == 0;
-        }
-        this.dialog = false;
       }
     },
     // select all

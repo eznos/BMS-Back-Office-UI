@@ -328,7 +328,7 @@
         :items-per-page="itemsPerPage"
         class="elevation-1 pa-6"
         :search="search"
-        loading
+        :loading="loadTable"
         loading-text="กำลังโหลด... โปรดรอสักครู่"
         show-select
         @input="enterSelect($event)"
@@ -361,6 +361,7 @@ export default {
   data: () => ({
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
+    loadTable: true,
     valid: true,
     modal: false,
     dialog: false,
@@ -1001,37 +1002,37 @@ export default {
       if (this.zoneFilterValue == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
-      if (this.zoneFilterValue == "เขตอังฏดาง") {
+      if (this.zoneFilterValue == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.zoneFilterValue == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       }
       if (this.editedItem.zone == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.id);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
-      if (this.editedItem.zone == "เขตอังฏดาง") {
+      if (this.editedItem.zone == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.id);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.editedItem.zone == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.id);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -1182,31 +1183,31 @@ export default {
       }
       if (this.editedItem.building == "2/37") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/38") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/39") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/40") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/41") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       } else {
@@ -1223,188 +1224,35 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {
-    this.initialize();
+  created() {},
+  mounted() {
+    this.getBuildingData();
   },
   methods: {
+    // mock data in table
+
     // get data from mockup api
-    getInfoDataCard() {
-      axios
-        .get(apiUrl + "/v1/table/resident")
+    getBuildingData() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      // var date = "?date=" + this.dateNow;
+      var date = "?date=2022-07-29";
+      return axios
+        .get(apiUrl + "/v1/resident" + date, config)
         .then((response) => {
           let data = response.data;
-          if (data.status === "success") {
-            this.total = data.result.total;
+          if (data.status == "success") {
+            this.residentTable = data.result.resident;
+            this.loadTable = false;
           }
         })
         .catch((error) => {
           console.log(error);
         });
-    },
-    // mock data in table
-    initialize() {
-      this.residentTable = [
-        {
-          rank: "ด.ต.หญิง",
-          first_name: "อธิวัฒน์",
-          last_name: " เจิมสูงเนิน",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "132",
-          water_zone: "ป.1",
-          electricity_no: "200190919501",
-          electricity_meter_no: "20019091950",
-          water_no: "4567",
-          water_meter_no: "4567",
-          date_pay: "2021-06",
-          price: 323.6,
-          room_type: "single",
-        },
-        {
-          rank: "จ.ส.ต.",
-          first_name: "ยุพาพร ",
-          last_name: "พวงมะเทศ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "133",
-          water_zone: "ป.1",
-          electricity_no: "200190955212",
-          electricity_meter_no: "20019095521",
-          water_no: "7540",
-          water_meter_no: "7540",
-          date_pay: "2021-06",
-          price: 742.29,
-          room_type: "family_2",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "เทวราช",
-          last_name: " ดวงทอง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/36",
-          room_no: "138",
-          water_zone: "ป.1",
-          electricity_no: "200190955393",
-          electricity_meter_no: "20019095539",
-          water_no: "9856",
-          water_meter_no: "9856",
-          date_pay: "2021-06",
-          price: 0.0,
-          room_type: "family_2",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "สุรพงษ์ ",
-          last_name: "ทั่งทอง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "140",
-          water_zone: "ป.1",
-          electricity_no: "200187439364",
-          electricity_meter_no: "20018743936",
-          water_no: "3214",
-          water_meter_no: "3214",
-          date_pay: "2021-06",
-          price: 33.34,
-          room_type: "family_2",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "จิรสิทธ์",
-          last_name: " ภูอ่าง",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "142",
-          water_zone: "ป.83",
-          electricity_no: "200130597255",
-          electricity_meter_no: "20013059725",
-          water_no: "5467",
-          water_meter_no: "5467",
-          date_pay: "2021-06",
-          price: 1068.8,
-          room_type: "single",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "วุฒิชัย",
-          last_name: " บุญใบ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/37",
-          room_no: "148",
-          water_zone: "ป.83",
-          electricity_no: "200130599746",
-          electricity_meter_no: "20013059974",
-          water_no: "8520",
-          water_meter_no: "8520",
-          date_pay: "2021-06",
-          price: 220.21,
-          room_type: "single",
-        },
-        {
-          rank: "พ.ต.อ.",
-          first_name: "ธรรมศธรรม",
-          last_name: " นาคมณี",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "22",
-          water_zone: "ป.83",
-          electricity_no: "200130694277",
-          electricity_meter_no: "20013069427",
-          water_no: "7845",
-          water_meter_no: "7845",
-          date_pay: "2021-06",
-          price: 153.5,
-          room_type: "single",
-        },
-        {
-          rank: "พ.ต.อ.",
-          first_name: "สุพล ",
-          last_name: "สุราวุฒิ",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "23",
-          water_zone: "ป.83",
-          electricity_no: "200130694548",
-          electricity_meter_no: "20013069454",
-          water_no: "3568",
-          water_meter_no: "3568",
-          date_pay: "2021-06",
-          price: 40.9,
-          room_type: "single",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "พีรันธร",
-          last_name: " ก้านขุนทด",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "24",
-          water_zone: "ป.83",
-          electricity_no: "200130695249",
-          electricity_meter_no: "20013069524",
-          water_no: "5568",
-          water_meter_no: "5568",
-          date_pay: "2021-06",
-          price: 829.37,
-          room_type: "family_1",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อักษร ",
-          last_name: "ทองวิจิตร",
-          zone: "เขตสุรนารายณ์",
-          building: "2/38",
-          room_no: "26",
-          water_zone: "ป.212",
-          electricity_no: "200130696190",
-          electricity_meter_no: "20013069619",
-          water_no: "1123",
-          water_meter_no: "1123",
-          date_pay: "2021-06",
-          price: 0.0,
-          room_type: "family_1",
-        },
-      ];
     },
     //  zone filter
     zoneFilter(value) {

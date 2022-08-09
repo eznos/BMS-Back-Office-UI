@@ -147,20 +147,16 @@
       <!-- title and button -->
       <v-card-title>
         <!-- title -->
-        <v-icon size="35px" class="icon"
-          >mdi-format-list-bulleted-triangle</v-icon
-        >
+        <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
         <h3>ตารางค่าน้ำประปา</h3>
-
-        <!-- button -->
         <v-spacer></v-spacer>
         <div>
           <!-- water diff_price_cal -->
           <v-dialog
             v-model="differencePriceCalculate"
             persistent
-            max-width="70%"
+            max-width="60%"
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
@@ -182,7 +178,7 @@
                 <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
                   <v-row>
                     <!-- meter group -->
-                    <v-col cols="4">
+                    <v-col cols="6">
                       <v-select
                         v-model="waterGroupCalculate"
                         label="สายของมิเตอร์น้ำ"
@@ -192,12 +188,11 @@
                         item-text="name"
                         item-value="id"
                         ref="input"
-                        v-on:keyup="checkEnterPressedToSubmit"
                       >
                       </v-select>
                     </v-col>
                     <!-- meter zone -->
-                    <v-col cols="4">
+                    <v-col cols="6">
                       <v-text-field
                         v-model.number="meterZone"
                         required
@@ -209,20 +204,6 @@
                       >
                       </v-text-field>
                     </v-col>
-                    <!-- sum of meter -->
-                    <!-- <v-col cols="4">
-                      <v-text-field
-                        v-model.number="meterSum"
-                        label="ค่าน้ำที่จดได้"
-                        prepend-icon="mdi-gauge"
-                        :rules="rules.buildingRoom"
-                        clearable
-                        required
-                        @keypress="isNumber($event)"
-                        ref="input"
-                      >
-                      </v-text-field>
-                    </v-col> -->
                   </v-row>
                 </v-form>
               </v-card-text>
@@ -526,7 +507,6 @@
         </v-data-table>
         <!-- end data-table -->
       </v-card-text>
-
       <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
         <div class="text-center">
           {{ statusAction }}
@@ -741,37 +721,37 @@ export default {
       if (this.zoneFilterValue == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
       if (this.zoneFilterValue == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.room);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.zoneFilterValue == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.room);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       }
       if (this.editedItem.zone == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
       if (this.editedItem.zone == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.room);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.editedItem.zone == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.room);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -780,174 +760,174 @@ export default {
     rooms() {
       if (this.editedItem.building == "2/11") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/12") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/13") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/14") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/15") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/16") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/17") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/18") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/19") {
         const buildingcenters =
           zonesBuildingsRoom[1].buildingangtadang[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/20") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/21") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/22") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/23") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/24") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/25") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/26") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/27") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/28") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/29") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/31") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/32") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/33") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/34") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/35") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/36") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/37") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/38") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/39") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/40") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/41") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -1045,10 +1025,10 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            this.statusAction = "คำนวนค่าน้ำส่วนต่าง" + "สำเร็จ";
             this.waterGroupCalculate = "";
             this.meterZone = "";
             this.differencePriceCalculate = false;
-            this.statusAction = "คำวนวนค่าน้ำส่วนต่าง สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
           }

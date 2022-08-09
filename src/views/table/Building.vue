@@ -97,7 +97,7 @@
             >
             </v-select>
           </v-col>
-          <!-- search by room_status -->
+          <!-- search by status -->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-select
               item-text="name"
@@ -149,7 +149,7 @@
             </v-btn>
             <v-spacer></v-spacer>
             <div>
-              <!-- add room -->
+              <!-- add room_no -->
               <v-dialog v-model="dialog" persistent max-width="75%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
@@ -175,7 +175,7 @@
                             <v-select
                               item-text="name"
                               item-value="value"
-                              v-model="editedItem.water_group"
+                              v-model="editedItem.water_zone"
                               :items="water_groups"
                               label="สายของมิเตอร์น้ำ"
                               autofocus
@@ -209,10 +209,10 @@
                             >
                             </v-autocomplete>
                           </v-col>
-                          <!-- room -->
+                          <!-- room_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
-                              v-model="editedItem.room"
+                              v-model="editedItem.room_no"
                               label="เลขห้องพัก"
                               :items="rooms"
                               clearable
@@ -260,7 +260,7 @@
                           <!-- water_meter_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.water_meter_no"
+                              v-model="editedItem.meter_no"
                               label="เลขมิเตอร์น้ำประปา"
                               @keypress="isNumber($event)"
                               clearable
@@ -283,12 +283,12 @@
                             >
                             </v-select>
                           </v-col>
-                          <!-- room_status -->
+                          <!-- status -->
                           <v-col cols="12" sm="6" md="4">
                             <v-select
                               item-text="name"
                               item-value="value"
-                              v-model="editedItem.room_status"
+                              v-model="editedItem.status"
                               :items="room_statuses"
                               label="สถานะห้องพัก"
                               clearable
@@ -386,20 +386,20 @@
               v-model="selected"
               :headers="headers"
               :items="buildingTable"
-              item-key="room"
+              item-key="room_no"
               :items-per-page="itemsPerPage"
               class="table header-blue"
               :search="search"
-              loading
+              :loading="loadTable"
               loading-text="กำลังโหลด... โปรดรอสักครู่"
               show-select
               @input="enterSelect($event)"
             >
-              <!-- color room_status on datatable  -->
-              <template v-slot:[`item.room_status`]="{ item }">
-                <v-chip :color="getColor(item.room_status)" dark>
-                  <td v-if="item.room_status == 'empty'">{{ "ว่าง" }}</td>
-                  <td v-if="item.room_status == 'not_empty'">
+              <!-- color status on datatable  -->
+              <template v-slot:[`item.status`]="{ item }">
+                <v-chip :color="getColor(item.status)" dark>
+                  <td v-if="item.status == 'empty'">{{ "ว่าง" }}</td>
+                  <td v-if="item.status == 'not_empty'">
                     {{ "ไม่ว่าง" }}
                   </td>
                 </v-chip>
@@ -416,7 +416,6 @@
               <!-- data edit and delete-->
               <template v-slot:[`item.actions`]="{ item }">
                 <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-                <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
               </template>
             </v-data-table>
           </v-card-text>
@@ -431,13 +430,15 @@ import room_statuses from "../../json/roomStatuses.json";
 import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
-
+import axios from "axios";
+import { apiUrl } from "../../utils/url";
 export default {
   data: () => ({
     el: "#app",
     zonesBuildingsRoom: zonesBuildingsRoom,
     valid: true,
     modal: false,
+    loadTable: true,
     dialog: false,
     menu: false,
     selected: [],
@@ -448,7 +449,7 @@ export default {
     attrs: {},
     zone: null,
     building: null,
-    room: null,
+    room_no: null,
     emailtarget: "",
     exportExcelResident: false,
     dateExport: new Date().toISOString().substr(0, 7),
@@ -458,7 +459,7 @@ export default {
     electricity_meter_no: "",
     water_meter_no: "",
     room_type: "",
-    room_status: "",
+    status: "",
     water_groups: water_groups,
     room_types: room_types,
     room_statuses: room_statuses,
@@ -475,17 +476,19 @@ export default {
     editedIndex: -1,
     editedItem: {
       first_name: "",
-      room: "",
+      room_no: "",
       water_no: "",
       water_meter_no: "",
-      room_status: "",
+      status: "",
+      room_type: "",
     },
     defaultItem: {
       first_name: "",
-      room: "",
+      room_no: "",
       water_no: "",
       water_meter_no: "",
-      room_status: "",
+      status: "",
+      room_type: "",
     },
     rules: {
       nameRules: [
@@ -523,7 +526,7 @@ export default {
       return [
         {
           text: "สายมิเตอร์น้ำ",
-          value: "water_group",
+          value: "water_zone",
           filter: this.waterGroupFilter,
         },
         {
@@ -538,16 +541,15 @@ export default {
         },
         {
           text: "เลขห้องพัก",
-          value: "room",
+          value: "room_no",
         },
-
         {
           text: "เลขผู้ใช้น้ำ",
           value: "water_no",
         },
         {
           text: "เลขมิเตอร์น้ำประปา",
-          value: "water_meter_no",
+          value: "meter_no",
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
@@ -564,7 +566,7 @@ export default {
         },
         {
           text: "สถานะ",
-          value: "room_status",
+          value: "status",
           filter: this.statusFilter,
         },
         {
@@ -575,7 +577,7 @@ export default {
         },
       ];
     },
-    zones() {
+      zones() {
       const zones = zonesBuildingsRoom;
       const zonedata = zones.map((x) => x.zone);
       return zonedata;
@@ -584,37 +586,37 @@ export default {
       if (this.zoneFilterValue == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
       if (this.zoneFilterValue == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) =>x.room);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.zoneFilterValue == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) =>x.room);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       }
       if (this.editedItem.zone == "เขตส่วนกลาง") {
         const buiding = zonesBuildingsRoom;
         const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.buildingName);
         return buildingCenter;
       }
       if (this.editedItem.zone == "เขตอัษฎางค์") {
         const buiding = zonesBuildingsRoom;
         const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) =>x.room);
+        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
         return buildingAngtadang;
       }
       if (this.editedItem.zone == "เขตสุรนารายณ์") {
         const buiding = zonesBuildingsRoom;
         const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) =>x.room);
+        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
         return buildingSuranarai;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -623,174 +625,174 @@ export default {
     rooms() {
       if (this.editedItem.building == "2/11") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/12") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/13") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/14") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/15") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/16") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/17") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/18") {
         const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/19") {
         const buildingcenters =
           zonesBuildingsRoom[1].buildingangtadang[0].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/20") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/21") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/22") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/23") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/24") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/25") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/26") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/27") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/28") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/29") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/31") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/32") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/33") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/34") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/35") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/36") {
         const buildingcenters =
           zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/37") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/38") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/39") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/40") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/41") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
-        const buildingCenter = buildingcenters.map((x) =>x.room);
+          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
+        const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       } else {
         return ["ไม่มีข้อมูล"];
@@ -805,244 +807,33 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {
-    this.initialize();
+  created() {},
+  mounted() {
+    this.getBuildingData();
   },
   methods: {
-    initialize() {
-      this.buildingTable = [
-        {
-          rank: "พล.ต.อ.",
-          first_name: "ชัชชาช้า",
-          last_name: "ชัชชาวาน",
-          zone: "เขตสุรนารายณ์",
-          building: "2/20",
-          room: "2",
-          water_group: "ป.1",
-          water_no: "1234",
-          water_meter_no: "1234",
-          electricity_no: "200190919501",
-          electricity_meter_no: "20019091950",
-          date_pay: "2022-03",
-          price: "30",
-          difference_price: "50",
-          sum_price: "80",
-          room_status: "not_empty",
-          permission: "user",
-          email: "user@123.com",
-          room_type: "family_1",
+    // get building
+    getBuildingData() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "ด.ต.หญิง",
-          first_name: "ภัทรพร",
-          last_name: "ศรีโอภาส",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "103",
-          water_group: "ป.1",
-          water_no: "4567",
-          water_meter_no: "4567",
-          electricity_no: "200190955212",
-          electricity_meter_no: "20019095521",
-          date_pay: "2021-06",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          room_status: "not_empty",
-          permission: "admin",
-          email: "smorston0@nytimes.com",
-          room_type: "family_2",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อมร ",
-          last_name: "ภูมพฤกษ์",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "107",
-          water_group: "ป.1",
-          water_no: "7540",
-          water_meter_no: "7540",
-          electricity_no: "200190955393",
-          electricity_meter_no: "20019095539",
-          date_pay: "2021-06",
-          price: "57",
-          difference_price: "25.34",
-          sum_price: "82.34",
-          room_status: "not_empty",
-          permission: "user",
-          email: "mtinkler1@google.ca",
-          room_type: "family_2",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อดุล ",
-          last_name: "วงศ์ทอง",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "202",
-          water_group: "ป.1",
-          water_no: "9856",
-          water_meter_no: "9856",
-          electricity_no: "200187439364",
-          electricity_meter_no: "20018743936",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          room_status: "not_empty",
-          permission: "user",
-          email: "ssmewings2@umn.edu",
-          room_type: "single",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "จรัส ",
-          last_name: "สิมฤทธิ์",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "206",
-          water_group: "ป.1",
-          water_no: "3214",
-          water_meter_no: "3214",
-          electricity_no: "200130597255",
-          electricity_meter_no: "20013059725",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          room_status: "empty",
-          permission: "user",
-          email: "asnartt3@intel.com",
-          room_type: "family_2",
-        },
-        {
-          rank: "ส.ต.อ.",
-          first_name: "ธิชากร ",
-          last_name: "ผินดอน",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "305",
-          water_group: "ป.83",
-          water_no: "5467",
-          water_meter_no: "5467",
-          electricity_no: "200130599746",
-          electricity_meter_no: "20013059974",
-          date_pay: "2021-06",
-          price: "76",
-          difference_price: "25.34",
-          sum_price: "101.34",
-          room_status: "empty",
-          permission: "user",
-          email: "ibirkbeck4@github.com",
-          room_type: "single",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "รุ่ง ",
-          last_name: "โฉมกิ่ง",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "402",
-          water_group: "ป.1",
-          water_no: "8520",
-          water_meter_no: "8520",
-          electricity_no: "200130694277",
-          electricity_meter_no: "20013069427",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          room_status: "empty",
-          permission: "user",
-          email: "gmcgrah5@ucoz.ru",
-          room_type: "family_1",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "อนุชา ",
-          last_name: "ฝากชัยภูมิ",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "413",
-          water_group: "ป.1",
-          water_no: "7845",
-          water_meter_no: "7845",
-          electricity_no: "200130694548",
-          electricity_meter_no: "20013069454",
-          date_pay: "2021-06",
-          price: "152",
-          difference_price: "25.34",
-          sum_price: "177.34",
-          room_status: "empty",
-          permission: "user",
-          email: "jkirkby6@answers.com",
-          room_type: "family_2",
-        },
-        {
-          rank: "ส.ต.อ.",
-          first_name: "รัฐพนย์ ",
-          last_name: "เรื่องเรือ",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "504",
-          water_group: "ป.1",
-          water_no: "3568",
-          water_meter_no: "3568",
-          electricity_no: "200130695249",
-          electricity_meter_no: "20013069524",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          room_status: "empty",
-          permission: "user",
-          email: "fillyes7@hubpages.com",
-          room_type: "family_1",
-        },
-        {
-          rank: "ร.ต.ท.",
-          first_name: "อิทธิพล",
-          last_name: "เพ็ญเติมพันธ์",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "514",
-          water_group: "ป.1",
-          water_no: "5568",
-          water_meter_no: "5568",
-          electricity_no: "200130696190",
-          electricity_meter_no: "20013069619",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          room_status: "empty",
-          permission: "user",
-          email: "mlarmet8@mail.ru",
-          room_type: "single",
-        },
-        {
-          rank: "ด.ต.",
-          first_name: "ไพโรจน์",
-          last_name: "ทนปรางค์",
-          zone: "เขตอังฏดาง",
-          building: "2/19",
-          room: "515",
-          water_group: "ป.1",
-          water_no: "1123",
-          water_meter_no: "1123",
-          electricity_no: "200130696190",
-          electricity_meter_no: "20013069619",
-          date_pay: "2021-06",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          room_status: "empty",
-          permission: "user",
-          email: "tgainseford9@sun.com",
-          room_type: "family_1",
-        },
-      ];
+      };
+      // var date = "?date=" + this.dateNow;
+      var date = "?date=2022-07-29";
+      return axios
+        .get(apiUrl + "/v1/buildings" + date, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.buildingTable = data.result.buildings;
+            this.loadTable = false;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
@@ -1129,6 +920,7 @@ export default {
       } else {
         this.buildingTable.push(this.editedItem);
       }
+
       this.close();
     },
     // clear input filter
@@ -1172,10 +964,10 @@ export default {
     clearForm() {
       this.$refs.formNewdata.reset();
     },
-    // color of room_status
-    getColor(room_status) {
-      if (room_status == "not_empty") return "red";
-      if (room_status == "empty") return "agree";
+    // color of status
+    getColor(status) {
+      if (status == "not_empty") return "red";
+      if (status == "empty") return "agree";
       else return "#ffffff";
     },
     // Check selectItems column
