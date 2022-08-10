@@ -119,7 +119,8 @@
 <script>
 // import { mapState } from "vuex";
 // import Popup from "./Popup.vue";
-
+// import axios from "axios";
+// import { apiUrl } from "../../utils/url";
 export default {
   name: "Toolbar",
   data: () => ({
@@ -198,9 +199,23 @@ export default {
   },
   methods: {
     logout() {
-      localStorage.clear();
-      // localStorage.clear();
-      window.location = "/login";
+      var axios = require("axios");
+      var config = {
+        method: "post",
+        url: "http://localhost:3000/v1/auth/logout",
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      axios(config)
+        .then(function () {
+          localStorage.clear();
+          window.location = "login";
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     },
     getUserData() {
       var rank = localStorage.getItem("rank");
