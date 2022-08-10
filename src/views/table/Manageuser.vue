@@ -222,7 +222,7 @@
         :items-per-page="itemsPerPage"
         class="elevation-1 pa-6"
         :search="search"
-        loading
+        :loading="loadTable"
         loading-text="กำลังโหลด... โปรดรอสักครู่"
         show-select
         @input="enterSelect($event)"
@@ -255,9 +255,12 @@ import roles from "../../json/role.json";
 import genders from "../../json/genders.json";
 import ranks from "../../json/rank.json";
 import affiliations from "../../json/affiliations.json";
+import axios from "axios";
+import { apiUrl } from "../../utils/url";
 export default {
   data: () => ({
     el: "#app",
+    loadTable: true,
     valid: false,
     on: {},
     attrs: {},
@@ -362,244 +365,32 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {
-    this.initialize();
+  created() {},
+  mounted() {
+    this.getUserList();
   },
   methods: {
-    initialize() {
-      this.userTable = [
-        {
-          rank: "พล.ต.อ.",
-          affiliation: "สภ.เมืองนครราชสีมา",
-          first_name: "ชัชชาช้า",
-          last_name: "ชัชชาวาน",
-          gender: "male",
-          zone: "เขตสุระ",
-          building: "2/20",
-          room: "2",
-          meter_group: "ป.1",
-          water_no: "1234",
-          water_meter_no: "1234",
-          date_pay: "2022-03",
-          price: "30",
-          difference_price: "50",
-          sum_price: "80",
-          status: "Approve",
-          role: "user",
-          email: "user@123.com",
-          phone_number: "0896585452",
+    getUserList() {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
         },
-        {
-          rank: "ด.ต.หญิง",
-          affiliation: "ศพฐ.3",
-          first_name: "ภัทรพร",
-          last_name: "ศรีโอภาส",
-          gender: "female",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "103",
-          meter_group: "ป.1",
-          water_no: "4567",
-          water_meter_no: "4567",
-          date_pay: "2021-06",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          status: "Approve",
-          role: "admin",
-          email: "smorston0@nytimes.com",
-          phone_number: "0896545652",
-        },
-        {
-          rank: "ด.ต.",
-          affiliation: "ศพฐ.3",
-          first_name: "อมร ",
-          last_name: "ภูมพฤกษ์",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "107",
-          meter_group: "ป.1",
-          water_no: "7540",
-          water_meter_no: "7540",
-          date_pay: "2021-06",
-          price: "57",
-          difference_price: "25.34",
-          sum_price: "82.34",
-          status: "Approve",
-          role: "user",
-          email: "mtinkler1@google.ca",
-          phone_number: "0896582458",
-        },
-        {
-          rank: "ด.ต.",
-          affiliation: "ศพฐ.3",
-          first_name: "อดุล ",
-          last_name: "วงศ์ทอง",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "202",
-          meter_group: "ป.1",
-          water_no: "9856",
-          water_meter_no: "9856",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "Approve",
-          role: "user",
-          email: "ssmewings2@umn.edu",
-          phone_number: "0896548572",
-        },
-        {
-          rank: "ร.ต.ท.",
-          affiliation: "ศพฐ.3",
-          first_name: "จรัส ",
-          last_name: "สิมฤทธิ์",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "206",
-          meter_group: "ป.1",
-          water_no: "3214",
-          water_meter_no: "3214",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "Non Approve",
-          role: "user",
-          email: "asnartt3@intel.com",
-          phone_number: "0995585452",
-        },
-        {
-          rank: "ส.ต.อ.",
-          affiliation: "ศพฐ.3",
-          first_name: "ธิชากร ",
-          last_name: "ผินดอน",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "305",
-          meter_group: "ป.83",
-          water_no: "5467",
-          water_meter_no: "5467",
-          date_pay: "2021-06",
-          price: "76",
-          difference_price: "25.34",
-          sum_price: "101.34",
-          status: "Non Approve",
-          role: "user",
-          email: "ibirkbeck4@github.com",
-          phone_number: "0685585452",
-        },
-        {
-          rank: "ด.ต.",
-          affiliation: "ภ.3(ส่วนกลาง)",
-          first_name: "รุ่ง ",
-          last_name: "โฉมกิ่ง",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "402",
-          meter_group: "ป.1",
-          water_no: "8520",
-          water_meter_no: "8520",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "Non Approve",
-          role: "user",
-          email: "gmcgrah5@ucoz.ru",
-          phone_number: "0689585452",
-        },
-        {
-          rank: "ด.ต.",
-          affiliation: "ภ.3(ส่วนกลาง)",
-          first_name: "อนุชา ",
-          last_name: "ฝากชัยภูมิ",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "413",
-          meter_group: "ป.1",
-          water_no: "7845",
-          water_meter_no: "7845",
-          date_pay: "2021-06",
-          price: "152",
-          difference_price: "25.34",
-          sum_price: "177.34",
-          status: "Non Approve",
-          role: "user",
-          email: "jkirkby6@answers.com",
-          phone_number: "0894587452",
-        },
-        {
-          rank: "ส.ต.อ.",
-          affiliation: "สนง.ผบช.ภ.3",
-          first_name: "รัฐพนย์ ",
-          last_name: "เรื่องเรือ",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "504",
-          meter_group: "ป.1",
-          water_no: "3568",
-          water_meter_no: "3568",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "Non Approve",
-          role: "user",
-          email: "fillyes7@hubpages.com",
-          phone_number: "0891254452",
-        },
-        {
-          rank: "ร.ต.ท.",
-          affiliation: "สนง.ผบช.ภ.3",
-          first_name: "อิทธิพล",
-          last_name: "เพ็ญเติมพันธ์",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "514",
-          meter_group: "ป.1",
-          water_no: "5568",
-          water_meter_no: "5568",
-          date_pay: "2021-06",
-          price: "95",
-          difference_price: "25.34",
-          sum_price: "120.34",
-          status: "Non Approve",
-          role: "user",
-          email: "mlarmet8@mail.ru",
-          phone_number: "0890256452",
-        },
-        {
-          rank: "ด.ต.",
-          affiliation: "ผบช.ภ.3",
-          first_name: "ไพโรจน์",
-          last_name: "ทนปรางค์",
-          gender: "male",
-          zone: "อัษฎางค์",
-          building: "2/19",
-          room: "515",
-          meter_group: "ป.1",
-          water_no: "1123",
-          water_meter_no: "1123",
-          date_pay: "2021-06",
-          price: "19",
-          difference_price: "25.34",
-          sum_price: "44.34",
-          status: "Non Approve",
-          role: "user",
-          email: "tgainseford9@sun.com",
-          phone_number: "0805785452",
-        },
-      ];
+      };
+      // var date = "?date=2022-07-29" + this.date_now;
+      var date = "?date=2022-07-29";
+      return axios
+        .get(apiUrl + "/v1/users" + date, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.userTable = data.result.user_lists;
+            this.loadTable = false;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     statusFilter(value) {
       if (!this.roleFilterValue) {
