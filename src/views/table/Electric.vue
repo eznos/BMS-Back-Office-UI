@@ -367,7 +367,7 @@
                 >
                   ยกเลิก
                 </v-btn>
-                <v-btn color="agree" text @click="exportExcelElectric = false">
+                <v-btn color="agree" text @click="getbillingsID">
                   ยืนยันข้อมูล
                 </v-btn>
               </v-card-actions>
@@ -840,6 +840,54 @@ export default {
           console.log(error);
         });
     },
+    // get selected id
+    getbillingsID() {
+      if (this.selectItems == true) {
+        let billingsIDs = [];
+        for (var i = 0; i < this.selected.length; i++) {
+          billingsIDs.push(this.selected[i].id);
+        }
+        this.exportElectric(billingsIDs);
+      }
+    },
+    // export with api
+    exportElectric(billingsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const billings_id = { billings_id: billingsIDs };
+      return axios
+        .post(apiUrl + "/v1/billings/electric/exports", billings_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.exportExcelElectric = false;
+            this.statusAction = "Export สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message ===
+            "some record does not have calculated status"
+          ) {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.exportExcelElectric = false;
+          } else {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.exportExcelElectric = false;
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -888,6 +936,9 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.electricTable[this.editedIndex], this.editedItem);
+        this.snackbar = true;
+        this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       } else {
         this.electricTable.push(this.editedItem);
       }

@@ -30,7 +30,7 @@
           v-bind="attrs"
           v-on="on"
           class="button-filter pt-5 pb-5"
-          :disabled="!selectItem"
+          :disabled="!selectItems"
           @click="deleteItemSelected"
         >
           <v-icon>mdi-delete-sweep</v-icon>
@@ -252,7 +252,7 @@
                 color="#1572A1"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
-                :disabled="!selectItem"
+                :disabled="!selectItems"
               >
                 <v-icon> mdi-file-export-outline </v-icon>
                 &nbsp; Export ข้อมูล Excel
@@ -271,7 +271,7 @@
                 >
                   ยกเลิก
                 </v-btn>
-                <v-btn color="agree" text @click="exportExcelResident = false">
+                <v-btn color="agree" text @click="getResidentsID()">
                   ยืนยันข้อมูล
                 </v-btn>
               </v-card-actions>
@@ -346,6 +346,11 @@
         </template>
       </v-data-table>
       <!-- end data-table -->
+      <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+        <div class="text-center">
+          {{ statusAction }}
+        </div>
+      </v-snackbar>
     </v-card>
   </v-app>
 </template>
@@ -362,6 +367,10 @@ export default {
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
     loadTable: true,
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     valid: true,
     modal: false,
     dialog: false,
@@ -370,7 +379,7 @@ export default {
     on: {},
     selected: [],
     itemsPerPage: 5,
-    selectItem: false,
+    selectItems: false,
     menu: false,
     room_type: "",
     search: "",
@@ -1226,13 +1235,13 @@ export default {
   },
   created() {},
   mounted() {
-    this.getBuildingData();
+    this.getResidentData();
   },
   methods: {
     // mock data in table
 
     // get data from mockup api
-    getBuildingData() {
+    getResidentData() {
       var config = {
         headers: {
           "x-api-key": "xxx-api-key",
@@ -1252,6 +1261,56 @@ export default {
         })
         .catch((error) => {
           console.log(error);
+        });
+    },
+    // get resident id
+    getResidentsID() {
+      if (this.selectItems == true) {
+        let residentsIDs = [];
+        for (var i = 0; i < this.selected.length; i++) {
+          residentsIDs.push(this.selected[i].id);
+        }
+        this.exportResident(residentsIDs);
+      }
+    },
+    // export with api
+    exportResident(roomsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const residents_id = { residents_id: roomsIDs };
+      return axios
+        .post(apiUrl + "/v1/resident/exports", residents_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.exportExcelResident = false;
+            this.statusAction = "Export สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+            // this.selected.length = 0
+            console.log(this.selected.length)
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message ===
+            "some record does not have calculated status"
+          ) {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.exportExcelResident = false;
+          } else {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.exportExcelResident = false;
+          }
         });
     },
     //  zone filter
@@ -1305,6 +1364,9 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.residentTable[this.editedIndex], this.editedItem);
+        this.snackbar = true;
+        this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       } else {
         this.residentTable.push(this.editedItem);
       }
@@ -1342,9 +1404,9 @@ export default {
     },
     enterSelect() {
       if (this.selected.length >= 1) {
-        return (this.selectItem = true);
+        return (this.selectItems = true);
       } else {
-        return (this.selectItem = false);
+        return (this.selectItems = false);
       }
     },
     // delete as selected

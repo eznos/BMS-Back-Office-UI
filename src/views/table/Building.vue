@@ -340,13 +340,13 @@
               </v-dialog>
               <!-- export excel to email -->
               <v-dialog
-                v-model="exportExcelResident"
+                v-model="exportExcelBuliding"
                 persistent
                 max-width="75%"
               >
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="#1572A1"
+                    color="#06C3FF"
                     class="button-filter pt-5 pb-5"
                     v-on="{ ...attrs }"
                     :disabled="!selectItems"
@@ -364,15 +364,11 @@
                     <v-btn
                       color="warning"
                       text
-                      @click="exportExcelResident = false"
+                      @click="exportExcelBuliding = false"
                     >
                       ยกเลิก
                     </v-btn>
-                    <v-btn
-                      color="agree"
-                      text
-                      @click="exportExcelResident = false"
-                    >
+                    <v-btn color="agree" text @click="getRoomsID()">
                       ยืนยันข้อมูล
                     </v-btn>
                   </v-card-actions>
@@ -420,6 +416,15 @@
             </v-data-table>
           </v-card-text>
         </v-card>
+        <v-snackbar
+          v-model="snackbar"
+          :timeout="timeout"
+          :color="colorSnackbar"
+        >
+          <div class="text-center">
+            {{ statusAction }}
+          </div>
+        </v-snackbar>
       </v-col>
     </v-row>
   </v-app>
@@ -438,6 +443,10 @@ export default {
     zonesBuildingsRoom: zonesBuildingsRoom,
     valid: true,
     modal: false,
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     loadTable: true,
     dialog: false,
     menu: false,
@@ -451,7 +460,7 @@ export default {
     building: null,
     room_no: null,
     emailtarget: "",
-    exportExcelResident: false,
+    exportExcelBuliding: false,
     dateExport: new Date().toISOString().substr(0, 7),
     menuExportExcel: false,
     electricity_no: "",
@@ -577,7 +586,7 @@ export default {
         },
       ];
     },
-      zones() {
+    zones() {
       const zones = zonesBuildingsRoom;
       const zonedata = zones.map((x) => x.zone);
       return zonedata;
@@ -835,6 +844,53 @@ export default {
           console.log(error);
         });
     },
+    getRoomsID() {
+      if (this.selectItems == true) {
+        let roomsIDs = [];
+        for (var i = 0; i < this.selected.length; i++) {
+          roomsIDs.push(this.selected[i].id);
+        }
+        this.exportBuliding(roomsIDs);
+      }
+    },
+    // export with api
+    exportBuliding(roomsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const rooms_id = { rooms_id: roomsIDs };
+      return axios
+        .post(apiUrl + "/v1/billings/electric/exports", rooms_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.exportExcelBuliding = false;
+            this.statusAction = "Export สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message ===
+            "some record does not have calculated status"
+          ) {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.exportExcelBuliding = false;
+          } else {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.exportExcelBuliding = false;
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -917,6 +973,9 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
+        this.snackbar = true;
+        this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       } else {
         this.buildingTable.push(this.editedItem);
       }
