@@ -62,9 +62,14 @@
             </v-card-text>
             <v-card-actions class="row-btn">
               <v-row>
-                <v-col>
+                <v-col cols="12">
                   <v-btn block color="primary" @click="submit">
                     <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-btn text color="agree" @click="userLogin">
+                    <v-icon>mdi-login</v-icon>สำหรับผู้อยู่อาศัย
                   </v-btn>
                 </v-col>
               </v-row>
@@ -140,7 +145,6 @@ export default {
             if (data.result.role === "admin") {
               this.$router.push({
                 name: "overview",
-                params: { name: this.role },
               });
             }
           }
@@ -159,6 +163,13 @@ export default {
             console.log(error.response.data.error_message);
           }
         });
+    },
+
+    userLogin() {
+      localStorage.setItem("role", "user");
+      this.$router.push({
+        name: "overview",
+      });
     },
   },
 };
