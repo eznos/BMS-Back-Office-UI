@@ -5,14 +5,19 @@
       <v-row justify="space-between" class="px-3">
         <div class="mb-4">
           <v-row style="align-items: center">
-            <div class="ml-3 mt-2">
-              <h2>ตารางสถานะห้องพัก</h2>
-            </div>
+            <!-- <div class="ml-3 mt-2">
+              <h2>ภาพรวม</h2>
+            </div> -->
           </v-row>
         </div>
         <!-- export data -->
-        <div>
-          <v-dialog v-model="dialog" persistent width="50%">
+        <div v-if="role === 'admin'">
+          <v-dialog
+            transition="dialog-bottom-transition"
+            v-model="dialog"
+            persistent
+            max-width="70%"
+          >
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" v-bind="attrs" v-on="on">
                 <v-icon> mdi-application-export </v-icon>
@@ -26,25 +31,75 @@
                 </v-icon>
                 &nbsp; Export ข้อมูลภาพรวมเป็นไฟล์ Excel หรือไม่ ?
               </v-card-title>
-              <!-- <v-card-text>
-                <v-row>
-                  <v-col cols="12">
-                    <v-select
-                      label="เลือกข้อมูลที่ต้องการส่งออก"
-                      :items="dataexport"
-                      prepend-icon="mdi-file-excel"
-                      clearable
-                    >
-                    </v-select>
-                  </v-col>
-                </v-row>
-              </v-card-text> -->
+              <v-card-text>
+                <v-form ref="formExport" lazy-validation>
+                  <v-row>
+                    <v-col cols="12">
+                      <v-select
+                        prepend-icon="mdi-clipboard-list-outline"
+                        v-model="infoCardSelect"
+                        :items="infoCardSelects"
+                        item-text="name"
+                        item-value="value"
+                        label="ข้อมูลสถิติ"
+                        multiple
+                        autofocus
+                        :rules="rules.dataRules"
+                      >
+                      </v-select>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-menu
+                        ref="menu"
+                        v-model="menu"
+                        :close-on-content-click="false"
+                        :return-value.sync="date"
+                        transition="scale-transition"
+                        offset-y
+                        max-width="290px"
+                        min-width="auto"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="date"
+                            label="ข้อมูลค่าน้ำ-ค่าไฟฟ้า ของเดือนที่เลือกไว้"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                            :rules="rules.dataRules"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="date"
+                          type="month"
+                          no-title
+                          scrollable
+                          multiple
+                        >
+                          <v-spacer></v-spacer>
+                          <v-btn text color="primary" @click="menu = false">
+                            Cancel
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="primary"
+                            @click="$refs.menu.save(date)"
+                          >
+                            OK
+                          </v-btn>
+                        </v-date-picker>
+                      </v-menu>
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text color="warning" @click="dialog = false">
                   ยกเลิก
                 </v-btn>
-                <v-btn text color="agree" @click="dialog = false"> ตกลง </v-btn>
+                <v-btn text color="agree" @click="submit()"> ตกลง </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -185,6 +240,11 @@
         </v-col>
       </v-row>
     </div>
+    <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+      <div class="text-center">
+        {{ statusAction }}
+      </div>
+    </v-snackbar>
   </div>
 </template>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -192,24 +252,36 @@
 import Chart from "chart.js";
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
+import infoCardSelects from "../../json/infoCardSelects.json";
 export default {
   mounted() {
     this.chartElectric();
     this.chartWater();
+    this.getInfoDataCard();
   },
   data() {
     return {
+      snackbar: false,
+      statusAction: "",
+      colorSnackbar: "",
+      timeout: 2000,
+      role: "",
+      infoCardSelect: [],
+      infoCardSelects: infoCardSelects,
+      menu: false,
+      date: [],
       dialog: false,
-      dataexport: ["1", "2", "3", "4", "5"],
       total: "",
       empty: "",
       move_in: "",
       move_out: "",
-      ecjan: "",
+      rules: {
+        dataRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
+      },
     };
   },
   created() {
-    this.getInfoDataCard();
+    this.getRole();
   },
   methods: {
     getInfoDataCard() {
@@ -507,6 +579,69 @@ export default {
         .catch((error) => {
           console.log(error);
         });
+    },
+    showLog() {
+      console.log(this.date);
+      console.log(this.infoCardSelect);
+      this.date = new Date().toISOString().substr(0, 7);
+      this.infoCardSelect = [];
+      this.dialog = false;
+    },
+    submit() {
+      if (this.$refs.formExport.validate()) {
+        this.exportOverview(this.date, this.infoCardSelect);
+      }
+    },
+    // export with api
+    exportOverview(date, infoCardSelect) {
+      let payload = {
+        date_selected: date,
+        info_selected: infoCardSelect,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      return axios
+        .post(apiUrl + "/v1/overviews/exports", payload, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.dialog = false;
+            this.statusAction = "Export สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+            this.date = new Date().toISOString().substr(0, 7);
+            this.infoCardSelect = [];
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message ===
+            "some record does not have calculated status"
+          ) {
+            this.statusAction = "บางบันทึกไม่มีสถานะการคำนวณ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.dialog = false;
+            this.date = new Date().toISOString().substr(0, 7);
+            this.infoCardSelect = [];
+          } else {
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.dialog = false;
+            this.date = new Date().toISOString().substr(0, 7);
+            this.infoCardSelect = [];
+          }
+        });
+    },
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
     },
   },
 };

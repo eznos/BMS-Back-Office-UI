@@ -124,6 +124,7 @@
               clearable
               item-text="name"
               item-value="value"
+              v-if="role === 'admin'"
             ></v-select>
           </v-col>
           <!-- btn filter -->
@@ -157,6 +158,7 @@
             v-model="differencePriceCalculate"
             persistent
             max-width="60%"
+            v-if="role === 'admin'"
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
@@ -185,6 +187,7 @@
                         prepend-icon="mdi-home-group"
                         required
                         :items="meterGroups"
+                        :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="id"
                         ref="input"
@@ -226,7 +229,12 @@
             </v-card>
           </v-dialog>
           <!-- edit user -->
-          <v-dialog v-model="dialog" persistent max-width="75%">
+          <v-dialog
+            v-if="role === 'admin'"
+            v-model="dialog"
+            persistent
+            max-width="75%"
+          >
             <v-card>
               <v-card-title>
                 <span>{{ formTitle }}</span>
@@ -442,7 +450,12 @@
             </v-card>
           </v-dialog>
           <!-- export excel -->
-          <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
+          <v-dialog
+            v-if="role === 'admin'"
+            v-model="exportExcelwater"
+            max-width="75%"
+            persistent
+          >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#06C3FF"
@@ -493,7 +506,7 @@
               {{ waterTable.price }}
             </v-chip>
           </template>
-          <template v-slot:[`item.status`]="{ item }">
+          <template v-if="role === 'admin'" v-slot:[`item.status`]="{ item }">
             <v-chip :color="getColorForStatus(item.status)">
               <td v-if="item.status == 'draft'">{{ "ร่าง" }}</td>
               <td v-if="item.status == 'in_progess'">{{ "กำลังดำเนินการ" }}</td>
@@ -501,7 +514,7 @@
               <td v-if="item.status == 'exported'">{{ "Export แล้ว" }}</td>
             </v-chip>
           </template>
-          <template v-slot:[`item.actions`]="{ item }">
+          <template v-if="role === 'admin'" v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
           </template>
         </v-data-table>
@@ -526,6 +539,7 @@ import water_groups from "../../json/waterGroups.json";
 export default {
   data: () => ({
     zonesBuildingsRoom: zonesBuildingsRoom,
+    role: "",
     loadTable: true,
     snackbar: false,
     statusAction: "",
@@ -949,13 +963,20 @@ export default {
     },
   },
 
-  created() {},
+  created() {
+    this.getRole();
+  },
 
   mounted() {
     this.getWaterData();
   },
 
   methods: {
+    // get role
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     // get water data from api
     getWaterData() {
       var config = {
@@ -964,7 +985,7 @@ export default {
           "x-refresh-token": "xxx-refresh-token",
         },
       };
-      // var date = "?date=2022-07-29" + this.date_now;
+      // var date = "?date=" + this.date_now;
       var date = "?date=2022-07-29";
       return axios
         .get(apiUrl + "/v1/billings/water" + date, config)
@@ -1152,6 +1173,9 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.waterTables[this.editedIndex], this.editedItem);
+        this.snackbar = true;
+        this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       } else {
         this.waterTables.push(this.editedItem);
       }
