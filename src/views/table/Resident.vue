@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <!-- title and filter -->
-    <div class="content background-main">
+    <div class="content background-main" v-if="role == 'admin'">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
@@ -17,7 +17,7 @@
       </v-row>
     </div>
     <!-- data-table and button -->
-    <v-card class="card-filter px-6 py-6">
+    <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <v-card-title>
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
@@ -352,6 +352,9 @@
         </div>
       </v-snackbar>
     </v-card>
+    <v-container v-if="role == 'user'">
+      <NotFound />
+    </v-container>
   </v-app>
 </template>
 
@@ -362,8 +365,11 @@ import ranks from "../../json/rank.json";
 import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
+import NotFound from "../../components/notFound/Notfound.vue";
 export default {
+  components: { NotFound },
   data: () => ({
+    role: "",
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
     loadTable: true,
@@ -1233,13 +1239,17 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {},
+  created() {
+    this.getRole();
+  },
   mounted() {
     this.getResidentData();
   },
   methods: {
-    // mock data in table
-
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     // get data from mockup api
     getResidentData() {
       var config = {
@@ -1292,7 +1302,7 @@ export default {
             this.colorSnackbar = "agree";
             this.snackbar = true;
             // this.selected.length = 0
-            console.log(this.selected.length)
+            console.log(this.selected.length);
           }
         })
         .catch((error) => {

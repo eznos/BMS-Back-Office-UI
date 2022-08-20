@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <!-- title  -->
-    <div class="content background-main">
+    <div class="content background-main" v-if="role === 'admin'">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
@@ -17,7 +17,7 @@
       </v-row>
     </div>
     <!-- filter -->
-    <v-card class="card-filter px-6 py-6">
+    <v-card class="card-filter px-6 py-6" v-if="role === 'admin'">
       <v-card-title>
         <v-icon size="35px" class="icon"
           >mdi-format-list-bulleted-triangle</v-icon
@@ -129,7 +129,7 @@
       </v-form>
     </v-card>
     <!-- table and buttons -->
-    <v-row>
+    <v-row v-if="role === 'admin'">
       <v-col cols="12">
         <v-card class="card-filter px-6 py-6">
           <v-card-title>
@@ -427,6 +427,9 @@
         </v-snackbar>
       </v-col>
     </v-row>
+    <v-container v-if="role == 'user'">
+      <NotFound />
+    </v-container>
   </v-app>
 </template>
 
@@ -437,8 +440,11 @@ import room_types from "../../json/roomTypes.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
+import NotFound from "../../components/notFound/Notfound.vue";
 export default {
+  components: { NotFound },
   data: () => ({
+    role: "",
     el: "#app",
     zonesBuildingsRoom: zonesBuildingsRoom,
     valid: true,
@@ -816,11 +822,18 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {},
+  created() {
+    this.getRole();
+  },
   mounted() {
     this.getBuildingData();
   },
   methods: {
+    // get role user
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     // get building
     getBuildingData() {
       var config = {
@@ -997,9 +1010,6 @@ export default {
         typeof value === "string" &&
         value.toString().toLocaleUpperCase().indexOf(search) !== -1
       );
-    },
-    getRandomInt() {
-      return Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
     },
     // clearFilter
     clearFilter() {

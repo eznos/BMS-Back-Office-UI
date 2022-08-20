@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <!-- title and bottom -->
-    <div class="content background-main">
+    <div class="content background-main" v-if="role == 'admin'">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
@@ -17,7 +17,7 @@
       </v-row>
     </div>
     <!-- table and buttons -->
-    <v-card class="card-filter px-6 py-6">
+    <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <v-card-title>
         <!-- title -->
         <v-icon size="35px" class="icon"
@@ -247,6 +247,9 @@
       </v-data-table>
       <!-- end data-table -->
     </v-card>
+    <v-container v-if="role == 'user'">
+      <NotFound />
+    </v-container>
   </v-app>
 </template>
 
@@ -257,9 +260,12 @@ import ranks from "../../json/rank.json";
 import affiliations from "../../json/affiliations.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
+import NotFound from "../../components/notFound/Notfound.vue";
 export default {
+  components: { NotFound },
   data: () => ({
     el: "#app",
+    role: "",
     loadTable: true,
     valid: false,
     on: {},
@@ -365,11 +371,17 @@ export default {
       val || this.closeDelete();
     },
   },
-  created() {},
+  created() {
+    this.getRole();
+  },
   mounted() {
     this.getUserList();
   },
   methods: {
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     getUserList() {
       var config = {
         headers: {
