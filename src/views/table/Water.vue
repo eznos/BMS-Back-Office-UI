@@ -7,8 +7,11 @@
         <div class="mb-4">
           <v-row style="align-items: center">
             <div class="ml-3 mt-9">
-              <h2>
+              <h2 v-if="role ==='admin'">
                 <v-icon size="40" color="blue">mdi-water</v-icon> จัดการน้ำประปา
+              </h2>
+                <h2 v-if="role ==='user'">
+                <v-icon size="40" color="blue">mdi-water</v-icon> ตารางค่าน้ำประปา
               </h2>
             </div>
             <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
@@ -486,6 +489,7 @@
       </v-card-title>
       <v-card-text>
         <!-- start data-table -->
+        <!-- data table for admin -->
         <v-data-table
           v-model="selected"
           :headers="headers"
@@ -500,13 +504,14 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
+          v-if="role === 'admin'"
         >
           <template v-slot:[`waterTable.price`]="{ waterTable }">
             <v-chip :color="getColor(waterTable.price)">
               {{ waterTable.price }}
             </v-chip>
           </template>
-          <template v-if="role === 'admin'" v-slot:[`item.status`]="{ item }">
+          <template v-slot:[`item.status`]="{ item }">
             <v-chip :color="getColorForStatus(item.status)">
               <td v-if="item.status == 'draft'">{{ "ร่าง" }}</td>
               <td v-if="item.status == 'in_progess'">{{ "กำลังดำเนินการ" }}</td>
@@ -514,11 +519,31 @@
               <td v-if="item.status == 'exported'">{{ "Export แล้ว" }}</td>
             </v-chip>
           </template>
-          <template v-if="role === 'admin'" v-slot:[`item.actions`]="{ item }">
+          <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
           </template>
         </v-data-table>
-        <!-- end data-table -->
+        <!-- data table for user -->
+        <v-data-table
+          :headers="headersUser"
+          :items="waterTables"
+          item-key="first_name"
+          :items-per-page="5"
+          class="elevation-1 pa-6 th-1"
+          :search="search"
+          :loading="loadTable"
+          loading-text="กำลังโหลด... โปรดรอสักครู่"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          @input="enterSelect($event)"
+          v-if="role === 'user'"
+        >
+          <template v-slot:[`waterTable.price`]="{ waterTable }">
+            <v-chip :color="getColor(waterTable.price)">
+              {{ waterTable.price }}
+            </v-chip>
+          </template>
+        </v-data-table>
       </v-card-text>
       <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
         <div class="text-center">
@@ -711,6 +736,72 @@ export default {
           text: "การจัดการ",
           value: "actions",
           sortable: false,
+        },
+      ];
+    },
+    // header for user
+    headersUser() {
+      return [
+        {
+          text: "ยศ",
+          align: "left",
+          value: "rank",
+        },
+        {
+          text: "ชื่อ",
+          value: "first_name",
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
+        },
+        {
+          text: "พื้นที่",
+          value: "zone",
+          filter: this.zoneFilter,
+        },
+        {
+          text: "สายของมิเตอร์",
+          value: "water_zone",
+          filter: this.groupFilter,
+        },
+        {
+          text: "อาคาร",
+          value: "building",
+          filter: this.buildingFilter,
+        },
+        {
+          text: "เลขห้องพัก",
+          value: "room",
+        },
+        {
+          text: "เลขผู้ใช้น้ำ",
+          value: "water_no",
+        },
+        {
+          text: "เลขมิเตอร์น้ำ",
+          value: "water_no",
+        },
+        {
+          text: "รอบบิล",
+          value: "billing_cycle",
+          filter: this.dateFilter,
+        },
+        {
+          text: "จำนวนหน่วย",
+          value: "unit",
+        },
+        {
+          text: "ค่าน้ำ",
+          value: "price",
+        },
+        {
+          text: "ค่าน้ำส่วนต่าง",
+          value: "price_diff",
+        },
+        {
+          text: "ค่าน้ำรวม",
+          value: "total_pay",
         },
       ];
     },

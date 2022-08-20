@@ -108,6 +108,7 @@
               label="ค้นหาด้วยสถานะ"
               class="filter"
               clearable
+              v-if="role == 'admin'"
             ></v-select>
           </v-col>
           <v-row> </v-row>
@@ -342,7 +343,12 @@
             </v-card>
           </v-dialog>
           <!-- export -->
-          <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
+          <v-dialog
+            v-if="role == 'admin'"
+            v-model="exportExcelElectric"
+            persistent
+            max-width="75%"
+          >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#06C3FF"
@@ -376,7 +382,7 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <!-- start data-table -->
+        <!-- data table for admin -->
         <v-data-table
           v-model="selected"
           :headers="headers"
@@ -391,6 +397,7 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
+          v-if="role == 'admin'"
         >
           <!-- color of price on datatable  -->
           <template v-slot:[`item.price`]="{ item }">
@@ -412,7 +419,28 @@
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
           </template>
         </v-data-table>
-        <!-- end data-table -->
+        <!-- table for user -->
+        <v-data-table
+          :headers="headersUser"
+          :items="electricTable"
+          item-key="first_name"
+          :items-per-page="itemsPerPage"
+          class="elevation-1 pa-6"
+          :search="search"
+          :loading="loadTable"
+          loading-text="กำลังโหลด... โปรดรอสักครู่"
+          :sort-by.sync="sortBy"
+          :sort-desc.sync="sortDesc"
+          v-if="role == 'user'"
+          @input="enterSelect($event)"
+        >
+          <!-- color of price on datatable  -->
+          <template v-slot:[`item.price`]="{ item }">
+            <v-chip :color="getColor(item.price)">
+              {{ item.price }}
+            </v-chip>
+          </template>
+        </v-data-table>
       </v-card-text>
       <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
         <div class="text-center">
@@ -434,6 +462,7 @@ export default {
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
     snackbar: false,
+    role: "",
     statusAction: "",
     colorSnackbar: "",
     timeout: 2000,
@@ -580,6 +609,62 @@ export default {
           value: "actions",
           align: "center",
           sortable: false,
+        },
+      ];
+    },
+    // for user
+    headersUser() {
+      return [
+        {
+          text: "ยศ",
+          align: "left",
+          value: "rank",
+          filter: this.rankFilter,
+        },
+        {
+          text: "ชื่อ",
+          value: "first_name",
+        },
+        {
+          text: "นามสกุล",
+          value: "last_name",
+        },
+        {
+          text: "พื้นที่",
+          value: "zone",
+          filter: this.zoneFilter,
+        },
+        {
+          text: "อาคาร",
+          value: "building",
+          filter: this.buildingFilter,
+        },
+        {
+          text: "เลขห้องพัก",
+          value: "room_no",
+        },
+        {
+          text: "เลขผู้ใช้ไฟ",
+          value: "electricity_no",
+        },
+        {
+          text: "เลขมิเตอร์ไฟ",
+          value: "electricity_meter_no",
+        },
+        {
+          text: "เดือน",
+          value: "date_pay",
+          filter: this.dateFilter,
+        },
+        {
+          text: "หน่วย",
+          value: "unit",
+          filterable: false,
+        },
+        {
+          text: "ค่าไฟฟ้า",
+          value: "price",
+          filterable: false,
         },
       ];
     },
@@ -812,11 +897,18 @@ export default {
       val || this.close();
     },
   },
-  created() {},
+  created() {
+    this.getRole();
+  },
   mounted() {
     this.getElectricData();
   },
   methods: {
+    // get role for user
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     // get electric
     getElectricData() {
       var config = {

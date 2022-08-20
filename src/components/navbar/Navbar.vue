@@ -21,30 +21,14 @@
       </v-menu>
 
       <!-- แถบเมนู logout -->
-      <v-menu bottom left class="background2">
+      <v-menu bottom left class="background2" v-if="role == 'admin'">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-logout-variant</v-icon>
           </v-btn>
         </template>
-        <!-- <v-list flat>
-          <v-list-item
-            v-for="link in items"
-            :key="link.text"
-            router
-            :to="link.route"
-            :click="link.click"
-            active-class="border"
-            :dialog="link.dialog"
-          >
-            <v-list-item-action>
-              <v-icon>{{ link.icon }}</v-icon>
-            </v-list-item-action>
-            <v-list-item-title>{{ link.text }}</v-list-item-title>
-          </v-list-item>
-        </v-list> -->
         <v-card color="red">
-          <v-list>
+          <v-list v-if="role === 'admin'">
             <v-list-item>
               <v-list-item-avatar>
                 <img v-bind:src="imageSrc" />
@@ -57,23 +41,31 @@
               </v-list-item-content>
             </v-list-item>
           </v-list>
-
           <v-list>
-            <v-btn class="button-menu" to="/edit" tile block color="green">
+            <v-btn
+              v-if="role === 'admin'"
+              class="button-menu"
+              to="/edit"
+              tile
+              block
+              color="green"
+            >
               แก้ไขข้อมูลส่วนตัว
             </v-btn>
             <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
-
             <v-btn tile block @click="logout" color="red"> ออกจากระบบ </v-btn>
             <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
           </v-list>
         </v-card>
       </v-menu>
+      <v-btn icon @click="logout" v-if="role == 'user'">
+        <v-icon>mdi-logout-variant</v-icon>
+      </v-btn>
     </v-app-bar>
     <!-- จบ -->
     <v-navigation-drawer v-model="drawer" dark app class="background2">
       <!-- avatar  -->
-      <v-layout column align-center>
+      <v-layout v-if="role === 'admin'" column align-center>
         <v-flex class="mt-5">
           <router-link to="/edit">
             <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
@@ -95,9 +87,28 @@
         </v-flex>
       </v-layout>
       <!-- แถบเมนูด้านข้าง -->
-      <v-list>
+      <!-- for admin -->
+      <v-list v-if="role === 'admin'">
         <v-list-item
           v-for="link in links"
+          color="#FF695D"
+          :key="link.text"
+          router
+          :to="link.route"
+          active-class="border"
+        >
+          <v-list-item-action>
+            <v-icon>{{ link.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ link.text }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+      <!-- for user -->
+      <v-list v-if="role === 'user'">
+        <v-list-item
+          v-for="link in linksUser"
           color="#FF695D"
           :key="link.text"
           router
@@ -117,10 +128,6 @@
 </template>
 
 <script>
-// import { mapState } from "vuex";
-// import Popup from "./Popup.vue";
-// import axios from "axios";
-// import { apiUrl } from "../../utils/url";
 export default {
   name: "Toolbar",
   data: () => ({
@@ -134,9 +141,6 @@ export default {
     scr: "",
     // แถบเมนู
     links: [
-      // { icon: "dashboard", text: "Dashboard", route: "/dashboard" },
-      // { icon: "folder", text: "My Project", route: "/projects" },
-      // { icon: "person", text: "Team", route: "/team" },
       {
         icon: "mdi-chart-arc",
         text: "ภาพรวม",
@@ -184,6 +188,36 @@ export default {
         icon: " mdi-clipboard-edit",
         text: "แก้ไขข้อมูลผู้ใช้",
         route: "/edit",
+      },
+    ],
+    linksUser: [
+      {
+        icon: "mdi-chart-arc",
+        text: "ภาพรวม",
+        route: "/overview",
+      },
+      {
+        icon: "mdi-water",
+        text: "ตารางค่าน้ำประปา",
+        route: "/waterbill",
+      },
+      {
+        icon: "mdi-lightning-bolt",
+        text: "ตารางค่าไฟฟ้า",
+        route: "/electricbill",
+      },
+      {
+        icon: " mdi-google-maps",
+        text: "แผนที่",
+        route: "/map",
+      },
+    ],
+    itemsUser: [
+      {
+        icon: " mdi-logout",
+        text: "ออกจากระบบ",
+        route: "/login",
+        click: "logout",
       },
     ],
   }),

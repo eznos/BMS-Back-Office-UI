@@ -23,7 +23,12 @@
         &nbsp;&nbsp;
         <v-spacer></v-spacer>
         <!-- add marker buttons -->
-        <v-dialog v-model="dialog" max-width="45%" persistent>
+        <v-dialog
+          v-model="dialog"
+          max-width="45%"
+          persistent
+          v-if="role == 'admin'"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn color="agree" dark v-bind="attrs" v-on="on">
               <v-icon> mdi-map-marker-plus </v-icon>
@@ -207,11 +212,13 @@ export default {
   },
   data() {
     return {
+      role: "",
       valid: true,
       markers: [],
       place: null,
       building: "",
       zone: "",
+      description: "",
       mapImage: "",
       latitude: "",
       longitude: "",
@@ -240,7 +247,14 @@ export default {
     };
   },
   description: "Autocomplete Example (#164)",
+  created() {
+    this.getRole();
+  },
   methods: {
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     setDescription(description) {
       this.description = description;
     },

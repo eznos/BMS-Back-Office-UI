@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <v-card class="mx-auto" elevation="10" width="100%">
+    <v-card class="mx-auto" elevation="10" width="100%" v-if="role === 'admin'">
       <v-card-title>
         <div class="ml-3 mt-2 title">
           <h3>
@@ -211,6 +211,10 @@
         </div>
       </v-card-actions>
     </v-card>
+    <v-container v-if="role == 'user'">
+       <NotFound />
+    </v-container>
+   
   </v-app>
 </template>
 <script>
@@ -222,8 +226,10 @@ import axios from "axios";
 import ranks from "../../json/rank.json";
 import affiliations from "../../json/affiliations.json";
 import genders from "../../json/genders.json";
+import NotFound from "../../components/notFound/Notfound.vue";
+
 export default {
-  components: {},
+  components: { NotFound },
   data: () => ({
     loading: false,
     dialog: false,
@@ -281,21 +287,25 @@ export default {
   setup() {},
   watch: {},
   computed: {},
+  created() {
+    this.getRole();
+  },
 
   methods: {
+    getRole() {
+      var role = localStorage.getItem("role");
+      this.role = role;
+    },
     submit() {
       if (this.$refs.formEdit.validate()) {
         this.imageURL = this.uploadProfileImageToStorage(this.profileImage);
-
-        // TODO: request register to mock api
-        // this.callAPIRegister()
+        this.callAPIRegister();
       }
     },
     async uploadProfileImageToStorage(profileImage) {
       const metadata = { contentType: "image/jpeg" };
       const imageName = uuidv4() + ".jpg";
       const storageRef = ref(storage, `profile-image/${imageName}`);
-
       return new Promise(function (resolve) {
         uploadString(storageRef, profileImage, "data_url", metadata).then(
           (snapshot) => {
@@ -307,7 +317,6 @@ export default {
       });
     },
     async callAPIRegister() {
-      // TODO: request with mock api
       const data = {
         rank: this.rank,
         profile_url: this.imageURL,
@@ -332,7 +341,6 @@ export default {
           console.log(response.data);
         })
         .catch((error) => {
-          // TODO: revise handler
           if (error.response.data.status == "unprocessable_entity") {
             this.snackbar = true;
             this.snackbarColor = "warning";
