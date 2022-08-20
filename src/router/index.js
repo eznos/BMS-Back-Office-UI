@@ -106,6 +106,11 @@ const routes = [
       requiresAuthAdmin: true,
     },
   },
+  {
+    // catch all 404 - define at the very end
+    path: "*",
+    component: () => import("../components/notFound/Notfound.vue")
+    }
 ];
 
 const router = new VueRouter({
