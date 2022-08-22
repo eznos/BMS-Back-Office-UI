@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <!-- filer and title-->
-    <div class="content background-main">
+    <div class="content background-main" v-if="role == 'admin'">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
@@ -130,7 +130,7 @@
     </div>
     <div></div>
     <!-- data table and button -->
-    <v-card class="card-filter px-6 py-6">
+    <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <v-card-title>
         <!-- title -->
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
@@ -448,6 +448,9 @@
         </div>
       </v-snackbar>
     </v-card>
+    <v-container v-if="role == 'user'">
+      <NotFound />
+    </v-container>
   </v-app>
 </template>
 
@@ -457,7 +460,9 @@ import ranks from "../../json/rank.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
+import NotFound from "../../components/notFound/Notfound.vue";
 export default {
+  components: { NotFound },
   data: () => ({
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",

@@ -1,17 +1,18 @@
 <template>
   <v-app id="app">
     <!-- title and filter card -->
-    <div class="content background-main">
+    <div class="content background-main" v-if="role == 'admin'">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
           <v-row style="align-items: center">
             <div class="ml-3 mt-9">
-              <h2 v-if="role ==='admin'">
+              <h2 v-if="role === 'admin'">
                 <v-icon size="40" color="blue">mdi-water</v-icon> จัดการน้ำประปา
               </h2>
-                <h2 v-if="role ==='user'">
-                <v-icon size="40" color="blue">mdi-water</v-icon> ตารางค่าน้ำประปา
+              <h2 v-if="role === 'user'">
+                <v-icon size="40" color="blue">mdi-water</v-icon>
+                ตารางค่าน้ำประปา
               </h2>
             </div>
             <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
@@ -147,7 +148,7 @@
       </v-card>
     </div>
     <!-- button and data table -->
-    <v-card class="card-filter px-6 py-6">
+    <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <!-- title and button -->
       <v-card-title>
         <!-- title -->
@@ -551,6 +552,9 @@
         </div>
       </v-snackbar>
     </v-card>
+    <v-container v-if="role == 'user'">
+      <NotFound />
+    </v-container>
   </v-app>
 </template>
 
@@ -561,7 +565,9 @@ import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import water_groups from "../../json/waterGroups.json";
+import NotFound from "../../components/notFound/Notfound.vue";
 export default {
+  components: { NotFound },
   data: () => ({
     zonesBuildingsRoom: zonesBuildingsRoom,
     role: "",
