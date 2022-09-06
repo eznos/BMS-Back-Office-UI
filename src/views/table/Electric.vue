@@ -1,7 +1,7 @@
 <template>
   <v-app id="app">
     <!-- filer and title-->
-    <div class="content background-main" v-if="role == 'admin'">
+    <div class="content background-main">
       <v-row justify="space-between" class="px-3">
         <!-- title -->
         <div class="mb-4">
@@ -23,114 +23,133 @@
           >
           &nbsp;&nbsp;
           <h3>เครื่องมือค้นหา</h3>
-          <!-- button -->
+          <v-chip color="#F3FF83" class="ma-2"> ค่าไฟมากกว่าค่าเฉลี่ย </v-chip>
+          <v-chip color="#FFDE83" class="ma-2"> ค่าไฟน้อยกว่าค่าเฉลี่ย </v-chip>
+          <v-chip color="#FFA5A5" class="ma-2"> ค่าไฟเป็น 0 </v-chip>
           <v-spacer></v-spacer>
         </v-card-title>
         <!-- filter -->
-        <v-row justify="space-between" class="px-3">
-          <!-- Filter for  name-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-text-field
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              type="text"
-              label="ค้นหา"
-              class="filter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <!-- Filter for  zone-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="zoneFilterValue"
-              prepend-icon="mdi-map-legend"
-              label="ค้นหาด้วยพื้นที่"
-              class="filter"
-              :items="zones"
-              clearable
-              item-text="zone"
-              item-value="id"
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- Filter for  building-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="buildingFilterValue"
-              prepend-icon="mdi-office-building-outline"
-              label="ค้นหาด้วยอาคาร"
-              class="filter"
-              :items="buildings"
-              clearable
-              :disabled="!zoneFilterValue"
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- filter by date -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-menu
-              v-model="modalfilter"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateFilterValue"
-                  label="ค้นหาด้วยเดือน"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  class="filter"
-                  clearable
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="dateFilterValue"
-                type="month"
-                locale="th-TH"
-                scrollable
-                @input="modalfilter = false"
-              ></v-date-picker>
-            </v-menu>
-          </v-col>
-          <!-- Filter for  status-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-select
-              item-text="name"
-              item-value="value"
-              v-model="statusFilterValue"
-              :items="statuses"
-              prepend-icon="mdi-list-status"
-              label="ค้นหาด้วยสถานะ"
-              class="filter"
-              clearable
-              v-if="role == 'admin'"
-            ></v-select>
-          </v-col>
-          <v-row> </v-row>
-          <!-- btn filter -->
-          <v-col cols="12" justify="space-between" class="px-3">
-            <v-btn
-              outlined
-              color="error"
-              width="140"
-              @click="clearFilter"
-              class="button-filter pt-6 pb-6"
-            >
-              <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการค้นหา
-            </v-btn>
-          </v-col>
-        </v-row>
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header> แสดงเพิ่มเติม </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row justify="space-between" class="px-3">
+                <!-- Filter for  name-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    type="text"
+                    label="ค้นหา"
+                    class="filter"
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <!-- Filter for  zone-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-map-legend"
+                    label="ค้นหาด้วยพื้นที่"
+                    class="filter"
+                    :items="zones"
+                    clearable
+                    item-text="zone"
+                    item-value="id"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- Filter for  building-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="buildingFilterValue"
+                    prepend-icon="mdi-office-building-outline"
+                    label="ค้นหาด้วยอาคาร"
+                    class="filter"
+                    :items="buildings"
+                    clearable
+                    :disabled="!zoneFilterValue"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- filter by date -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-menu
+                    v-model="modalfilter"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="dateFilterValue"
+                        label="ค้นหาด้วยเดือน"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        class="filter"
+                        clearable
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="dateFilterValue"
+                      type="month"
+                      locale="th-TH"
+                      scrollable
+                      @input="modalfilter = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <!-- Filter for  status-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    item-text="name"
+                    item-value="value"
+                    v-model="statusFilterValue"
+                    :items="statuses"
+                    prepend-icon="mdi-list-status"
+                    label="ค้นหาด้วยสถานะ"
+                    class="filter"
+                    clearable
+                  ></v-select>
+                </v-col>
+                <!-- Filter for  price-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    v-model="electricAverageFilterValue"
+                    :items="electricAverages"
+                    prepend-icon="mdi-list-status"
+                    label="ค้นหาด้วยค่าไฟฟ้า"
+                    class="filter"
+                    clearable
+                  ></v-select>
+                </v-col>
+                <v-row> </v-row>
+                <!-- btn filter -->
+                <v-col cols="12" justify="space-between" class="px-3">
+                  <v-btn
+                    outlined
+                    color="error"
+                    width="140"
+                    @click="clearFilter"
+                    class="button-filter pt-6 pb-6"
+                  >
+                    <v-icon>mdi-delete-sweep</v-icon>
+                    &nbsp; ล้างการค้นหา
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-card>
     </div>
     <div></div>
     <!-- data table and button -->
-    <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
+    <v-card class="card-filter px-6 py-6">
       <v-card-title>
         <!-- title -->
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
@@ -343,12 +362,7 @@
             </v-card>
           </v-dialog>
           <!-- export -->
-          <v-dialog
-            v-if="role == 'admin'"
-            v-model="exportExcelElectric"
-            persistent
-            max-width="75%"
-          >
+          <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#06C3FF"
@@ -397,7 +411,6 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
-          v-if="role == 'admin'"
         >
           <!-- color of price on datatable  -->
           <template v-slot:[`item.price`]="{ item }">
@@ -417,28 +430,6 @@
           <!-- editor data -->
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-          </template>
-        </v-data-table>
-        <!-- table for user -->
-        <v-data-table
-          :headers="headersUser"
-          :items="electricTable"
-          item-key="first_name"
-          :items-per-page="itemsPerPage"
-          class="elevation-1 pa-6"
-          :search="search"
-          :loading="loadTable"
-          loading-text="กำลังโหลด... โปรดรอสักครู่"
-          :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
-          v-if="role == 'user'"
-          @input="enterSelect($event)"
-        >
-          <!-- color of price on datatable  -->
-          <template v-slot:[`item.price`]="{ item }">
-            <v-chip :color="getColor(item.price)">
-              {{ item.price }}
-            </v-chip>
           </template>
         </v-data-table>
       </v-card-text>
@@ -467,6 +458,8 @@ export default {
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
     snackbar: false,
+    electricAverageFilterValue: "",
+    electricAverages: ["น้อยกว่าค่าเฉลี่ย", "มากกว่าค่าเฉลี่ย"],
     role: "",
     statusAction: "",
     colorSnackbar: "",
@@ -602,7 +595,7 @@ export default {
         {
           text: "ค่าไฟฟ้า",
           value: "price",
-          filterable: false,
+          filter: this.electricAverageFilter,
         },
         {
           text: "สถานะ",
@@ -617,62 +610,7 @@ export default {
         },
       ];
     },
-    // for user
-    headersUser() {
-      return [
-        {
-          text: "ยศ",
-          align: "left",
-          value: "rank",
-          filter: this.rankFilter,
-        },
-        {
-          text: "ชื่อ",
-          value: "first_name",
-        },
-        {
-          text: "นามสกุล",
-          value: "last_name",
-        },
-        {
-          text: "พื้นที่",
-          value: "zone",
-          filter: this.zoneFilter,
-        },
-        {
-          text: "อาคาร",
-          value: "building",
-          filter: this.buildingFilter,
-        },
-        {
-          text: "เลขห้องพัก",
-          value: "room_no",
-        },
-        {
-          text: "เลขผู้ใช้ไฟ",
-          value: "electricity_no",
-        },
-        {
-          text: "เลขมิเตอร์ไฟ",
-          value: "electricity_meter_no",
-        },
-        {
-          text: "เดือน",
-          value: "date_pay",
-          filter: this.dateFilter,
-        },
-        {
-          text: "หน่วย",
-          value: "unit",
-          filterable: false,
-        },
-        {
-          text: "ค่าไฟฟ้า",
-          value: "price",
-          filterable: false,
-        },
-      ];
-    },
+
     // autocomplete for filter
     zones() {
       const zones = zonesBuildingsRoom;
@@ -1012,6 +950,15 @@ export default {
       }
       return value === this.statusFilterValue;
     },
+    electricAverageFilter(value) {
+      if (this.electricAverageFilterValue == "น้อยกว่าค่าเฉลี่ย") {
+        return value < 260;
+      }
+      if (this.electricAverageFilterValue == "มากกว่าค่าเฉลี่ย") {
+        return value > 300;
+      }
+      return true;
+    },
     dateFilter(value) {
       if (!this.dateFilterValue) {
         return true;
@@ -1060,6 +1007,7 @@ export default {
         (this.dateFilterValue = "");
       this.statusFilterValue = "";
       this.search = "";
+      this.electricAverageFilterValue = "";
     },
     // search in data table
     filterOnlyCapsText(value, search) {
@@ -1087,6 +1035,8 @@ export default {
     // color of price
     getColor(price) {
       if (price == 0) return "#FF606090";
+      if (price >= 300) return "#E6FF007C";
+      if (price <= 260) return "#FFBB007C";
       else return "#FFFFFF00";
     },
     // status color

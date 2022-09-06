@@ -7,7 +7,7 @@
         <div class="mb-4">
           <v-row style="align-items: center">
             <div class="ml-3 mt-9">
-              <h2 v-if="role === 'admin'">
+              <h2>
                 <v-icon size="40" color="blue">mdi-water</v-icon> จัดการน้ำประปา
               </h2>
               <h2 v-if="role === 'user'">
@@ -29,122 +29,140 @@
           >
           &nbsp;&nbsp;
           <h3>เครื่องมือค้นหา</h3>
-          <!-- button -->
+          <v-chip color="#F3FF83" class="ma-2"> ค่าน้ำประปารวมมากกว่าค่าเฉลี่ย </v-chip>
+          <v-chip color="#FFDE83" class="ma-2"> ค่าประปารวมน้อยกว่าค่าเฉลี่ย </v-chip>
           <v-spacer></v-spacer>
         </v-card-title>
         <!-- filter -->
-        <v-row justify="space-between" class="px-3">
-          <!-- Filter for  name-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-text-field
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              type="text"
-              label="ค้นหา"
-              class="filter"
-              clearable
-            ></v-text-field>
-          </v-col>
-          <!-- Filter for waterGroup-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="waterGroupfilterValue"
-              label="ค้นหาด้วยด้วยสายมิเตอร์"
-              prepend-icon="mdi-home-group"
-              :items="meterGroups"
-              class="filter"
-              clearable
-              item-text="name"
-              item-value="name"
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-header> แสดงเพิ่มเติม </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-row justify="space-between" class="px-3">
+                <!-- Filter for  name-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    type="text"
+                    label="ค้นหา"
+                    class="filter"
+                    clearable
+                  ></v-text-field>
+                </v-col>
+                <!-- Filter for waterGroup-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="waterGroupfilterValue"
+                    label="ค้นหาด้วยด้วยสายมิเตอร์"
+                    prepend-icon="mdi-home-group"
+                    :items="meterGroups"
+                    class="filter"
+                    clearable
+                    item-text="name"
+                    item-value="name"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- Filter for  zone-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-map-legend"
+                    label="ค้นหาด้วยด้วยเขต"
+                    class="filter"
+                    :items="zones"
+                    item-text="zone"
+                    item-value="id"
+                    clearable
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- Filter for  building-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="buildingFilterValue"
+                    prepend-icon="mdi-office-building"
+                    label="ค้นหาด้วยด้วยอาคาร"
+                    class="filter"
+                    :items="buildings"
+                    clearable
+                    :disabled="!zoneFilterValue"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- filter by date -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-menu
+                    v-model="menuDatefilter"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-text-field
+                        v-model="dateFilterValue"
+                        label="ค้นหาด้วยด้วยรอบบิล"
+                        prepend-icon="mdi-calendar"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        class="filter"
+                        clearable
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="dateFilterValue"
+                      type="month"
+                      locale="th-TH"
+                      scrollable
+                      @input="menuDatefilter = false"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <!-- Filter for  status-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    v-model="stateFilterValue"
+                    :items="statuses"
+                    prepend-icon="mdi-list-status"
+                    label="ค้นหาด้วยด้วยสถานะ"
+                    class="filter"
+                    clearable
+                    item-text="name"
+                    item-value="value"
+                  ></v-select>
+                </v-col>
+                <!--  -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    v-model="waterAverageFilterValue"
+                    :items="waterAverages"
+                    prepend-icon="mdi-list-status"
+                    label="ค้นหาด้วยค่าน้ำ"
+                    class="filter"
+                    clearable
+                  ></v-select>
+                </v-col>
+                <!-- btn filter -->
+                <v-col cols="12" justify="space-between" class="px-3">
+                  <v-btn
+                    outlined
+                    color="error"
+                    width="140"
+                    @click="clearFilter"
+                    class="button-filter pt-6 pb-6"
+                  >
+                    <v-icon>mdi-delete-sweep</v-icon>
+                    &nbsp; ล้างการค้นหา
+                  </v-btn>
+                </v-col>
+              </v-row></v-expansion-panel-content
             >
-            </v-autocomplete>
-          </v-col>
-          <!-- Filter for  zone-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="zoneFilterValue"
-              prepend-icon="mdi-map-legend"
-              label="ค้นหาด้วยด้วยเขต"
-              class="filter"
-              :items="zones"
-              item-text="zone"
-              item-value="id"
-              clearable
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- Filter for  building-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="buildingFilterValue"
-              prepend-icon="mdi-office-building"
-              label="ค้นหาด้วยด้วยอาคาร"
-              class="filter"
-              :items="buildings"
-              clearable
-              :disabled="!zoneFilterValue"
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- filter by date -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-menu
-              v-model="menuDatefilter"
-              :close-on-content-click="false"
-              :nudge-right="40"
-              transition="scale-transition"
-              offset-y
-              min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dateFilterValue"
-                  label="ค้นหาด้วยด้วยรอบบิล"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                  class="filter"
-                  clearable
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="dateFilterValue"
-                type="month"
-                locale="th-TH"
-                scrollable
-                @input="menuDatefilter = false"
-              ></v-date-picker>
-            </v-menu>
-          </v-col>
-          <!-- Filter for  status-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-select
-              v-model="stateFilterValue"
-              :items="statuses"
-              prepend-icon="mdi-list-status"
-              label="ค้นหาด้วยด้วยสถานะ"
-              class="filter"
-              clearable
-              item-text="name"
-              item-value="value"
-              v-if="role === 'admin'"
-            ></v-select>
-          </v-col>
-          <!-- btn filter -->
-          <v-col cols="12" justify="space-between" class="px-3">
-            <v-btn
-              outlined
-              color="error"
-              width="140"
-              @click="clearFilter"
-              class="button-filter pt-6 pb-6"
-            >
-              <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการค้นหา
-            </v-btn>
-          </v-col>
-        </v-row>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </v-card>
     </div>
     <!-- button and data table -->
@@ -162,7 +180,6 @@
             v-model="differencePriceCalculate"
             persistent
             max-width="60%"
-            v-if="role === 'admin'"
           >
             <template v-slot:activator="{ on: attrs }">
               <v-btn
@@ -233,12 +250,7 @@
             </v-card>
           </v-dialog>
           <!-- edit user -->
-          <v-dialog
-            v-if="role === 'admin'"
-            v-model="dialog"
-            persistent
-            max-width="75%"
-          >
+          <v-dialog v-model="dialog" persistent max-width="75%">
             <v-card>
               <v-card-title>
                 <span>{{ formTitle }}</span>
@@ -454,12 +466,7 @@
             </v-card>
           </v-dialog>
           <!-- export excel -->
-          <v-dialog
-            v-if="role === 'admin'"
-            v-model="exportExcelwater"
-            max-width="75%"
-            persistent
-          >
+          <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 color="#06C3FF"
@@ -489,7 +496,6 @@
         </div>
       </v-card-title>
       <v-card-text>
-        <!-- start data-table -->
         <!-- data table for admin -->
         <v-data-table
           v-model="selected"
@@ -505,11 +511,10 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
-          v-if="role === 'admin'"
         >
-          <template v-slot:[`waterTable.price`]="{ waterTable }">
-            <v-chip :color="getColor(waterTable.price)">
-              {{ waterTable.price }}
+          <template v-slot:[`item.total_pay`]="{ item }">
+            <v-chip :color="getColor(item.total_pay)">
+              {{ item.total_pay }}
             </v-chip>
           </template>
           <template v-slot:[`item.status`]="{ item }">
@@ -522,27 +527,6 @@
           </template>
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-          </template>
-        </v-data-table>
-        <!-- data table for user -->
-        <v-data-table
-          :headers="headersUser"
-          :items="waterTables"
-          item-key="first_name"
-          :items-per-page="5"
-          class="elevation-1 pa-6 th-1"
-          :search="search"
-          :loading="loadTable"
-          loading-text="กำลังโหลด... โปรดรอสักครู่"
-          :sort-by.sync="sortBy"
-          :sort-desc.sync="sortDesc"
-          @input="enterSelect($event)"
-          v-if="role === 'user'"
-        >
-          <template v-slot:[`waterTable.price`]="{ waterTable }">
-            <v-chip :color="getColor(waterTable.price)">
-              {{ waterTable.price }}
-            </v-chip>
           </template>
         </v-data-table>
       </v-card-text>
@@ -571,6 +555,8 @@ export default {
   data: () => ({
     zonesBuildingsRoom: zonesBuildingsRoom,
     role: "",
+    waterAverageFilterValue: "",
+    waterAverages: ["น้อยกว่าค่าเฉลี่ย", "มากกว่าค่าเฉลี่ย"],
     loadTable: true,
     snackbar: false,
     statusAction: "",
@@ -732,6 +718,7 @@ export default {
         {
           text: "ค่าน้ำรวม",
           value: "total_pay",
+          filter: this.waterAverageFilter,
         },
         {
           text: "สถานะ",
@@ -742,72 +729,6 @@ export default {
           text: "การจัดการ",
           value: "actions",
           sortable: false,
-        },
-      ];
-    },
-    // header for user
-    headersUser() {
-      return [
-        {
-          text: "ยศ",
-          align: "left",
-          value: "rank",
-        },
-        {
-          text: "ชื่อ",
-          value: "first_name",
-        },
-        {
-          text: "นามสกุล",
-          value: "last_name",
-        },
-        {
-          text: "พื้นที่",
-          value: "zone",
-          filter: this.zoneFilter,
-        },
-        {
-          text: "สายของมิเตอร์",
-          value: "water_zone",
-          filter: this.groupFilter,
-        },
-        {
-          text: "อาคาร",
-          value: "building",
-          filter: this.buildingFilter,
-        },
-        {
-          text: "เลขห้องพัก",
-          value: "room",
-        },
-        {
-          text: "เลขผู้ใช้น้ำ",
-          value: "water_no",
-        },
-        {
-          text: "เลขมิเตอร์น้ำ",
-          value: "water_no",
-        },
-        {
-          text: "รอบบิล",
-          value: "billing_cycle",
-          filter: this.dateFilter,
-        },
-        {
-          text: "จำนวนหน่วย",
-          value: "unit",
-        },
-        {
-          text: "ค่าน้ำ",
-          value: "price",
-        },
-        {
-          text: "ค่าน้ำส่วนต่าง",
-          value: "price_diff",
-        },
-        {
-          text: "ค่าน้ำรวม",
-          value: "total_pay",
         },
       ];
     },
@@ -1098,9 +1019,11 @@ export default {
         });
     },
     // color of price
-    getColor(price) {
-      if (price == 0) return "red";
-      else return "#ffffff";
+    getColor(total_pay) {
+      if (total_pay == 0) return "#FF606090";
+      if (total_pay >= 200) return "#E6FF007C";
+      if (total_pay <= 150) return "#FFBB007C";
+      else return "#FFFFFF00";
     },
     // color for status
     getColorForStatus(status) {
@@ -1231,6 +1154,15 @@ export default {
       }
       return value === this.zoneFilterValue;
     },
+    waterAverageFilter(value) {
+      if (this.waterAverageFilterValue == "น้อยกว่าค่าเฉลี่ย") {
+        return value < 200;
+      }
+      if (this.waterAverageFilterValue == "มากกว่าค่าเฉลี่ย") {
+        return value > 200;
+      }
+      return true;
+    },
     groupFilter(value) {
       if (!this.waterGroupfilterValue) {
         return true;
@@ -1286,6 +1218,7 @@ export default {
         (this.dateFilterValue = "");
       this.zoneFilterValue = "";
       this.search = "";
+      this.waterAverageFilterValue = "";
     },
     filterOnlyCapsText(value, search) {
       return (
