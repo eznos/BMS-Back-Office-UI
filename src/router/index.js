@@ -50,7 +50,6 @@ const routes = [
       requiresAuthAdmin: true,
     },
   },
-
   {
     path: "/residents",
     name: "resident",

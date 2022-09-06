@@ -165,11 +165,36 @@ export default {
         });
     },
 
-    userLogin() {
-      localStorage.setItem("role", "user");
-      this.$router.push({
-        name: "overview",
-      });
+    async userLogin() {
+      let headerAPI = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+        data: data,
+      };
+      var data = "";
+      axios
+        .post(apiUrl + "/v1/auth/login-user", data, headerAPI)
+        .then(async (response) => {
+          let data = response.data;
+          if (data.status === "success") {
+            this.role = data.result.role;
+            localStorage.setItem("role", this.role);
+            if (data.result.role === "user") {
+              this.$router.push({
+                name: "overview",
+              });
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.error_message === "invalid API Key") {
+            this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+            this.isLogin = false;
+            console.log(error.response.data.error_message);
+          }
+        });
     },
   },
 };

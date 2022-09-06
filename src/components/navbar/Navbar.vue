@@ -172,7 +172,12 @@ export default {
         route: "/manageuser",
       },
       {
-        icon: " mdi-google-maps",
+        icon: "mdi-clipboard-text-clock",
+        text: "ประวัติ",
+        route: "/history",
+      },
+      {
+        icon: "mdi-google-maps",
         text: "แผนที่",
         route: "/map",
       },
@@ -197,14 +202,9 @@ export default {
         route: "/overview",
       },
       {
-        icon: "mdi-water",
-        text: "ตารางค่าน้ำประปา",
-        route: "/waterbill",
-      },
-      {
-        icon: "mdi-lightning-bolt",
-        text: "ตารางค่าไฟฟ้า",
-        route: "/electricbill",
+        icon: "mdi-clipboard-text-clock",
+        text: "ประวัติ",
+        route: "/history",
       },
       {
         icon: " mdi-google-maps",
