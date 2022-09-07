@@ -416,6 +416,12 @@ export default {
                 },
               });
             }
+            if (data.status == "success no data") {
+              this.loadTable = false;
+              this.snackbar = true;
+              this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
+              this.colorSnackbar = "warning";
+            }
           })
           .catch((error) => {
             this.loadTable = false;
