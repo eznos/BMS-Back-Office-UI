@@ -31,7 +31,7 @@
           v-on="on"
           class="button-filter pt-5 pb-5"
           :disabled="!selectItems"
-          @click="deleteItemSelected"
+          @click="getResidentsID()"
         >
           <v-icon>mdi-delete-sweep</v-icon>
           &nbsp; ลบข้อมูลที่เลือก
@@ -780,18 +780,23 @@ export default {
         for (var i = 0; i < this.selected.length; i++) {
           residentsIDs.push(this.selected[i].id);
         }
-        this.exportResident(residentsIDs);
+        if (this.exportExcelResident == true) {
+          this.exportResident(residentsIDs);
+        }
+        if (this.exportExcelResident == false) {
+          this.deleteResident(residentsIDs);
+        }
       }
     },
     // export with api
-    exportResident(roomsIDs) {
+    exportResident(residentsIDs) {
       var config = {
         headers: {
           "x-api-key": "xxx-api-key",
           "x-refresh-token": "xxx-refresh-token",
         },
       };
-      const residents_id = { residents_id: roomsIDs };
+      const residents_id = { residents_id: residentsIDs };
       return axios
         .post(apiUrl + "/v1/resident/exports", residents_id, config)
         .then((response) => {
@@ -801,8 +806,7 @@ export default {
             this.statusAction = "Export สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
-            // this.selected.length = 0
-            console.log(this.selected.length);
+            this.selectItems = false;
           }
         })
         .catch((error) => {
@@ -818,6 +822,39 @@ export default {
           } else {
             this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.exportExcelResident = false;
+          }
+        });
+    },
+    // delete with api
+    deleteResident(residentsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const resident_id = { residents_id: residentsIDs };
+      const residents_id = "?resident_id=" + JSON.stringify(resident_id);
+      return axios
+        .delete(apiUrl + "/v1/delete/resident/" + residents_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            this.deleteItemSelected();
+            this.exportExcelResident = false;
+            this.statusAction =
+              "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.error_message === "bad_request") {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
             this.snackbar = true;
             this.exportExcelResident = false;
           }
@@ -925,9 +962,9 @@ export default {
         for (var i = 0; i < this.selected.length; i++) {
           const index = this.residentTable.indexOf(this.selected[i]);
           this.residentTable.splice(index, 1);
-          this.selected.length == 0;
         }
-        this.dialog = false;
+        this.residentTable.indexOf(this.selected[0]);
+        this.selectItems = false;
       }
     },
   },
