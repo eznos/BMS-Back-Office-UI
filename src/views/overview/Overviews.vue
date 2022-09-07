@@ -211,7 +211,7 @@
                 </div>
               </v-card-title>
               <v-card-actions>
-                <div class="chart-responsive" :style="{ padding: 10 }">
+                <div class="chart-responsive" :style="{ padding: -20 }">
                   <canvas id="water" width="600" height="350"></canvas>
                 </div>
               </v-card-actions>
@@ -443,6 +443,7 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            var electric = document.getElementById("electric");
             return new Chart(electric, {
               type: "bar",
               data: {
@@ -580,13 +581,6 @@ export default {
           console.log(error);
         });
     },
-    showLog() {
-      console.log(this.date);
-      console.log(this.infoCardSelect);
-      this.date = new Date().toISOString().substr(0, 7);
-      this.infoCardSelect = [];
-      this.dialog = false;
-    },
     submit() {
       if (this.$refs.formExport.validate()) {
         this.exportOverview(this.date, this.infoCardSelect);
@@ -650,7 +644,7 @@ export default {
 <style scoped>
 .chart-responsive {
   width: 100%;
-  margin: 20px auto;
+  margin: 0px auto;
 }
 .font {
   font-family: Sarabun;
