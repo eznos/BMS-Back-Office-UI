@@ -784,7 +784,7 @@ export default {
           this.exportResident(residentsIDs);
         }
         if (this.exportExcelResident == false) {
-          this.deleteResident(residentsIDs);
+          this.deleteItemSelected(residentsIDs);
         }
       }
     },
@@ -842,7 +842,6 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            this.deleteItemSelected();
             this.exportExcelResident = false;
             this.statusAction =
               "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
@@ -957,7 +956,7 @@ export default {
       }
     },
     // delete as selected
-    deleteItemSelected() {
+    deleteItemSelected(residentsIDs) {
       if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
         for (var i = 0; i < this.selected.length; i++) {
           const index = this.residentTable.indexOf(this.selected[i]);
@@ -965,6 +964,7 @@ export default {
         }
         this.residentTable.indexOf(this.selected[0]);
         this.selectItems = false;
+        this.deleteResident(residentsIDs)
       }
     },
   },
