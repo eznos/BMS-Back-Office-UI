@@ -142,7 +142,7 @@
               color="error"
               class="button-filter pt-5 pb-5"
               :disabled="!selectItems"
-              @click="deleteItemSelected"
+              @click="getRoomsID()"
             >
               <v-icon>mdi-delete-sweep</v-icon>
               &nbsp; ลบข้อมูลที่เลือก
@@ -863,7 +863,12 @@ export default {
         for (var i = 0; i < this.selected.length; i++) {
           roomsIDs.push(this.selected[i].id);
         }
-        this.exportBuliding(roomsIDs);
+        if (this.exportExcelBuliding == true) {
+          this.exportBuliding(roomsIDs);
+        }
+        if (this.exportExcelBuliding == false) {
+          this.deleteItemSelected(roomsIDs);
+        }
       }
     },
     // export with api
@@ -901,6 +906,44 @@ export default {
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.exportExcelBuliding = false;
+          }
+        });
+    },
+    // delete buildibg
+    deleteRoom(roomsIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const room_id = { rooms_id: roomsIDs };
+      const rooms_id = "?rooms_id=" + JSON.stringify(room_id);
+      return axios
+        .delete(apiUrl + "/v1/delete/room/" + rooms_id, config)
+        .then((response) => {
+          let data = response.data;
+          if (confirm) {
+            if (data.status == "success") {
+              this.statusAction =
+                "ลบข้อมูลผู้อยู่อาศัยจำนวน " +
+                this.selected.length +
+                "คน สำเร็จ";
+              this.colorSnackbar = "agree";
+              this.snackbar = true;
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.error_message === "bad_request") {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+          } else {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
           }
         });
     },
@@ -1048,14 +1091,15 @@ export default {
       }
     },
     // delete as selected
-    deleteItemSelected() {
+    deleteItemSelected(roomsIDs) {
       if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
         for (var i = 0; i < this.selected.length; i++) {
           const index = this.buildingTable.indexOf(this.selected[i]);
           this.buildingTable.splice(index, 1);
-          this.selected.length == 0;
         }
-        this.dialog = false;
+        this.buildingTable.indexOf(this.selected[0]);
+        this.selectItems = false;
+        this.deleteRoom(roomsIDs);
       }
     },
   },
