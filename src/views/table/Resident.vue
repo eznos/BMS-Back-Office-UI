@@ -156,7 +156,6 @@
                           required
                           counter="12"
                           maxlength="12"
-                          disabled
                         ></v-text-field>
                       </v-col>
                       <!-- electric_meter_no -->
@@ -168,7 +167,7 @@
                           clearable
                           required
                           counter="11"
-                          disabled
+                          maxlength="11"
                         ></v-text-field>
                       </v-col>
                       <!-- water_no -->
@@ -180,7 +179,7 @@
                           clearable
                           required
                           counter="4"
-                          disabled
+                          maxlength="4"
                         ></v-text-field>
                       </v-col>
                       <!-- water_meter_no -->
@@ -192,7 +191,7 @@
                           clearable
                           required
                           counter="4"
-                          disabled
+                          maxlength="4"
                         ></v-text-field>
                       </v-col>
                       <!-- room_type -->
@@ -750,6 +749,7 @@ export default {
       var role = localStorage.getItem("role");
       this.role = role;
     },
+
     // get data from mockup api
     getResidentData() {
       var config = {
@@ -787,6 +787,66 @@ export default {
           this.deleteItemSelected(residentsIDs);
         }
       }
+    },
+    // add residet
+    addResident(
+      rank,
+      first_name,
+      last_name,
+      water_zone,
+      zone,
+      building,
+      room_no,
+      electricity_no,
+      electricity_meter_no,
+      water_no,
+      water_meter_no,
+      room_type
+    ) {
+      let payload = {
+        rank: rank,
+        first_name: first_name.trim(),
+        last_name: last_name.trim(),
+        water_zone: water_zone,
+        zone: zone,
+        building: building,
+        room_no: room_no,
+        electricity_no: electricity_no,
+        electricity_meter_no: electricity_meter_no,
+        water_no: water_no,
+        water_meter_no: water_meter_no,
+        room_type: room_type,
+      };
+      let headerAPI = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+          "Content-Type": "application/json",
+        },
+        payload: payload,
+      };
+      axios
+        .post(apiUrl + "/v1/resident/add", payload, headerAPI)
+        .then(async (response) => {
+          let data = response.data;
+          if (data.status === "success") {
+            console.log(data);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.error_message === "invalid username or password"
+          ) {
+            this.loginFail = "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
+            this.isLogin = false;
+            console.log(error.response.data.error_message);
+          } else {
+            this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+            this.isLogin = false;
+            console.log(error.response.data.error_message);
+          }
+        });
     },
     // export with api
     exportResident(residentsIDs) {
@@ -915,6 +975,23 @@ export default {
         this.colorSnackbar = "agree";
       } else {
         this.residentTable.push(this.editedItem);
+        this.addResident(
+          this.editedItem.rank,
+          this.editedItem.first_name,
+          this.editedItem.last_name,
+          this.editedItem.water_zone,
+          this.editedItem.zone,
+          this.editedItem.building,
+          this.editedItem.room_no,
+          this.editedItem.electricity_no,
+          this.editedItem.electricity_meter_no,
+          this.editedItem.water_no,
+          this.editedItem.water_meter_no,
+          this.editedItem.room_type
+        );
+        this.snackbar = true;
+        this.statusAction = "เพิ่มข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       }
       this.close();
     },
@@ -964,7 +1041,7 @@ export default {
         }
         this.residentTable.indexOf(this.selected[0]);
         this.selectItems = false;
-        this.deleteResident(residentsIDs)
+        this.deleteResident(residentsIDs);
       }
     },
   },
