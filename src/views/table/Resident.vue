@@ -831,6 +831,10 @@ export default {
           let data = response.data;
           if (data.status === "success") {
             console.log(data);
+            this.statusAction =
+              "เพิ่มข้อมูลผู้อยู่อาศัยสำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
           }
         })
         .catch((error) => {
@@ -863,10 +867,13 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             this.exportExcelResident = false;
-            this.statusAction = "Export สำเร็จ";
+            this.statusAction =
+              "Export ข้อมูลผู้อยู่อาศัยจำนวน " +
+              this.selected.length +
+              "คน สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
-            this.selectItems = false;
+            this.selected = [];
           }
         })
         .catch((error) => {
@@ -907,6 +914,7 @@ export default {
               "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
+            this.selected = [];
           }
         })
         .catch((error) => {
@@ -1039,7 +1047,6 @@ export default {
           const index = this.residentTable.indexOf(this.selected[i]);
           this.residentTable.splice(index, 1);
         }
-        this.residentTable.indexOf(this.selected[0]);
         this.selectItems = false;
         this.deleteResident(residentsIDs);
       }

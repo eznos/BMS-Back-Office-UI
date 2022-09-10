@@ -886,9 +886,13 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             this.exportExcelBuliding = false;
-            this.statusAction = "Export สำเร็จ";
+            this.statusAction =
+              "Export ข้อมูลห้องพักจำนวน " +
+              this.selected.length +
+              " ห้อง สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
+            this.selected = [];
           }
         })
         .catch((error) => {
@@ -931,6 +935,7 @@ export default {
                 "คน สำเร็จ";
               this.colorSnackbar = "agree";
               this.snackbar = true;
+              this.selected = [];
             }
           }
         })

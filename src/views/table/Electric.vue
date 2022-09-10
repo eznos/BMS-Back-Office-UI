@@ -900,13 +900,16 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             this.exportExcelElectric = false;
-            this.statusAction = "Export สำเร็จ";
+            this.statusAction =
+              "Export ข้อมูลผู้อยู่ใช้ไฟจำนวน " +
+              this.selected.length +
+              "คน สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
+            this.selected = [];
           }
         })
         .catch((error) => {
-          console.log(error);
           if (
             error.response.data.error_message ===
             "some record does not have calculated status"
@@ -950,6 +953,7 @@ export default {
       }
       return value === this.statusFilterValue;
     },
+    // electric average price
     electricAverageFilter(value) {
       if (this.electricAverageFilterValue == "น้อยกว่าค่าเฉลี่ย") {
         return value < 260;

@@ -482,6 +482,7 @@ export default {
           this.selected.length == 0;
         }
         this.dialog = false;
+        this.selected = [];
       }
     },
     // select all

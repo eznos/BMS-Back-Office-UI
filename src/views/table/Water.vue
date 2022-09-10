@@ -29,8 +29,12 @@
           >
           &nbsp;&nbsp;
           <h3>เครื่องมือค้นหา</h3>
-          <v-chip color="#F3FF83" class="ma-2"> ค่าน้ำประปารวมมากกว่าค่าเฉลี่ย </v-chip>
-          <v-chip color="#FFDE83" class="ma-2"> ค่าประปารวมน้อยกว่าค่าเฉลี่ย </v-chip>
+          <v-chip color="#F3FF83" class="ma-2">
+            ค่าน้ำประปารวมมากกว่าค่าเฉลี่ย
+          </v-chip>
+          <v-chip color="#FFDE83" class="ma-2">
+            ค่าประปารวมน้อยกว่าค่าเฉลี่ย
+          </v-chip>
           <v-spacer></v-spacer>
         </v-card-title>
         <!-- filter -->
@@ -1116,9 +1120,13 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             this.exportExcelwater = false;
-            this.statusAction = "Export สำเร็จ";
+            this.statusAction =
+              "Export ข้อมูลผู้อยู่ใช้น้ำจำนวน " +
+              this.selected.length +
+              "คน สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
+            this.selected = [];
           }
         })
         .catch((error) => {
