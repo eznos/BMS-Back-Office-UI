@@ -462,7 +462,7 @@
                 <v-spacer></v-spacer>
                 <v-form ref="formButton" v-model="valid" lazy-validation>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
-                  <v-btn color="agree" :disabled="!valid" text @click="save">
+                  <v-btn color="agree" :disabled="!valid" text @click="save()">
                     ยืนยัน
                   </v-btn>
                 </v-form>
@@ -590,7 +590,6 @@ export default {
     emailtarget: "",
     date_now: new Date().toISOString().substr(0, 10),
     differencePriceCalculate: false,
-    importExcel: false,
     exportExcelwater: false,
     menu: false,
     search: "",
@@ -602,9 +601,9 @@ export default {
     zoneFilterValue: "",
     dateFilterValue: "",
     date: "",
+    WaterBillingID: "",
     stateFilterValue: "",
     statuses: statuses,
-    billingsIDs: "",
     waterTables: [],
     editedIndex: -1,
     editedItem: {
@@ -1147,6 +1146,42 @@ export default {
           }
         });
     },
+    // edit billing via API 
+    editWaterBilling(unit, price, status, billing_cycle) {
+      let idwater = "?id=" + JSON.stringify(this.WaterBillingID);
+      const payload = {
+        unit: unit,
+        price: price,
+        status: status,
+        billing_cycle: billing_cycle,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+      };
+      return axios
+        .patch(apiUrl + "/v1/billdings/water/edit/" + idwater, payload, config)
+        .then(async () => {
+        })
+        .catch((error) => {
+          console.log(error);
+          if (
+            error.response.data.status ===
+            "unauthorized"
+          ) {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1199,6 +1234,7 @@ export default {
       this.editedIndex = this.waterTables.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.WaterBillingID = item.id;
     },
     close() {
       this.dialog = false;
@@ -1210,6 +1246,12 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.waterTables[this.editedIndex], this.editedItem);
+        this.editWaterBilling(
+          this.editedItem.unit,
+          this.editedItem.price,
+          this.editedItem.status,
+          this.editedItem.billing_cycle
+        );
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
