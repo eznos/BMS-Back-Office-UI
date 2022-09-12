@@ -952,6 +952,55 @@ export default {
           }
         });
     },
+    // create building room
+    createBuilding(
+      water_zone,
+      zone,
+      building,
+      room_no,
+      electricity_no,
+      electricity_meter_no,
+      water_no,
+      meter_no,
+      room_type,
+      status
+    ) {
+      let payload = {
+        water_zone: water_zone,
+        zone: zone,
+        building: building,
+        room_no: room_no,
+        electricity_no: electricity_no,
+        electricity_meter_no: electricity_meter_no,
+        water_no: water_no,
+        water_meter_no: meter_no,
+        room_type: room_type,
+        status: status,
+      };
+      let headerAPI = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+          "Content-Type": "application/json",
+        },
+        payload: payload,
+      };
+      axios
+        .post(apiUrl + "/v1/building/add/", payload, headerAPI)
+        .then(() => {})
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.error_message === "invalid API Key") {
+            this.snackbar = true;
+            this.statusAction = "เพิ่มข้อมูลผิดพลาด กรูณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "wanning";
+          } else {
+            this.snackbar = true;
+            this.statusAction = "เพิ่มข้อมูลผิดพลาด กรูณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1039,6 +1088,21 @@ export default {
         this.colorSnackbar = "agree";
       } else {
         this.buildingTable.push(this.editedItem);
+        this.createBuilding(
+          this.editedItem.water_zone,
+          this.editedItem.zone,
+          this.editedItem.building,
+          this.editedItem.room_no,
+          this.editedItem.electricity_no,
+          this.editedItem.electricity_meter_no,
+          this.editedItem.water_no,
+          this.editedItem.meter_no,
+          this.editedItem.room_type,
+          this.editedItem.status
+        );
+        this.snackbar = true;
+        this.statusAction = "เพิ่มข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       }
 
       this.close();
