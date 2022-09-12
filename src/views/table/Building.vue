@@ -444,6 +444,7 @@ import NotFound from "../../components/notFound/Notfound.vue";
 export default {
   components: { NotFound },
   data: () => ({
+    buildingID: "",
     role: "",
     el: "#app",
     zonesBuildingsRoom: zonesBuildingsRoom,
@@ -1001,6 +1002,54 @@ export default {
           }
         });
     },
+    editBuilding(
+      water_zone,
+      zone,
+      building,
+      room_no,
+      electricity_no,
+      electricity_meter_no,
+      water_no,
+      meter_no,
+      room_type,
+      status
+    ) {
+      let building_ID = "?id=" + JSON.stringify(this.buildingID);
+      const payload = {
+        water_zone: water_zone,
+        zone: zone,
+        building: building,
+        room_no: room_no,
+        electricity_no: electricity_no,
+        electricity_meter_no: electricity_meter_no,
+        water_no: water_no,
+        water_meter_no: meter_no,
+        room_type: room_type,
+        status: status,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+      };
+      return axios
+        .patch(apiUrl + "/v1/building/edit/" + building_ID, payload, config)
+        .then(async () => {})
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1050,6 +1099,7 @@ export default {
       this.editedIndex = this.buildingTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.buildingID = item.id;
     },
     deleteItem(item) {
       this.editedIndex = this.buildingTable.indexOf(item);
@@ -1083,6 +1133,18 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
+        this.editBuilding(
+          this.editedItem.water_zone,
+          this.editedItem.zone,
+          this.editedItem.building,
+          this.editedItem.room_no,
+          this.editedItem.electricity_no,
+          this.editedItem.electricity_meter_no,
+          this.editedItem.water_no,
+          this.editedItem.meter_no,
+          this.editedItem.room_type,
+          this.editedItem.status
+        );
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
