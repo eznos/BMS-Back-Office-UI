@@ -220,7 +220,7 @@
                     color="agree"
                     :disabled="!valid"
                     text
-                    @click="validateForm"
+                    @click="save()"
                   >
                     ยืนยัน
                   </v-btn>
@@ -391,6 +391,7 @@ export default {
     dialogDelete: false,
     exportExcelResident: false,
     meterGroup: "",
+    resident_id: "",
     meterGroups: water_groups,
     room_types: room_types,
     // Filter models.
@@ -749,7 +750,6 @@ export default {
       var role = localStorage.getItem("role");
       this.role = role;
     },
-
     // get data from mockup api
     getResidentData() {
       var config = {
@@ -831,8 +831,7 @@ export default {
           let data = response.data;
           if (data.status === "success") {
             console.log(data);
-            this.statusAction =
-              "เพิ่มข้อมูลผู้อยู่อาศัยสำเร็จ";
+            this.statusAction = "เพิ่มข้อมูลผู้อยู่อาศัยสำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
           }
@@ -849,6 +848,59 @@ export default {
             this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
             this.isLogin = false;
             console.log(error.response.data.error_message);
+          }
+        });
+    },
+    // edit resident
+    editResidentData(
+      rank,
+      first_name,
+      last_name,
+      water_zone,
+      zone,
+      building,
+      room_no,
+      electricity_no,
+      electricity_meter_no,
+      water_no,
+      water_meter_no,
+      room_type
+    ) {
+      let resident_id = "?id=" + JSON.stringify(this.resident_id);
+      const payload = {
+        rank: rank,
+        first_name: first_name.trim(),
+        last_name: last_name.trim(),
+        water_zone: water_zone,
+        zone: zone,
+        building: building,
+        room_no: room_no,
+        electricity_no: electricity_no,
+        electricity_meter_no: electricity_meter_no,
+        water_no: water_no,
+        water_meter_no: water_meter_no,
+        room_type: room_type,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+      };
+      return axios
+        .patch(apiUrl + "/v1/resident/edit" + resident_id, payload, config)
+        .then(async () => {})
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
           }
         });
     },
@@ -945,6 +997,7 @@ export default {
       this.editedIndex = this.residentTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.resident_id = item.id;
     },
     deleteItem(item) {
       this.editedIndex = this.residentTable.indexOf(item);
@@ -969,20 +1022,30 @@ export default {
         this.editedIndex = -1;
       });
     },
-    // validate before save
-    async validateForm() {
-      if (this.$refs.formAdduser.validate()) {
-        this.save();
-      }
-    },
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.residentTable[this.editedIndex], this.editedItem);
+        // edit
+        this.editResidentData(
+          this.editedItem.rank,
+          this.editedItem.first_name,
+          this.editedItem.last_name,
+          this.editedItem.water_zone,
+          this.editedItem.zone,
+          this.editedItem.building,
+          this.editedItem.room_no,
+          this.editedItem.electricity_no,
+          this.editedItem.electricity_meter_no,
+          this.editedItem.water_no,
+          this.editedItem.water_meter_no,
+          this.editedItem.room_type
+        );
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
       } else {
         this.residentTable.push(this.editedItem);
+        // add
         this.addResident(
           this.editedItem.rank,
           this.editedItem.first_name,
@@ -1000,14 +1063,6 @@ export default {
         this.snackbar = true;
         this.statusAction = "เพิ่มข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
-      }
-      this.close();
-    },
-    savea() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.residentTable[this.editedIndex], this.editedItem);
-      } else {
-        this.residentTable.push(this.editedItem);
       }
       this.close();
     },
