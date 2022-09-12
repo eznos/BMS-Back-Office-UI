@@ -310,7 +310,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editedItem.date_pay"
+                              v-model="editedItem.billing_cycle"
                               label="เดือน"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -323,7 +323,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editedItem.date_pay"
+                            v-model="editedItem.billing_cycle"
                             type="month"
                             locale="th-TH"
                           >
@@ -339,7 +339,9 @@
                               text
                               color="agree"
                               @click="
-                                $refs.dialogAdduser.save(editedItem.date_pay)
+                                $refs.dialogAdduser.save(
+                                  editedItem.billing_cycle
+                                )
                               "
                             >
                               ยืนยัน
@@ -485,6 +487,7 @@ export default {
     ranks: ranks,
     building: null,
     room_no: null,
+    ElectricBillingID: "",
     // Filter models.
     zoneFilterValue: "",
     buildingFilterValue: "",
@@ -503,7 +506,7 @@ export default {
       electricity_no: "",
       electricity_meter_no: "",
       status: "draft",
-      date_pay: new Date().toISOString().substr(0, 7),
+      billing_cycle: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
       first_name: "",
@@ -512,7 +515,7 @@ export default {
       electricity_no: "",
       electricity_meter_no: "",
       status: "draft",
-      date_pay: new Date().toISOString().substr(0, 7),
+      billing_cycle: new Date().toISOString().substr(0, 7),
     },
     rules: {
       format: [
@@ -584,7 +587,7 @@ export default {
         },
         {
           text: "เดือน",
-          value: "date_pay",
+          value: "billing_cycle",
           filter: this.dateFilter,
         },
         {
@@ -926,6 +929,42 @@ export default {
           }
         });
     },
+    // edit billing via API
+    editElectricBilling(unit, price, status, billing_cycle) {
+      let idelectric = "?id=" + JSON.stringify(this.ElectricBillingID);
+      const payload = {
+        unit: unit,
+        price: price,
+        status: status,
+        billing_cycle: billing_cycle,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+      };
+      return axios
+        .patch(
+          apiUrl + "/v1/billdings/electric/edit/" + idelectric,
+          payload,
+          config
+        )
+        .then(async () => {})
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
+    },
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -973,6 +1012,7 @@ export default {
       this.editedIndex = this.electricTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.ElectricBillingID = item.id;
     },
     close() {
       this.dialog = false;
@@ -984,6 +1024,12 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.electricTable[this.editedIndex], this.editedItem);
+        this.editElectricBilling(
+          this.editedItem.unit,
+          this.editedItem.price,
+          this.editedItem.status,
+          this.editedItem.billing_cycle
+        );
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
