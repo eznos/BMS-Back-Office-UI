@@ -34,7 +34,7 @@
           v-on="on"
           class="button-filter pt-5 pb-5"
           :disabled="!selectItems"
-          @click="deleteItemSelected(selected)"
+          @click="getUsersID()"
         >
           <v-icon>mdi-delete-sweep</v-icon>
           &nbsp; ลบข้อมูลที่เลือก
@@ -42,17 +42,6 @@
         <v-spacer></v-spacer>
         <!-- add user -->
         <v-dialog v-model="dialog" persistent max-width="75%">
-          <!-- <template v-slot:activator="{ on: attrs }">
-            <v-btn
-              color="agree"
-              class="button-filter pt-5 pb-5"
-              dark
-              v-on="{ ...attrs }"
-            >
-              <v-icon> mdi-account-plus </v-icon>
-              &nbsp; เพื่มผู้ใช้งาน
-            </v-btn>
-          </template> -->
           <v-card>
             <v-card-title>
               <div>
@@ -242,11 +231,15 @@
         <!-- data -->
         <template v-slot:[`item.actions`]="{ item }">
           <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
-          <!-- <v-icon @click="deleteItem(item)"> mdi-delete </v-icon> -->
         </template>
       </v-data-table>
       <!-- end data-table -->
     </v-card>
+    <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+      <div class="text-center">
+        {{ statusAction }}
+      </div>
+    </v-snackbar>
     <v-container v-if="role == 'user'">
       <NotFound />
     </v-container>
@@ -266,6 +259,11 @@ export default {
   data: () => ({
     el: "#app",
     role: "",
+    userID: "",
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     loadTable: true,
     valid: false,
     on: {},
@@ -382,6 +380,15 @@ export default {
       var role = localStorage.getItem("role");
       this.role = role;
     },
+    getUsersID() {
+      if (this.selectItems == true) {
+        let userID = [];
+        for (var i = 0; i < this.selected.length; i++) {
+          userID.push(this.selected[i].id);
+        }
+        this.deleteItemSelected(userID);
+      }
+    },
     getUserList() {
       var config = {
         headers: {
@@ -404,6 +411,74 @@ export default {
           console.log(error);
         });
     },
+    // edit user (email)
+    editUser(email) {
+      let user_ID = "?id=" + JSON.stringify(this.userID);
+      let payload = {
+        email: email,
+      };
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+        },
+      };
+      return axios
+        .patch(apiUrl + "/v1/users/edit/" + user_ID, payload, config)
+        .then(async () => {})
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
+    },
+    // delete user
+    deleteUserAPI(userIDs) {
+      var config = {
+        headers: {
+          "x-api-key": "xxx-api-key",
+          "x-refresh-token": "xxx-refresh-token",
+        },
+      };
+      const users_id = { users_id: userIDs };
+      const userIDS = "?users_id=" + JSON.stringify(users_id);
+      return axios
+        .delete(apiUrl + "/v1/users/delete/" + userIDS, config)
+        .then((response) => {
+          let data = response.data;
+          if (confirm) {
+            if (data.status == "success") {
+              this.statusAction =
+                "ลบข้อมูลผู้อยู่อาศัยจำนวน " +
+                this.selected.length +
+                "คน สำเร็จ";
+              this.colorSnackbar = "agree";
+              this.snackbar = true;
+              this.selected = [];
+            }
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.error_message === "bad_request") {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+          } else {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+          }
+        });
+    },
     statusFilter(value) {
       if (!this.roleFilterValue) {
         return true;
@@ -414,11 +489,7 @@ export default {
       this.editedIndex = this.userTable.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-    },
-    deleteItem(item) {
-      this.editedIndex = this.userTable.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
+      this.userID = item.id;
     },
     deleteItemConfirm() {
       this.userTable.splice(this.editedIndex, 1);
@@ -441,14 +512,10 @@ export default {
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.userTable[this.editedIndex], this.editedItem);
-      } else {
-        this.userTable.push(this.editedItem);
-      }
-      this.close();
-    },
-    savea() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.userTable[this.editedIndex], this.editedItem);
+        this.editUser(this.editedItem.email);
+        this.snackbar = true;
+        this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+        this.colorSnackbar = "agree";
       } else {
         this.userTable.push(this.editedItem);
       }
@@ -474,24 +541,15 @@ export default {
     },
 
     // delete as selected
-    deleteItemSelected() {
+    deleteItemSelected(userIDs) {
       if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {
         for (var i = 0; i < this.selected.length; i++) {
           const index = this.userTable.indexOf(this.selected[i]);
           this.userTable.splice(index, 1);
-          this.selected.length == 0;
         }
         this.dialog = false;
-        this.selected = [];
+        this.deleteUserAPI(userIDs);
       }
-    },
-    // select all
-    toggleAll() {
-      if (this.selected.length) this.selected = [];
-      else this.selected = this.getDesserts.slice();
-    },
-    clearform() {
-      this.$refs.formAdduser.reset();
     },
     // color of price
     getColor(role) {
