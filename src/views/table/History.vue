@@ -282,9 +282,7 @@ export default {
     },
   },
   watch: {},
-  created() {
-    console.log(this.showchart);
-  },
+  created() {},
   mounted() {},
   methods: {
     async checkEnterPressedToSubmit(e) {

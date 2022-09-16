@@ -805,31 +805,31 @@ export default {
       }
       if (this.editedItem.building == "2/37") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/38") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/39") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/40") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       }
       if (this.editedItem.building == "2/41") {
         const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
+          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
         const buildingCenter = buildingcenters.map((x) => x.id);
         return buildingCenter;
       } else {
