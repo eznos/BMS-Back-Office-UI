@@ -3,7 +3,7 @@
     <v-app-bar class="background" dark app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="text-uppercase">
-        <span class="font-weight-light">ระบบจัดการค่าน้ำ ค่าไฟฟ้า</span>
+        <span class="font-weight-light">ระบบจัดการค่าน้ำ ค่าไฟฟ้า </span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu offset-y>
@@ -19,7 +19,6 @@
           </v-list-item>
         </v-list>
       </v-menu>
-
       <!-- แถบเมนู logout -->
       <v-menu bottom left class="background2" v-if="role == 'admin'">
         <template v-slot:activator="{ on, attrs }">
@@ -50,17 +49,60 @@
               block
               color="green"
             >
-              แก้ไขข้อมูลส่วนตัว
+              แก้ไขข้อมูลส่วนตัว <v-icon right>mdi-account-edit</v-icon>
             </v-btn>
-            <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
-            <v-btn tile block @click="logout" color="red"> ออกจากระบบ </v-btn>
-            <!-- <v-list-item-title>Enable messages</v-list-item-title> -->
+            <!-- <v-btn tile block @click="logout" color="red"> ออกจากระบบ </v-btn> -->
+            <v-dialog v-model="dialog" width="500" persistent>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn block tile color="red" v-bind="attrs" v-on="on" ma-2>
+                  ออกจากระบบ <v-icon right>mdi-logout</v-icon>
+                </v-btn>
+              </template>
+              <v-card>
+                <v-card-title> ต้องการออกจากระบบหรือไม่ ? </v-card-title>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="agree" text @click="logout"> ยืนยัน </v-btn>
+                  <v-btn color="primary" text @click="dialog = false">
+                    ยกเลิก
+                  </v-btn>
+                  <v-spacer></v-spacer>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-list>
         </v-card>
       </v-menu>
-      <v-btn icon @click="logout" v-if="role == 'user'">
+      <!-- <v-btn icon @click="logout" v-if="role == 'user'">
         <v-icon>mdi-logout-variant</v-icon>
-      </v-btn>
+      </v-btn> -->
+      <v-dialog v-model="dialog" width="500" persistent>
+        <template v-slot:activator="{ on: dialog }">
+          <v-tooltip>
+            <template #activator="{ on: tooltip }">
+              <v-btn
+                icon
+                color="red"
+                v-on="{ ...tooltip, ...dialog }"
+                ma-2
+                v-if="role == 'user'"
+              >
+                <v-icon right>mdi-logout</v-icon>
+              </v-btn>
+            </template>
+            <span>ออกจากระบบ</span>
+          </v-tooltip>
+        </template>
+        <v-card>
+          <v-card-title> ต้องการออกจากระบบหรือไม่ ? </v-card-title>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="agree" text @click="logout"> ยืนยัน </v-btn>
+            <v-btn color="primary" text @click="dialog = false"> ยกเลิก </v-btn>
+            <v-spacer></v-spacer>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-app-bar>
     <!-- จบ -->
     <v-navigation-drawer v-model="drawer" dark app class="background2">
@@ -139,6 +181,7 @@ export default {
     rank: "",
     role: "",
     scr: "",
+    goDark: false,
     // แถบเมนู
     links: [
       {
