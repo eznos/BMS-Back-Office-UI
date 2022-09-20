@@ -24,109 +24,118 @@
         >
         &nbsp;&nbsp;
         <h3>เครื่องมือค้นหา</h3>
+        <v-chip color="agree" class="ma-2" @click="statusFilterValue = scales "> ห้องว่าง </v-chip>
+        <v-chip color="red" class="ma-2"> ห้องไม่ว่าง </v-chip>
         <v-spacer></v-spacer>
       </v-card-title>
-      <v-form ref="formFilter">
-        <!-- filter -->
-        <v-row class="px-3">
-          <!-- search -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-text-field
-              v-model="search"
-              prepend-icon="mdi-magnify"
-              type="text"
-              label="ค้นหา"
-              clearable
-              class="filter"
-            ></v-text-field>
-          </v-col>
-          <!-- search -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              item-text="name"
-              item-value="value"
-              v-model="waterGroupFilterValue"
-              prepend-icon="mdi-water-circle"
-              type="text"
-              label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
-              clearable
-              class="filter"
-              :items="water_groups"
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- Filter for  zone-->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="zoneFilterValue"
-              prepend-icon="mdi-map-marker-radius"
-              type="text"
-              label="ค้นหาด้วยพื้นที่"
-              clearable
-              class="filter"
-              :items="zones"
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- search by building -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-autocomplete
-              v-model="buildFilterValue"
-              prepend-icon="mdi-office-building-marker"
-              type="text"
-              label="ค้นหาด้วยอาคาร"
-              clearable
-              class="filter"
-              :disabled="!zoneFilterValue"
-              :items="buildings"
-              i
-            >
-            </v-autocomplete>
-          </v-col>
-          <!-- search by type -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-select
-              item-text="name"
-              item-value="value"
-              v-model="typeFilterValue"
-              prepend-icon="mdi-shape-outline"
-              label="ค้นหาด้วยประเภทห้อง"
-              :items="room_types"
-              clearable
-              class="filter"
-            >
-            </v-select>
-          </v-col>
-          <!-- search by status -->
-          <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-            <v-select
-              item-text="name"
-              item-value="value"
-              v-model="statusFilterValue"
-              prepend-icon="mdi-list-status"
-              label="ค้นหาด้วยสถานะ"
-              :items="room_statuses"
-              clearable
-              class="filter"
-            >
-            </v-select>
-          </v-col>
-          <v-row> </v-row>
-          <!-- btn filter -->
-          <v-col cols="12" justify="space-between" class="px-3">
-            <v-btn
-              outlined
-              color="error"
-              width="140"
-              @click="clearFilter"
-              class="button-filter pt-6 pb-6"
-            >
-              <v-icon>mdi-delete-sweep</v-icon>
-              &nbsp; ล้างการค้นหา
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-form>
+      <v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-header> แสดงเพิ่มเติม </v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-form ref="formFilter">
+              <!-- filter -->
+              <v-row class="px-3">
+                <!-- search -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-text-field
+                    v-model="search"
+                    prepend-icon="mdi-magnify"
+                    type="text"
+                    label="ค้นหา"
+                    clearable
+                    class="filter"
+                  ></v-text-field>
+                </v-col>
+                <!-- search -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    item-text="name"
+                    item-value="value"
+                    v-model="waterGroupFilterValue"
+                    prepend-icon="mdi-water-circle"
+                    type="text"
+                    label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
+                    clearable
+                    class="filter"
+                    :items="water_groups"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- Filter for  zone-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-map-marker-radius"
+                    type="text"
+                    label="ค้นหาด้วยพื้นที่"
+                    clearable
+                    class="filter"
+                    :items="zones"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- search by building -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="buildFilterValue"
+                    prepend-icon="mdi-office-building-marker"
+                    type="text"
+                    label="ค้นหาด้วยอาคาร"
+                    clearable
+                    class="filter"
+                    :disabled="!zoneFilterValue"
+                    :items="buildings"
+                    i
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- search by type -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    item-text="name"
+                    item-value="value"
+                    v-model="typeFilterValue"
+                    prepend-icon="mdi-shape-outline"
+                    label="ค้นหาด้วยประเภทห้อง"
+                    :items="room_types"
+                    clearable
+                    class="filter"
+                  >
+                  </v-select>
+                </v-col>
+                <!-- search by status -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-select
+                    item-text="name"
+                    item-value="value"
+                    v-model="statusFilterValue"
+                    prepend-icon="mdi-list-status"
+                    label="ค้นหาด้วยสถานะ"
+                    :items="room_statuses"
+                    clearable
+                    class="filter"
+                  >
+                  </v-select>
+                </v-col>
+                <v-row> </v-row>
+                <!-- btn filter -->
+                <v-col cols="12" justify="space-between" class="px-3">
+                  <v-btn
+                    outlined
+                    color="error"
+                    width="140"
+                    @click="clearFilter"
+                    class="button-filter pt-6 pb-6"
+                  >
+                    <v-icon>mdi-delete-sweep</v-icon>
+                    &nbsp; ล้างการค้นหา
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-form>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </v-card>
     <!-- table and buttons -->
     <v-row v-if="role === 'admin'">
@@ -153,7 +162,7 @@
               <v-dialog v-model="dialog" persistent max-width="75%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="agree"
+                    color="#046FE5"
                     dark
                     v-on="{ ...attrs }"
                     class="button-filter pt-5 pb-5"
@@ -346,7 +355,7 @@
               >
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="#06C3FF"
+                    color="agree"
                     class="button-filter pt-5 pb-5"
                     v-on="{ ...attrs }"
                     :disabled="!selectItems"

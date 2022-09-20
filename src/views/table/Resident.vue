@@ -43,7 +43,7 @@
           <v-dialog v-model="dialog" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="agree"
+                color="#046FE5"
                 class="button-filter pt-5 pb-5"
                 dark
                 v-on="{ ...attrs }"
@@ -248,7 +248,7 @@
           <v-dialog v-model="exportExcelResident" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="#1572A1"
+                color="agree"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
                 :disabled="!selectItems"

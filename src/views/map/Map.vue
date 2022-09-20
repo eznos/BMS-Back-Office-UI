@@ -30,7 +30,7 @@
           v-if="role == 'admin'"
         >
           <template v-slot:activator="{ on, attrs }">
-            <v-btn color="agree" dark v-bind="attrs" v-on="on">
+            <v-btn color="#046FE5" dark v-bind="attrs" v-on="on">
               <v-icon> mdi-map-marker-plus </v-icon>
               เพิ่มเขตอาคารในแผนที่
             </v-btn>

@@ -188,7 +188,7 @@
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 class="button-filter pt-5 pb-5"
-                color="agree"
+                color="#1B99A1"
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-calculator </v-icon>
@@ -473,7 +473,7 @@
           <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="#06C3FF"
+                color="agree"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
                 :disabled="!selectItems"
