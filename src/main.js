@@ -3,7 +3,7 @@ import App from "./App.vue";
 import vuetify from "./plugins/vuetify";
 import router from "./router";
 import "material-design-icons-iconfont/dist/material-design-icons.css";
-
+import * as dayjs from 'dayjs'
 import * as VueGoogleMaps from "vue2-google-maps";
 
 Vue.config.productionTip = false;
@@ -21,5 +21,6 @@ Vue.use(VueGoogleMaps, {
 new Vue({
   vuetify,
   router,
+  dayjs,
   render: (h) => h(App),
 }).$mount("#app");
