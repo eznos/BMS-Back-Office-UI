@@ -256,6 +256,8 @@ export default {
     username: "",
     password: "",
     text: "",
+    deleted: false,
+    role: "user",
     snackbar: false,
     snackbarColor: "",
     ranks: ranks,
@@ -301,16 +303,18 @@ export default {
     },
     async callAPIRegister() {
       const datas = {
-        rank: this.rank,
-        profile_url: this.imageURL,
-        phone_number: this.phoneNumber,
-        gender: this.gender,
-        first_name: this.firstName,
-        last_name: this.lastName,
-        affiliation: this.affiliation,
         username: this.username,
         password: this.password,
+        role: this.role,
+        rank: this.rank,
+        affiliation: this.affiliation,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        gender: this.gender,
         email: this.email,
+        phoneNumber: this.phoneNumber,
+        profileUrl: this.imageURL,
+        deleted: this.deleted,
       };
       const config = {
         headers: {
@@ -327,11 +331,22 @@ export default {
           });
         })
         .catch((error) => {
-          if (error.response.data.error_message == "unauthorized") {
+          console.log(error.response.data.error_message);
+          if (error.response.data.error_message === "username already taken") {
             this.snackbar = true;
-            this.snackbarColor = "red";
-            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+            this.snackbarColor = "warning";
+            this.text = "ชื่อผู้ใช้งานนี้ ถูกใช้งานไปแล้ว";
           }
+          if (error.response.data.error_message === "email already taken") {
+            this.snackbar = true;
+            this.snackbarColor = "warning";
+            this.text = "อีเมลนี้ ถูกใช้งานไปแล้ว";
+          }
+          // else {
+          //   this.snackbar = true;
+          //   this.snackbarColor = "red";
+          //   this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+          // }
         });
     },
     async uploadProfileImageToStorage(profileImage) {

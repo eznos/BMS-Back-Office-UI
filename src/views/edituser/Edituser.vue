@@ -80,7 +80,7 @@
                   <v-col cols="12" sm="4" md="6" lg="2">
                     <v-autocomplete
                       item-text="name"
-                      item-value="id"
+                      item-value="name"
                       v-model="rank"
                       :items="ranks"
                       label="ยศ"
@@ -96,7 +96,7 @@
                   <v-col cols="12" sm="4" md="6" lg="2">
                     <v-autocomplete
                       item-text="name"
-                      item-value="id"
+                      item-value="name"
                       v-model="affiliation"
                       :items="affiliations"
                       :rules="rules.nomalRules"
@@ -203,7 +203,7 @@
               width="200px"
               large
               :disabled="!valid"
-              @click="submit"
+              @click="submit()"
             >
               ยืนยันการลงทะเบียน
             </v-btn>
@@ -211,10 +211,14 @@
         </div>
       </v-card-actions>
     </v-card>
+    <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
+      <div class="text-center">
+        {{ statusAction }}
+      </div>
+    </v-snackbar>
     <v-container v-if="role == 'user'">
-       <NotFound />
+      <NotFound />
     </v-container>
-   
   </v-app>
 </template>
 <script>
@@ -231,6 +235,10 @@ import NotFound from "../../components/notFound/Notfound.vue";
 export default {
   components: { NotFound },
   data: () => ({
+    snackbar: false,
+    statusAction: "",
+    colorSnackbar: "",
+    timeout: 2000,
     loading: false,
     dialog: false,
     on: {},
@@ -294,12 +302,14 @@ export default {
   methods: {
     getRole() {
       var role = localStorage.getItem("role");
+      var user_ID = localStorage.getItem("id");
       this.role = role;
+      this.user_ID = user_ID;
     },
     submit() {
       if (this.$refs.formEdit.validate()) {
         this.imageURL = this.uploadProfileImageToStorage(this.profileImage);
-        this.callAPIRegister();
+        this.callAPIEditUser();
       }
     },
     async uploadProfileImageToStorage(profileImage) {
@@ -316,19 +326,18 @@ export default {
         );
       });
     },
-    async callAPIRegister() {
+    async callAPIEditUser() {
       const data = {
         rank: this.rank,
-        profile_url: this.imageURL,
-        phone_number: this.phoneNumber,
-        gender: this.gender,
-        first_name: this.firstName,
-        last_name: this.lastName,
         affiliation: this.affiliation,
-        username: this.username,
-        password: this.password,
+        first_name: this.firstname,
+        last_name: this.lastname,
         email: this.email,
+        phone_number: this.phoneNumber,
+        gender: this.defaultGender,
+        profile_url: this.imageURL,
       };
+
       const config = {
         headers: {
           "x-api-key": "xxx-api-key",
@@ -336,20 +345,19 @@ export default {
         },
       };
       axios
-        .post(apiUrl + "/v1/auth/register", data, config)
-        .then((response) => {
-          console.log(response.data);
+        .patch(apiUrl + "/v1/user/" + this.user_ID + "/edit", data, config)
+        .then(() => {
+          this.profileImage = null
+          this.$refs.formEdit.reset();
+          this.statusAction = "แก้ไขข้อมูลสำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
         })
         .catch((error) => {
-          if (error.response.data.status == "unprocessable_entity") {
-            this.snackbar = true;
-            this.snackbarColor = "warning";
-            this.text = "เลข recovery code ไม่ถูกต้อง";
-          } else {
-            this.snackbar = true;
-            this.snackbarColor = "red";
-            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
-          }
+          console.log(error);
+          this.snackbar = true;
+          this.snackbarColor = "red";
+          this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
         });
     },
     // upload image and preview

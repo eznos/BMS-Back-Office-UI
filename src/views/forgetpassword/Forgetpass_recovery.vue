@@ -241,18 +241,16 @@ export default {
         },
       };
       axios(config)
-        .then(() => {
-          // let data = response;
-          // if (data.status == "204") {
-          //   console.log("suss");
-          // }
-        })
+        .then(() => {})
         .catch((error) => {
-          // console.log(error);
           if (error.response.data.status === "unprocessable_entity") {
-            console.log("invalid email");
+            this.snackbar = true;
+            this.snackbarColor = "red";
+            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
           } else {
-            console.log("กรุณา โทรมานะจัส");
+            this.snackbar = true;
+            this.snackbarColor = "red";
+            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
           }
         });
     },

@@ -97,8 +97,8 @@ export default {
       usernameRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
       Password_Format: [
         (val) =>
-          (val || "").length >= 6 ||
-          "กรุณาใส่รหัสผ่านอย่างน้อย 6 ตัวหรือมากกว่า",
+          (val || "").length >= 3 ||
+          "กรุณาใส่รหัสผ่านอย่างน้อย 3 ตัวหรือมากกว่า",
       ],
     },
   }),
@@ -126,17 +126,17 @@ export default {
         payload: payload,
       };
       axios
-        .post(apiUrl + "/v1/auth/login", payload, headerAPI)
+        .post(apiUrl + "/v1/login", payload, headerAPI)
         .then(async (response) => {
           let data = response.data;
           if (data.status === "success") {
             this.rank = data.result.rank;
-            this.fristName = data.result.first_name;
-            this.lastName = data.result.last_name;
-            this.image = data.result.profile_image_url;
+            this.fristName = data.result.firstName;
+            this.lastName = data.result.lastName;
+            this.image = data.result.profileUrl;
             this.role = data.result.role;
             this.affiliation = data.result.affiliation;
-            this.user_id = data.result.user_id;
+            this.user_id = data.result.id;
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);

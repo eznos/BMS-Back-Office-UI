@@ -668,11 +668,11 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "first_name",
+          value: "firstName",
         },
         {
           text: "นามสกุล",
-          value: "last_name",
+          value: "lastName",
         },
         {
           text: "พื้นที่",
@@ -1007,13 +1007,15 @@ export default {
         },
       };
       // var date = "?date=" + this.date_now;
-      var date = "?date=2022-07-29";
+      var date = "?date=2022-10-10";
       return axios
         .get(apiUrl + "/v1/billings/water" + date, config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            this.waterTables = data.result.billings;
+            console.log(data.result[0].accommodations[0].room)
+            console.log(data.result[0].accommodations[0].billings)
+            this.waterTables = data.result[0].accommodations;
             this.loadTable = false;
           }
         })

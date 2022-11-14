@@ -279,7 +279,7 @@ export default {
       var axios = require("axios");
       var config = {
         method: "post",
-        url: "http://localhost:3000/v1/auth/logout",
+        url: "http://localhost:3000/v1/logout",
         headers: {
           "x-api-key": "xxx-api-key",
           "x-refresh-token": "xxx-refresh-token",

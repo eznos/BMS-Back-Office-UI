@@ -80,7 +80,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.first_name"
+                        v-model="editedItem.firstName"
                         label="ชื่อ"
                         required
                         :rules="rules.name"
@@ -89,7 +89,7 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.last_name"
+                        v-model="editedItem.lastName"
                         label="นามสกุล"
                         required
                         :rules="rules.name"
@@ -330,11 +330,11 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "first_name",
+          value: "firstName",
         },
         {
           text: "นามสกุล",
-          value: "last_name",
+          value: "lastName",
         },
         {
           text: "เพศ",
@@ -346,7 +346,7 @@ export default {
         },
         {
           text: "เบอร์โทรศัพท์",
-          value: "phone_number",
+          value: "phoneNumber",
         },
         {
           text: "ตำแหน่ง",
@@ -396,13 +396,12 @@ export default {
           "x-refresh-token": "xxx-refresh-token",
         },
       };
-      // var date = "?date=2022-07-29" + this.date_now;
-      var date = "?date=2022-07-29";
       return axios
-        .get(apiUrl + "/v1/users" + date, config)
+        .get(apiUrl + "/v1/users", config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            console.log(data.id)
             this.userTable = data.result.user_lists;
             this.loadTable = false;
           }
@@ -413,7 +412,7 @@ export default {
     },
     // edit user (email)
     editUser(email) {
-      let user_ID = "?id=" + JSON.stringify(this.userID);
+      let user_ID = "?id=" + (this.userID);
       let payload = {
         email: email,
       };
@@ -521,7 +520,6 @@ export default {
       }
       this.close();
     },
-
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -539,7 +537,6 @@ export default {
         return (this.selectItems = false);
       }
     },
-
     // delete as selected
     deleteItemSelected(userIDs) {
       if (confirm("ต้องการลบข้อมูลที่เลือกหรือไม่ ?")) {

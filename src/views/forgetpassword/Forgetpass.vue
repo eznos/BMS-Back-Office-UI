@@ -122,13 +122,11 @@ export default {
       };
       axios(config)
         .then((response) => {
-          let data = response;
-          if (data.status == "204") {
-            localStorage.setItem("userEmail", this.email);
-            this.$router.push({
-              name: "ForgetpasswordRecoverycode",
-            });
-          }
+          console.log(response);
+          localStorage.setItem("userEmail", this.email);
+          this.$router.push({
+            name: "ForgetpasswordRecoverycode",
+          });
         })
         .catch((error) => {
           // console.log(error);
