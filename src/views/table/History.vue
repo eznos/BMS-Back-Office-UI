@@ -130,6 +130,11 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าไฟฟ้า</h3>
               </template>
+              <template v-slot:item.created_at="{ item }">
+                <span>{{
+                  new Date(item.created_at).toISOString().substr(0, 7)
+                }}</span>
+              </template>
               <!-- color of price on datatable  -->
               <template v-slot:[`item.price`]="{ item }">
                 <v-chip :color="getColor(item.price)">
@@ -156,6 +161,11 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าน้ำประปา</h3>
               </template>
+              <template v-slot:item.created_at="{ item }">
+                <span>{{
+                  new Date(item.created_at).toISOString().substr(0, 7)
+                }}</span>
+              </template>
               <!-- color of price on datatable  -->
               <template v-slot:[`item.price`]="{ item }">
                 <v-chip :color="getColor(item.price)">
@@ -169,16 +179,6 @@
               </template>
             </v-data-table>
           </v-col>
-          <v-col cols="12" v-if="(showchart = true)">
-            <v-card>
-              <v-card-subtitle>
-                ประวัติการใช้น้ำของปี {{ this.datenow }}
-              </v-card-subtitle>
-              <div class="chart-responsive" :style="{ padding: 0 }">
-                <canvas id="electric" width="900" height="350"></canvas>
-              </div>
-            </v-card>
-          </v-col>
         </v-row>
       </v-card-text>
       <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
@@ -189,16 +189,13 @@
     </v-card>
   </v-app>
 </template>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-import Chart from "chart.js";
 import statuses from "../../json/statuses.json";
 import ranks from "../../json/rank.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 export default {
   data: () => ({
-    showchart: false,
     datenow: new Date().toISOString().substr(0, 4),
     firstName: "",
     lastName: "",
@@ -244,7 +241,7 @@ export default {
         {
           text: "เดือน",
           align: "left",
-          value: "date",
+          value: "created_at",
         },
         {
           text: "จำนวยหน่วย",
@@ -252,7 +249,7 @@ export default {
         },
         {
           text: "ค่าใช้จ่าย",
-          value: "total_price",
+          value: "total_pay",
         },
       ];
     },
@@ -261,7 +258,7 @@ export default {
         {
           text: "เดือน",
           align: "left",
-          value: "date",
+          value: "created_at",
         },
         {
           text: "จำนวยหน่วย",
@@ -275,7 +272,7 @@ export default {
         },
         {
           text: "ค่าใช้จ่าย",
-          value: "total_price",
+          value: "total_pay",
           align: "left",
         },
       ];
@@ -304,121 +301,29 @@ export default {
         };
         return axios
           .get(
-            `${apiUrl}/v1/billings/history?rank=${this.rank}&first_name=${this.firstName}&last_name=${this.lastName}`,
+            `${apiUrl}/v1/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
             config
           )
           .then((response) => {
             let data = response.data;
             if (data.status == "success") {
-              this.waterHistoryTable = data.result.water.history;
-              this.electricHistoryTable = data.result.electric.history;
+              console.log(data);
+              this.electricHistoryTable =
+                data.result.electric.accommodations[0].billings;
+              this.waterHistoryTable =
+                data.result.water.accommodations[0].billings;
               this.loadTable = false;
               this.snackbar = true;
               this.statusAction = "ค้นหาเรียบร้อย";
               this.colorSnackbar = "agree";
-              const historiesElectric = data.result.electric.history;
-              const historiesWater = data.result.water.history;
-              this.historyElectric = historiesElectric.map(
-                (x) => x.total_price
-              );
-              this.historyWater = historiesWater.map((x) => x.total_price);
-              this.showchart == true;
-              return new Chart(electric, {
-                type: "bar",
-                data: {
-                  labels: [
-                    "มกราคม",
-                    "กุมภาพันธ์",
-                    "มีนาคม",
-                    "เมษายน",
-                    "พฤษภาคม ",
-                    "มิถุนายน ",
-                    "กรกฎาคม",
-                    "สิงหาคม",
-                    "กันยายน",
-                    "ตุลาคม",
-                    "พฤศจิกายน",
-                    "ธันวาคม",
-                  ],
-                  datasets: [
-                    {
-                      label: "ค่าไฟฟ้า",
-                      data: [
-                        this.historyElectric[0],
-                        this.historyElectric[1],
-                        this.historyElectric[2],
-                        this.historyElectric[3],
-                        this.historyElectric[4],
-                        this.historyElectric[5],
-                        this.historyElectric[6],
-                        this.historyElectric[7],
-                        this.historyElectric[8],
-                        this.historyElectric[9],
-                        this.historyElectric[10],
-                        this.historyElectric[11],
-                      ],
-                      backgroundColor: "#8CFFD5",
-                      borderWidth: 1,
-                    },
-                    {
-                      label: "ค่าน้ำประปา",
-                      data: [
-                        this.historyWater[0],
-                        this.historyWater[1],
-                        this.historyWater[2],
-                        this.historyWater[3],
-                        this.historyWater[4],
-                        this.historyWater[5],
-                        this.historyWater[6],
-                        this.historyWater[7],
-                        this.historyWater[8],
-                        this.historyWater[9],
-                        this.historyWater[10],
-                        this.historyWater[11],
-                      ],
-                      backgroundColor: "#F86D6D",
-                    },
-                  ],
-                },
-                options: {
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  locale: "th-TH",
-                  layout: {
-                    padding: 15,
-                  },
-                  legend: {
-                    position: "top", // place legend on the right side of chart
-                    plugins: {
-                      labels: {
-                        font: {
-                          size: 20,
-                          family: "Sarabun",
-                        },
-                      },
-                    },
-                  },
-                  scales: {
-                    xAxes: [
-                      {
-                        stacked: true, // this should be set to make the bars stacked
-                      },
-                    ],
-                    yAxes: [
-                      {
-                        stacked: true, // this also..
-                        beginAtZero: true,
-                      },
-                    ],
-                  },
-                },
-              });
             }
             if (data.status == "success no data") {
               this.loadTable = false;
               this.snackbar = true;
               this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
               this.colorSnackbar = "warning";
+            } else {
+              console.log("Ez");
             }
           })
           .catch((error) => {
@@ -485,7 +390,6 @@ export default {
       this.waterHistoryTable = [];
       this.$refs.history.reset();
       this.loadTable = true;
-      this.showchart = false;
     },
     // color of price
     getColor(price) {
