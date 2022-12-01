@@ -24,7 +24,9 @@
         >
         &nbsp;&nbsp;
         <h3>เครื่องมือค้นหา</h3>
-        <v-chip color="agree" class="ma-2" @click="statusFilterValue = scales "> ห้องว่าง </v-chip>
+        <v-chip color="agree" class="ma-2" @click="statusFilterValue = scales">
+          ห้องว่าง
+        </v-chip>
         <v-chip color="red" class="ma-2"> ห้องไม่ว่าง </v-chip>
         <v-spacer></v-spacer>
       </v-card-title>
@@ -71,6 +73,7 @@
                     clearable
                     class="filter"
                     :items="zones"
+                    item-text="zone"
                   >
                   </v-autocomplete>
                 </v-col>
@@ -85,7 +88,7 @@
                     class="filter"
                     :disabled="!zoneFilterValue"
                     :items="buildings"
-                    i
+                    item-text="building"
                   >
                   </v-autocomplete>
                 </v-col>
@@ -183,7 +186,7 @@
                           <v-col cols="12" sm="6" md="4">
                             <v-select
                               item-text="name"
-                              item-value="value"
+                              item-value="id"
                               v-model="editedItem.water_zone"
                               :items="water_groups"
                               label="สายของมิเตอร์น้ำ"
@@ -199,6 +202,8 @@
                             <v-autocomplete
                               v-model="editedItem.zone"
                               :items="zones"
+                              item-value="id"
+                              item-text="zone"
                               label="พื้นที่"
                               clearable
                               required
@@ -211,6 +216,8 @@
                             <v-autocomplete
                               v-model="editedItem.building"
                               :items="buildings"
+                              item-text="building"
+                              item-value="id"
                               label="อาคาร"
                               clearable
                               required
@@ -224,6 +231,8 @@
                               v-model="editedItem.room_no"
                               label="เลขห้องพัก"
                               :items="rooms"
+                              item-text="room"
+                              item-value="room"
                               clearable
                               required
                               :rules="rules.zonesBuildingsRoom"
@@ -239,6 +248,7 @@
                               clearable
                               required
                               counter="12"
+                              maxlength="12"
                               :rules="rules.electricNumber"
                             ></v-text-field>
                           </v-col>
@@ -251,6 +261,7 @@
                               clearable
                               required
                               counter="4"
+                              maxlength="4"
                               :rules="rules.waterNumber"
                             ></v-text-field>
                           </v-col>
@@ -263,6 +274,7 @@
                               clearable
                               required
                               counter="11"
+                              maxlength="11"
                               :rules="rules.electricMeterNumber"
                             ></v-text-field>
                           </v-col>
@@ -275,6 +287,7 @@
                               clearable
                               required
                               counter="4"
+                              maxlength="4"
                               :rules="rules.waterNumber"
                             ></v-text-field>
                           </v-col>
@@ -446,17 +459,23 @@
 import room_statuses from "../../json/roomStatuses.json";
 import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
-import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import NotFound from "../../components/notFound/Notfound.vue";
+import { APIKey } from "../../utils/key";
+import zones from "../../json/zones.json";
+import buildings from "../../json/buildings.json";
+import rooms from "../../json/rooms.json";
 export default {
   components: { NotFound },
   data: () => ({
+    token: "",
     buildingID: "",
     role: "",
     el: "#app",
-    zonesBuildingsRoom: zonesBuildingsRoom,
+    zone: zones,
+    building: buildings,
+    room_no: rooms,
     valid: true,
     modal: false,
     snackbar: false,
@@ -472,9 +491,7 @@ export default {
     first_name: "",
     on: {},
     attrs: {},
-    zone: null,
-    building: null,
-    room_no: null,
+    zonevalues: "",
     emailtarget: "",
     exportExcelBuliding: false,
     dateExport: new Date().toISOString().substr(0, 7),
@@ -551,42 +568,42 @@ export default {
       return [
         {
           text: "สายมิเตอร์น้ำ",
-          value: "water_zone",
+          value: "waterZone.name",
           filter: this.waterGroupFilter,
         },
         {
           text: "พื้นที่",
-          value: "zone",
+          value: "zone.name",
           filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
-          value: "building",
+          value: "building.name",
           filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
-          value: "room_no",
+          value: "roomNo",
         },
         {
           text: "เลขผู้ใช้น้ำ",
-          value: "water_no",
+          value: "waterNo",
         },
         {
           text: "เลขมิเตอร์น้ำประปา",
-          value: "meter_no",
+          value: "waterMeterNo",
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
-          value: "electricity_no",
+          value: "electricityNo",
         },
         {
           text: "เลขมิเตอร์ไฟฟ้า",
-          value: "electricity_meter_no",
+          value: "electricityMeterNo",
         },
         {
           text: "ประเภทห้องพัก",
-          value: "room_type",
+          value: "roomType",
           filter: this.typeFilter,
         },
         {
@@ -603,225 +620,16 @@ export default {
       ];
     },
     zones() {
-      const zones = zonesBuildingsRoom;
-      const zonedata = zones.map((x) => x.zone);
-      return zonedata;
+      const zone = zones;
+      return zone;
     },
     buildings() {
-      if (this.zoneFilterValue == "เขตส่วนกลาง") {
-        const buiding = zonesBuildingsRoom;
-        const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.buildingName);
-        return buildingCenter;
-      }
-      if (this.zoneFilterValue == "เขตอัษฎางค์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
-        return buildingAngtadang;
-      }
-      if (this.zoneFilterValue == "เขตสุรนารายณ์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
-        return buildingSuranarai;
-      }
-      if (this.editedItem.zone == "เขตส่วนกลาง") {
-        const buiding = zonesBuildingsRoom;
-        const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.buildingName);
-        return buildingCenter;
-      }
-      if (this.editedItem.zone == "เขตอัษฎางค์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
-        return buildingAngtadang;
-      }
-      if (this.editedItem.zone == "เขตสุรนารายณ์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
-        return buildingSuranarai;
-      } else {
-        return ["ไม่มีข้อมูล"];
-      }
+      const building = buildings;
+      return building;
     },
     rooms() {
-      if (this.editedItem.building == "2/11") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/12") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/13") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/14") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/15") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/16") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/17") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/18") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/19") {
-        const buildingcenters =
-          zonesBuildingsRoom[1].buildingangtadang[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/20") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/21") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/22") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/23") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/24") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/25") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/26") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/27") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/28") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/29") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/31") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/32") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/33") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/34") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/35") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/36") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/37") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/38") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/39") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/40") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/41") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      } else {
-        return ["ไม่มีข้อมูล"];
-      }
+      const room = rooms;
+      return room;
     },
   },
   watch: {
@@ -834,11 +642,17 @@ export default {
   },
   created() {
     this.getRole();
+    this.gettoken();
   },
   mounted() {
     this.getBuildingData();
   },
   methods: {
+    // get refreshToken
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     // get role user
     getRole() {
       var role = localStorage.getItem("role");
@@ -848,18 +662,17 @@ export default {
     getBuildingData() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": APIKey,
+          "x-refresh-token": this.token,
         },
       };
-      // var date = "?date=" + this.dateNow;
-      var date = "?date=2022-07-29";
       return axios
-        .get(apiUrl + "/v1/buildings" + date, config)
+        .get(apiUrl + "/v1/building/buildings", config)
         .then((response) => {
           let data = response.data;
+          console.log(data);
           if (data.status == "success") {
-            this.buildingTable = data.result.buildings;
+            this.buildingTable = data.result;
             this.loadTable = false;
           }
         })
@@ -976,27 +789,26 @@ export default {
       status
     ) {
       let payload = {
-        water_zone: water_zone,
-        zone: zone,
-        building: building,
-        room_no: room_no,
-        electricity_no: electricity_no,
-        electricity_meter_no: electricity_meter_no,
-        water_no: water_no,
-        water_meter_no: meter_no,
-        room_type: room_type,
+        waterZoneId: water_zone,
+        zoneId: zone,
+        buildingId: building,
+        roomNo: room_no,
+        electricityNo: electricity_no,
+        electricityMeterNo: electricity_meter_no,
+        waterNo: water_no,
+        waterMeterNo: meter_no,
+        roomType: room_type,
         status: status,
       };
       let headerAPI = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
-          "Content-Type": "application/json",
+          "x-api-key": APIKey,
+          "x-refresh-token": this.token,
         },
         payload: payload,
       };
       axios
-        .post(apiUrl + "/v1/building/add/", payload, headerAPI)
+        .post(apiUrl + "/v1/building/buildings/add", payload, headerAPI)
         .then(() => {})
         .catch((error) => {
           console.log(error);
@@ -1011,38 +823,33 @@ export default {
           }
         });
     },
-    editBuilding(
-      water_zone,
-      zone,
-      building,
-      room_no,
-      electricity_no,
-      electricity_meter_no,
-      water_no,
-      meter_no,
-      room_type,
-      status
-    ) {
-      let building_ID = "?id=" + JSON.stringify(this.buildingID);
-      const payload = {
-        water_zone: water_zone,
-        zone: zone,
-        building: building,
-        room_no: room_no,
-        electricity_no: electricity_no,
-        electricity_meter_no: electricity_meter_no,
-        water_no: water_no,
-        water_meter_no: meter_no,
-        room_type: room_type,
-        status: status,
+    editBuilding() {
+      let building_ID = this.buildingID;
+      let payload = {
+        waterZoneId: this.editedItem.water_zone,
+        zoneId: this.editedItem.zone.id,
+        buildingId: this.editedItem.building.id,
+        roomNo: this.editedItem.room_no,
+        electricityNo: this.editedItem.electricity_no,
+        electricityMeterNo: this.editedItem.electricity_meter_no,
+        waterNo: this.editedItem.water_no,
+        waterMeterNo: this.editedItem.meter_no,
+        roomType: this.editedItem.room_type,
+        status: this.editedItem.status,
       };
-      var config = {
+      let config = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": APIKey,
+          "x-refresh-token": this.token,
         },
+        payload: payload,
       };
       return axios
-        .patch(apiUrl + "/v1/building/edit/" + building_ID, payload, config)
+        .patch(
+          apiUrl + "/v1/building/buildings/edit/" + building_ID,
+          payload,
+          config
+        )
         .then(async () => {})
         .catch((error) => {
           console.log(error);
@@ -1051,11 +858,13 @@ export default {
             this.colorSnackbar = "warning";
             this.snackbar = true;
             this.differencePriceCalculate = false;
+            console.log(payload);
           } else {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.differencePriceCalculate = false;
+            console.log(payload);
           }
         });
     },
@@ -1109,6 +918,7 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
       this.buildingID = item.id;
+      console.log(this.buildingID);
     },
     deleteItem(item) {
       this.editedIndex = this.buildingTable.indexOf(item);
@@ -1138,14 +948,14 @@ export default {
         this.save();
       }
     },
-    // add user
+    // create room or update room
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
         this.editBuilding(
-          this.editedItem.water_zone,
-          this.editedItem.zone,
-          this.editedItem.building,
+          this.editedItem.water_zone.id,
+          this.editedItem.zone.id,
+          this.editedItem.building.id,
           this.editedItem.room_no,
           this.editedItem.electricity_no,
           this.editedItem.electricity_meter_no,
@@ -1157,6 +967,7 @@ export default {
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
+        console.log(this.editBuilding);
       } else {
         this.buildingTable.push(this.editedItem);
         this.createBuilding(
