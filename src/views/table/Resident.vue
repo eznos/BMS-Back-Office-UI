@@ -368,6 +368,7 @@ import NotFound from "../../components/notFound/Notfound.vue";
 export default {
   components: { NotFound },
   data: () => ({
+    token: "",
     role: "",
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
@@ -457,49 +458,49 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "first_name",
+          value: "firstName",
         },
         {
           text: "นามสกุล",
-          value: "last_name",
+          value: "lastName",
         },
         {
           text: "พื้นที่",
-          value: "zone",
+          value: "accommodations[0].room.zone.name",
           filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
-          value: "building",
+          value: "accommodations[0].room.building.name",
           filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
-          value: "room_no",
+          value: "accommodations[0].room.roomNo",
         },
         {
           text: "สายมิเตอร์น้ำ",
-          value: "water_zone",
+          value: "accommodations[0].room.waterZone.name",
         },
         {
           text: "เลขผู้ใช้น้ำ",
-          value: "water_no",
+          value: "accommodations[0].room.waterNo",
         },
         {
           text: "เลขมิเตอร์น้ำประปา",
-          value: "water_meter_no",
+          value: "accommodations[0].room.waterMeterNo",
         },
         {
           text: "เลขผู้ใช้ไฟฟ้า",
-          value: "electricity_no",
+          value: "accommodations[0].room.electricityNo",
         },
         {
           text: "เลขมิเตอร์ไฟฟ้า",
-          value: "electricity_meter_no",
+          value: "accommodations[0].room.electricityMeterNo",
         },
         {
           text: "ประเภทห้อง",
-          value: "room_type",
+          value: "accommodations[0].room.roomType",
         },
         {
           text: "การจัดการ",
@@ -741,11 +742,16 @@ export default {
   },
   created() {
     this.getRole();
+    this.gettoken();
   },
   mounted() {
     this.getResidentData();
   },
   methods: {
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     getRole() {
       var role = localStorage.getItem("role");
       this.role = role;
@@ -754,19 +760,18 @@ export default {
     getResidentData() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
-      // var date = "?date=" + this.dateNow;
-      var date = "?date=2022-07-29";
       return axios
-        .get(apiUrl + "/v1/resident" + date, config)
+        .get(apiUrl + "/v1/resident/residentslist" , config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            this.residentTable = data.result.resident;
+            this.residentTable = data.result;
             this.loadTable = false;
+            console.log(data.result)
           }
         })
         .catch((error) => {
