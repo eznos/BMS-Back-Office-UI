@@ -3,7 +3,9 @@
     <v-app-bar class="background" dark app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="text-uppercase">
-        <span class="font-weight-light">ระบบจัดการค่าน้ำค่าไฟ อาคารบ้านพักตำรวจภูธรภาค 3 (ส่วนกลาง)</span>
+        <span class="font-weight-light"
+          >ระบบจัดการค่าน้ำค่าไฟ อาคารบ้านพักตำรวจภูธรภาค 3 (ส่วนกลาง)</span
+        >
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu offset-y>
@@ -170,6 +172,7 @@
 </template>
 
 <script>
+
 export default {
   name: "Toolbar",
   data: () => ({
@@ -279,15 +282,16 @@ export default {
       var axios = require("axios");
       var config = {
         method: "post",
-        url: "http://localhost:3000/v1/logout",
+        url: "http://localhost:3000/auth/v1/logout",
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
           "x-refresh-token": "xxx-refresh-token",
         },
       };
       axios(config)
         .then(function () {
           localStorage.clear();
+          sessionStorage.clear();
           window.location = "login";
         })
         .catch(function (error) {

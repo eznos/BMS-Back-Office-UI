@@ -67,7 +67,7 @@ export default {
   },
 };
 </script>
-
+  
 <style lang="scss">
 #app {
   @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@700&display=swap");

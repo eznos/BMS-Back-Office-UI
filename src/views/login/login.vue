@@ -120,14 +120,15 @@ export default {
       };
       let headerAPI = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
           "Content-Type": "application/json",
         },
         payload: payload,
       };
       axios
-        .post(apiUrl + "/v1/login", payload, headerAPI)
+        .post(apiUrl + "/v1/auth/login", payload, headerAPI)
         .then(async (response) => {
+          console.log(response.data);
           let data = response.data;
           if (data.status === "success") {
             this.rank = data.result.rank;
@@ -137,6 +138,8 @@ export default {
             this.role = data.result.role;
             this.affiliation = data.result.affiliation;
             this.user_id = data.result.id;
+            this.refreshToken = data.token.refresh_token;
+            this.accessToken = data.token.access_token;
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);
@@ -144,6 +147,8 @@ export default {
             localStorage.setItem("role", this.role);
             localStorage.setItem("affiliation", this.affiliation);
             localStorage.setItem("id", this.user_id);
+            sessionStorage.setItem("refreshToken", this.refreshToken);
+            sessionStorage.setItem("accessToken", this.accessToken);
             if (data.result.role === "admin") {
               this.$router.push({
                 name: "overview",
@@ -170,7 +175,7 @@ export default {
     async userLogin() {
       let headerAPI = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": "339ea1bdb4c96a94b5291cec559b50e2",
         },
         data: data,
       };

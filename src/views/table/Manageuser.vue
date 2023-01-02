@@ -257,8 +257,10 @@ import NotFound from "../../components/notFound/Notfound.vue";
 export default {
   components: { NotFound },
   data: () => ({
+    key: process.env.APIKey,
     el: "#app",
     role: "",
+    token: "",
     userID: "",
     snackbar: false,
     statusAction: "",
@@ -371,6 +373,7 @@ export default {
   },
   created() {
     this.getRole();
+    this.gettoken();
   },
   mounted() {
     this.getUserList();
@@ -379,6 +382,10 @@ export default {
     getRole() {
       var role = localStorage.getItem("role");
       this.role = role;
+    },
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
     },
     getUsersID() {
       if (this.selectItems == true) {
@@ -392,17 +399,17 @@ export default {
     getUserList() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       return axios
-        .get(apiUrl + "/v1/users", config)
+        .get(apiUrl + "/v1/user/users", config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            console.log(data.id)
-            this.userTable = data.result.user_lists;
+            console.log(data);
+            this.userTable = data.result;
             this.loadTable = false;
           }
         })
@@ -412,7 +419,7 @@ export default {
     },
     // edit user (email)
     editUser(email) {
-      let user_ID = "?id=" + (this.userID);
+      let user_ID = "?id=" + this.userID;
       let payload = {
         email: email,
       };

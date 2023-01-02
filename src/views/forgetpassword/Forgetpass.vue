@@ -117,7 +117,7 @@ export default {
         method: "post",
         url: apiUrl + "/v1/auth/" + this.email + "/forgot-password",
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios(config)

@@ -253,6 +253,7 @@ import Chart from "chart.js";
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
 import infoCardSelects from "../../json/infoCardSelects.json";
+
 export default {
   mounted() {
     this.chartElectric();
@@ -261,6 +262,7 @@ export default {
   },
   data() {
     return {
+      // myApiKey:process.env.API_KEY,
       snackbar: false,
       statusAction: "",
       colorSnackbar: "",
@@ -282,6 +284,7 @@ export default {
   },
   created() {
     this.getRole();
+    console.log(process.env.apiKey)
   },
   methods: {
     getInfoDataCard() {

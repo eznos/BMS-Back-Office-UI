@@ -161,7 +161,7 @@
             </v-btn>
             <v-spacer></v-spacer>
             <div>
-              <!-- add room_no -->
+              <!-- add roomNo -->
               <v-dialog v-model="dialog" persistent max-width="75%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
@@ -187,7 +187,7 @@
                             <v-select
                               item-text="name"
                               item-value="id"
-                              v-model="editedItem.water_zone"
+                              v-model="editedItem.waterZone"
                               :items="water_groups"
                               label="สายของมิเตอร์น้ำ"
                               autofocus
@@ -225,10 +225,10 @@
                             >
                             </v-autocomplete>
                           </v-col>
-                          <!-- room_no -->
+                          <!-- roomNo -->
                           <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
-                              v-model="editedItem.room_no"
+                              v-model="editedItem.roomNo"
                               label="เลขห้องพัก"
                               :items="rooms"
                               item-text="room"
@@ -239,10 +239,10 @@
                             >
                             </v-autocomplete>
                           </v-col>
-                          <!-- electricity_no -->
+                          <!-- electricityNo -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.electricity_no"
+                              v-model="editedItem.electricityNo"
                               label="เลขผู้ใช้ไฟฟ้า"
                               @keypress="isNumber($event)"
                               clearable
@@ -252,10 +252,10 @@
                               :rules="rules.electricNumber"
                             ></v-text-field>
                           </v-col>
-                          <!-- water_no -->
+                          <!-- waterNo -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.water_no"
+                              v-model="editedItem.waterNo"
                               label="เลขผู้ใช้น้ำ"
                               @keypress="isNumber($event)"
                               clearable
@@ -265,10 +265,10 @@
                               :rules="rules.waterNumber"
                             ></v-text-field>
                           </v-col>
-                          <!-- electricity_meter_no -->
+                          <!-- electricityMeterNo -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.electricity_meter_no"
+                              v-model="editedItem.electricityMeterNo"
                               label="เลขมิเตอร์น้ำไฟฟ้า"
                               @keypress="isNumber($event)"
                               clearable
@@ -281,7 +281,7 @@
                           <!-- water_meter_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
-                              v-model="editedItem.meter_no"
+                              v-model="editedItem.waterMeterNo"
                               label="เลขมิเตอร์น้ำประปา"
                               @keypress="isNumber($event)"
                               clearable
@@ -294,7 +294,7 @@
                           <!-- type -->
                           <v-col cols="12" sm="6" md="4">
                             <v-select
-                              v-model="editedItem.room_type"
+                              v-model="editedItem.roomType"
                               :items="room_types"
                               label="ประเภทห้องพัก"
                               clearable
@@ -404,7 +404,7 @@
               v-model="selected"
               :headers="headers"
               :items="buildingTable"
-              item-key="room_no"
+              item-key="id"
               :items-per-page="itemsPerPage"
               class="table header-blue"
               :search="search"
@@ -422,12 +422,12 @@
                   </td>
                 </v-chip>
               </template>
-              <template v-slot:[`item.room_type`]="{ item }">
-                <td v-if="item.room_type == 'single'">{{ "ห้องโสด" }}</td>
-                <td v-if="item.room_type == 'family_1'">
+              <template v-slot:[`item.roomType`]="{ item }">
+                <td v-if="item.roomType == 'single'">{{ "ห้องโสด" }}</td>
+                <td v-if="item.roomType == 'family_1'">
                   {{ "ห้องครอบครัว 1" }}
                 </td>
-                <td v-if="item.room_type == 'family_2'">
+                <td v-if="item.roomType == 'family_2'">
                   {{ "ห้องครอบครัว 2" }}
                 </td>
               </template>
@@ -462,7 +462,6 @@ import room_types from "../../json/roomTypes.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import NotFound from "../../components/notFound/Notfound.vue";
-import { APIKey } from "../../utils/key";
 import zones from "../../json/zones.json";
 import buildings from "../../json/buildings.json";
 import rooms from "../../json/rooms.json";
@@ -471,11 +470,12 @@ export default {
   data: () => ({
     token: "",
     buildingID: "",
+    roomID: "",
     role: "",
     el: "#app",
     zone: zones,
     building: buildings,
-    room_no: rooms,
+    roomNo: rooms,
     valid: true,
     modal: false,
     snackbar: false,
@@ -496,11 +496,11 @@ export default {
     exportExcelBuliding: false,
     dateExport: new Date().toISOString().substr(0, 7),
     menuExportExcel: false,
-    electricity_no: "",
-    water_no: "",
-    electricity_meter_no: "",
+    electricityNo: "",
+    waterNo: "",
+    electricityMeterNo: "",
     water_meter_no: "",
-    room_type: "",
+    roomType: "",
     status: "",
     water_groups: water_groups,
     room_types: room_types,
@@ -517,20 +517,28 @@ export default {
     buildingTable: [],
     editedIndex: -1,
     editedItem: {
-      first_name: "",
-      room_no: "",
-      water_no: "",
-      water_meter_no: "",
+      waterZone: "",
+      zone: "",
+      building: "",
+      roomNo: "",
+      electricityNo: "",
+      electricityMeterNo: "",
+      waterNo: "",
+      waterMeterNo: "",
+      roomType: "",
       status: "",
-      room_type: "",
     },
     defaultItem: {
-      first_name: "",
-      room_no: "",
-      water_no: "",
-      water_meter_no: "",
+      waterZone: "",
+      zone: "",
+      building: "",
+      roomNo: "",
+      electricityNo: "",
+      electricityMeterNo: "",
+      waterNo: "",
+      waterMeterNo: "",
+      roomType: "",
       status: "",
-      room_type: "",
     },
     rules: {
       nameRules: [
@@ -662,7 +670,7 @@ export default {
     getBuildingData() {
       var config = {
         headers: {
-          "x-api-key": APIKey,
+          "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,
         },
       };
@@ -707,6 +715,7 @@ export default {
         .post(apiUrl + "/v1/billings/electric/exports", rooms_id, config)
         .then((response) => {
           let data = response.data;
+          console.log(this.selected)
           if (data.status == "success") {
             this.exportExcelBuliding = false;
             this.statusAction =
@@ -738,28 +747,28 @@ export default {
     },
     // delete buildibg
     deleteRoom(roomsIDs) {
-      var config = {
-        headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
-        },
+      var data = {
+        id: roomsIDs,
       };
-      const room_id = { rooms_id: roomsIDs };
-      const rooms_id = "?rooms_id=" + JSON.stringify(room_id);
+      var config = {
+        method: "delete",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
       return axios
-        .delete(apiUrl + "/v1/delete/room/" + rooms_id, config)
-        .then((response) => {
-          let data = response.data;
+        .delete(apiUrl + "/v1/building/buildings/delete", config)
+        .then(() => {
           if (confirm) {
-            if (data.status == "success") {
-              this.statusAction =
-                "ลบข้อมูลผู้อยู่อาศัยจำนวน " +
-                this.selected.length +
-                "คน สำเร็จ";
-              this.colorSnackbar = "agree";
-              this.snackbar = true;
-              this.selected = [];
-            }
+            console.log(this.selected)
+            this.statusAction =
+              "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
+            this.colorSnackbar = "agree";
+            this.snackbar = true;
+            this.selected = [];
           }
         })
         .catch((error) => {
@@ -777,32 +786,32 @@ export default {
     },
     // create building room
     createBuilding(
-      water_zone,
+      waterZone,
       zone,
       building,
-      room_no,
-      electricity_no,
-      electricity_meter_no,
-      water_no,
-      meter_no,
-      room_type,
+      roomNo,
+      electricityNo,
+      electricityMeterNo,
+      waterNo,
+      waterMeterNo,
+      roomType,
       status
     ) {
       let payload = {
-        waterZoneId: water_zone,
+        waterZoneId: waterZone,
         zoneId: zone,
         buildingId: building,
-        roomNo: room_no,
-        electricityNo: electricity_no,
-        electricityMeterNo: electricity_meter_no,
-        waterNo: water_no,
-        waterMeterNo: meter_no,
-        roomType: room_type,
+        roomNo: roomNo,
+        electricityNo: electricityNo,
+        electricityMeterNo: electricityMeterNo,
+        waterNo: waterNo,
+        waterMeterNo: waterMeterNo,
+        roomType: roomType,
         status: status,
       };
       let headerAPI = {
         headers: {
-          "x-api-key": APIKey,
+          "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,
         },
         payload: payload,
@@ -826,20 +835,20 @@ export default {
     editBuilding() {
       let building_ID = this.buildingID;
       let payload = {
-        waterZoneId: this.editedItem.water_zone,
+        waterZoneId: this.editedItem.waterZone.id,
         zoneId: this.editedItem.zone.id,
         buildingId: this.editedItem.building.id,
-        roomNo: this.editedItem.room_no,
-        electricityNo: this.editedItem.electricity_no,
-        electricityMeterNo: this.editedItem.electricity_meter_no,
-        waterNo: this.editedItem.water_no,
-        waterMeterNo: this.editedItem.meter_no,
-        roomType: this.editedItem.room_type,
+        roomNo: this.editedItem.roomNo,
+        electricityNo: this.editedItem.electricityNo,
+        electricityMeterNo: this.editedItem.electricityMeterNo,
+        waterNo: this.editedItem.waterNo,
+        waterMeterNo: this.editedItem.waterMeterNo,
+        roomType: this.editedItem.roomType,
         status: this.editedItem.status,
       };
       let config = {
         headers: {
-          "x-api-key": APIKey,
+          "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,
         },
         payload: payload,
@@ -918,7 +927,6 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
       this.buildingID = item.id;
-      console.log(this.buildingID);
     },
     deleteItem(item) {
       this.editedIndex = this.buildingTable.indexOf(item);
@@ -953,33 +961,32 @@ export default {
       if (this.editedIndex > -1) {
         Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
         this.editBuilding(
-          this.editedItem.water_zone.id,
+          this.editedItem.waterZone.id,
           this.editedItem.zone.id,
           this.editedItem.building.id,
-          this.editedItem.room_no,
-          this.editedItem.electricity_no,
-          this.editedItem.electricity_meter_no,
-          this.editedItem.water_no,
-          this.editedItem.meter_no,
-          this.editedItem.room_type,
+          this.editedItem.roomNo,
+          this.editedItem.electricityNo,
+          this.editedItem.electricityMeterNo,
+          this.editedItem.waterNo,
+          this.editedItem.waterMeterNo,
+          this.editedItem.roomType,
           this.editedItem.status
         );
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
-        console.log(this.editBuilding);
       } else {
         this.buildingTable.push(this.editedItem);
         this.createBuilding(
-          this.editedItem.water_zone,
+          this.editedItem.waterZone,
           this.editedItem.zone,
           this.editedItem.building,
-          this.editedItem.room_no,
-          this.editedItem.electricity_no,
-          this.editedItem.electricity_meter_no,
-          this.editedItem.water_no,
-          this.editedItem.meter_no,
-          this.editedItem.room_type,
+          this.editedItem.roomNo,
+          this.editedItem.electricityNo,
+          this.editedItem.electricityMeterNo,
+          this.editedItem.waterNo,
+          this.editedItem.waterMeterNo,
+          this.editedItem.roomType,
           this.editedItem.status
         );
         this.snackbar = true;
@@ -1050,6 +1057,7 @@ export default {
         }
         this.buildingTable.indexOf(this.selected[0]);
         this.selectItems = false;
+        this.roomID = this.selected.id;
         this.deleteRoom(roomsIDs);
       }
     },

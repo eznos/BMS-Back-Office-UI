@@ -202,7 +202,7 @@ export default {
       };
       let headerAPI = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
           "Content-Type": "application/json",
         },
         payload: payload,
@@ -213,8 +213,7 @@ export default {
           payload,
           headerAPI
         )
-        .then((response) => {
-          console.log(response.data);
+        .then(() => {
           localStorage.clear();
           window.location = "/login";
         })
@@ -237,7 +236,7 @@ export default {
         method: "post",
         url: apiUrl + "/v1/auth/" + this.email + "/forgot-password",
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios(config)
