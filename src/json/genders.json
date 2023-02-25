@@ -1,16 +1,13 @@
 [
     {
-        "id": "197f131d-01d9-4e3d-a0b0-e616aa8d7fe5",
         "name": "ชาย",
         "value": "male"
     },
     {
-        "id": "b50bfe7d-87bc-4e28-b9cb-ad852e8cab64",
         "name": "หญิง",
         "value": "female"
     },
     {
-        "id": "23c2a4f7-1aeb-4612-91e9-1fc250a13409",
         "name": "ไม่ระบุ",
         "value": "n/a"
     }
