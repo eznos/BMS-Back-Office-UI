@@ -31,75 +31,12 @@
                 </v-icon>
                 &nbsp; Export ข้อมูลภาพรวมเป็นไฟล์ Excel หรือไม่ ?
               </v-card-title>
-              <v-card-text>
-                <v-form ref="formExport" lazy-validation>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-select
-                        prepend-icon="mdi-clipboard-list-outline"
-                        v-model="infoCardSelect"
-                        :items="infoCardSelects"
-                        item-text="name"
-                        item-value="value"
-                        label="ข้อมูลสถิติ"
-                        multiple
-                        autofocus
-                        :rules="rules.dataRules"
-                      >
-                      </v-select>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-menu
-                        ref="menu"
-                        v-model="menu"
-                        :close-on-content-click="false"
-                        :return-value.sync="date"
-                        transition="scale-transition"
-                        offset-y
-                        max-width="290px"
-                        min-width="auto"
-                      >
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-text-field
-                            v-model="date"
-                            label="ข้อมูลค่าน้ำ-ค่าไฟฟ้า ของเดือนที่เลือกไว้"
-                            prepend-icon="mdi-calendar"
-                            readonly
-                            v-bind="attrs"
-                            v-on="on"
-                            :rules="rules.dataRules"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker
-                          v-model="date"
-                          type="month"
-                          no-title
-                          scrollable
-                          multiple
-                        >
-                          <v-spacer></v-spacer>
-                          <v-btn text color="primary" @click="menu = false">
-                            Cancel
-                          </v-btn>
-                          <v-btn
-                            text
-                            color="primary"
-                            @click="$refs.menu.save(date)"
-                          >
-                            OK
-                          </v-btn>
-                        </v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>
-                </v-form>
-              </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text color="warning" @click="dialog = false">
                   ยกเลิก
                 </v-btn>
-                <v-btn text color="agree" @click="submit()"> ตกลง </v-btn>
+                <v-btn text color="agree" @click="exportOverview"> ตกลง </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -200,7 +137,7 @@
     <!-- chart -->
     <div class="pa-3 content background-main">
       <v-row>
-        <v-col cols="12" xs="12" sm="12" md="6" lg="6">
+        <v-col cols="12" xs="12" sm="12" md="12" lg="12">
           <div>
             <!-- water -->
             <v-card elevation="6" class="card-chart rounded-lg">
@@ -218,10 +155,10 @@
             </v-card>
           </div>
         </v-col>
-        <v-col cols="12" xs="12" sm="12" md="6" lg="6">
-          <div>
-            <!-- electric -->
-            <v-card elevation="6" class="card-chart rounded-lg">
+        <!-- <v-col cols="12" xs="12" sm="12" md="6" lg="6">
+          <div> -->
+        <!-- electric -->
+        <!-- <v-card elevation="6" class="card-chart rounded-lg">
               <v-card-title>
                 <div class="mx-auto">
                   <v-icon size="35px" color="#FDFC15"
@@ -235,9 +172,9 @@
                   <canvas id="electric" width="900" height="350"></canvas>
                 </div>
               </v-card-actions>
-            </v-card>
-          </div>
-        </v-col>
+            </v-card> -->
+        <!-- </div>
+        </v-col> -->
       </v-row>
     </div>
     <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
@@ -253,10 +190,10 @@ import Chart from "chart.js";
 import { apiUrl } from "../../utils/url";
 import axios from "axios";
 import infoCardSelects from "../../json/infoCardSelects.json";
-
+import FileDownload from "js-file-download";
 export default {
   mounted() {
-    this.chartElectric();
+    // this.chartElectric();
     this.chartWater();
     this.getInfoDataCard();
   },
@@ -284,25 +221,23 @@ export default {
   },
   created() {
     this.getRole();
-    console.log(process.env.apiKey)
   },
   methods: {
     getInfoDataCard() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios
-        .get(apiUrl + "/v1/overviews", config)
+        .get(apiUrl + "/v1/overviews/overviews", config)
         .then((response) => {
           let data = response.data;
           if (data.status === "success") {
-            this.total = data.result.summary.residents.total;
-            this.empty = data.result.summary.rooms.empty;
-            this.move_in = data.result.summary.residents.move_in_last_month;
-            this.move_out = data.result.summary.residents.move_out_last_month;
+            this.total = data.result.billings.info.numberOfResident;
+            this.empty = data.result.billings.info.numberOfRoom;
+            this.move_out = data.result.billings.info.numberOfExitInMount;
+            this.move_in = data.result.billings.info.numberOfComeInMonth;
           }
         })
         .catch((error) => {
@@ -312,15 +247,15 @@ export default {
     chartWater() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios
-        .get(apiUrl + "/v1/overviews", config)
+        .get(apiUrl + "/v1/overviews/overviews", config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            console.log(data);
             return new Chart(water, {
               type: "bar",
               data: {
@@ -342,18 +277,18 @@ export default {
                   {
                     label: "ส่วนกลาง",
                     data: [
-                      data.result.summary.billings.water.zones.center.jan,
-                      data.result.summary.billings.water.zones.center.feb,
-                      data.result.summary.billings.water.zones.center.mar,
-                      data.result.summary.billings.water.zones.center.apr,
-                      data.result.summary.billings.water.zones.center.may,
-                      data.result.summary.billings.water.zones.center.jun,
-                      data.result.summary.billings.water.zones.center.jul,
-                      data.result.summary.billings.water.zones.center.aug,
-                      data.result.summary.billings.water.zones.center.sep,
-                      data.result.summary.billings.water.zones.center.oct,
-                      data.result.summary.billings.water.zones.center.nov,
-                      data.result.summary.billings.water.zones.center.dec,
+                      data.result.billings.zone.Center.jan,
+                      data.result.billings.zone.Center.feb,
+                      data.result.billings.zone.Center.mar,
+                      data.result.billings.zone.Center.apr,
+                      data.result.billings.zone.Center.may,
+                      data.result.billings.zone.Center.jun,
+                      data.result.billings.zone.Center.jul,
+                      data.result.billings.zone.Center.aug,
+                      data.result.billings.zone.Center.sep,
+                      data.result.billings.zone.Center.oct,
+                      data.result.billings.zone.Center.nov,
+                      data.result.billings.zone.Center.dec,
                     ],
                     backgroundColor: "#8CFFD5",
                     borderWidth: 1,
@@ -361,36 +296,36 @@ export default {
                   {
                     label: "มหาชัย",
                     data: [
-                      data.result.summary.billings.water.zones.suranarai.jan,
-                      data.result.summary.billings.water.zones.suranarai.feb,
-                      data.result.summary.billings.water.zones.suranarai.mar,
-                      data.result.summary.billings.water.zones.suranarai.apr,
-                      data.result.summary.billings.water.zones.suranarai.may,
-                      data.result.summary.billings.water.zones.suranarai.jun,
-                      data.result.summary.billings.water.zones.suranarai.jul,
-                      data.result.summary.billings.water.zones.suranarai.aug,
-                      data.result.summary.billings.water.zones.suranarai.sep,
-                      data.result.summary.billings.water.zones.suranarai.oct,
-                      data.result.summary.billings.water.zones.suranarai.nov,
-                      data.result.summary.billings.water.zones.suranarai.dec,
+                      data.result.billings.zone.Suranarai.jan,
+                      data.result.billings.zone.Suranarai.feb,
+                      data.result.billings.zone.Suranarai.mar,
+                      data.result.billings.zone.Suranarai.apr,
+                      data.result.billings.zone.Suranarai.may,
+                      data.result.billings.zone.Suranarai.jun,
+                      data.result.billings.zone.Suranarai.jul,
+                      data.result.billings.zone.Suranarai.aug,
+                      data.result.billings.zone.Suranarai.sep,
+                      data.result.billings.zone.Suranarai.oct,
+                      data.result.billings.zone.Suranarai.nov,
+                      data.result.billings.zone.Suranarai.dec,
                     ],
                     backgroundColor: "#F86D6D",
                   },
                   {
                     label: "อัษฎางค์",
                     data: [
-                      data.result.summary.billings.water.zones.angtadang.jan,
-                      data.result.summary.billings.water.zones.angtadang.feb,
-                      data.result.summary.billings.water.zones.angtadang.mar,
-                      data.result.summary.billings.water.zones.angtadang.apr,
-                      data.result.summary.billings.water.zones.angtadang.may,
-                      data.result.summary.billings.water.zones.angtadang.jun,
-                      data.result.summary.billings.water.zones.angtadang.jul,
-                      data.result.summary.billings.water.zones.angtadang.aug,
-                      data.result.summary.billings.water.zones.angtadang.sep,
-                      data.result.summary.billings.water.zones.angtadang.oct,
-                      data.result.summary.billings.water.zones.angtadang.nov,
-                      data.result.summary.billings.water.zones.angtadang.dec,
+                      data.result.billings.zone.Asadang.jan,
+                      data.result.billings.zone.Asadang.feb,
+                      data.result.billings.zone.Asadang.mar,
+                      data.result.billings.zone.Asadang.apr,
+                      data.result.billings.zone.Asadang.may,
+                      data.result.billings.zone.Asadang.jun,
+                      data.result.billings.zone.Asadang.jul,
+                      data.result.billings.zone.Asadang.aug,
+                      data.result.billings.zone.Asadang.sep,
+                      data.result.billings.zone.Asadang.oct,
+                      data.result.billings.zone.Asadang.nov,
+                      data.result.billings.zone.Asadang.dec,
                     ],
                     backgroundColor: "#2E36F0",
                   },
@@ -434,206 +369,181 @@ export default {
           console.log(error);
         });
     },
-    chartElectric() {
-      var config = {
-        headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
-        },
-      };
-      axios
-        .get(apiUrl + "/v1/overviews", config)
-        .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            var electric = document.getElementById("electric");
-            return new Chart(electric, {
-              type: "bar",
-              data: {
-                labels: [
-                  "มกราคม",
-                  "กุมภาพันธ์",
-                  "มีนาคม",
-                  "เมษายน",
-                  "พฤษภาคม ",
-                  "มิถุนายน ",
-                  "กรกฎาคม",
-                  "สิงหาคม",
-                  "กันยายน",
-                  "ตุลาคม",
-                  "พฤศจิกายน",
-                  "ธันวาคม",
-                ],
-                datasets: [
-                  {
-                    label: "ส่วนกลาง",
-                    data: [
-                      data.result.summary.billings.electricity.zones.center.jan,
-                      data.result.summary.billings.electricity.zones.center.feb,
-                      data.result.summary.billings.electricity.zones.center.mar,
-                      data.result.summary.billings.electricity.zones.center.apr,
-                      data.result.summary.billings.electricity.zones.center.may,
-                      data.result.summary.billings.electricity.zones.center.jun,
-                      data.result.summary.billings.electricity.zones.center.jul,
-                      data.result.summary.billings.electricity.zones.center.aug,
-                      data.result.summary.billings.electricity.zones.center.sep,
-                      data.result.summary.billings.electricity.zones.center.oct,
-                      data.result.summary.billings.electricity.zones.center.nov,
-                      data.result.summary.billings.electricity.zones.center.dec,
-                    ],
-                    backgroundColor: "#8CFFD5",
-                    borderWidth: 1,
-                  },
-                  {
-                    label: "มหาชัย",
-                    data: [
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .jan,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .feb,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .mar,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .apr,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .may,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .jun,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .jul,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .aug,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .sep,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .oct,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .nov,
-                      data.result.summary.billings.electricity.zones.suranarai
-                        .dec,
-                    ],
-                    backgroundColor: "#F86D6D",
-                  },
-                  {
-                    label: "อัษฎางค์",
-                    data: [
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .jan,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .feb,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .mar,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .apr,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .may,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .jun,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .jul,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .aug,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .sep,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .oct,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .nov,
-                      data.result.summary.billings.electricity.zones.angtadang
-                        .dec,
-                    ],
-                    backgroundColor: "#2E36F0",
-                  },
-                ],
-              },
-              options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                locale: "th-TH",
-                layout: {
-                  padding: 15,
-                },
-                legend: {
-                  position: "top", // place legend on the right side of chart
-                  plugins: {
-                    labels: {
-                      font: {
-                        size: 20,
-                        family: "Sarabun",
-                      },
-                    },
-                  },
-                },
-                scales: {
-                  xAxes: [
-                    {
-                      stacked: true, // this should be set to make the bars stacked
-                    },
-                  ],
-                  yAxes: [
-                    {
-                      stacked: true, // this also..
-                    },
-                  ],
-                },
-              },
-            });
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    submit() {
-      if (this.$refs.formExport.validate()) {
-        this.exportOverview(this.date, this.infoCardSelect);
-      }
-    },
+    // chartElectric() {
+    //   var config = {
+    //     headers: {
+    //       "x-api-key": "xxx-api-key",
+    //       "x-refresh-token": "xxx-refresh-token",
+    //     },
+    //   };
+    //   axios
+    //     .get(apiUrl + "/v1/overviews", config)
+    //     .then((response) => {
+    //       let data = response.data;
+    //       if (data.status == "success") {
+    //         var electric = document.getElementById("electric");
+    //         return new Chart(electric, {
+    //           type: "bar",
+    //           data: {
+    //             labels: [
+    //               "มกราคม",
+    //               "กุมภาพันธ์",
+    //               "มีนาคม",
+    //               "เมษายน",
+    //               "พฤษภาคม ",
+    //               "มิถุนายน ",
+    //               "กรกฎาคม",
+    //               "สิงหาคม",
+    //               "กันยายน",
+    //               "ตุลาคม",
+    //               "พฤศจิกายน",
+    //               "ธันวาคม",
+    //             ],
+    //             datasets: [
+    //               {
+    //                 label: "ส่วนกลาง",
+    //                 data: [
+    //                   data.result.summary.billings.electricity.zones.center.jan,
+    //                   data.result.summary.billings.electricity.zones.center.feb,
+    //                   data.result.summary.billings.electricity.zones.center.mar,
+    //                   data.result.summary.billings.electricity.zones.center.apr,
+    //                   data.result.summary.billings.electricity.zones.center.may,
+    //                   data.result.summary.billings.electricity.zones.center.jun,
+    //                   data.result.summary.billings.electricity.zones.center.jul,
+    //                   data.result.summary.billings.electricity.zones.center.aug,
+    //                   data.result.summary.billings.electricity.zones.center.sep,
+    //                   data.result.summary.billings.electricity.zones.center.oct,
+    //                   data.result.summary.billings.electricity.zones.center.nov,
+    //                   data.result.summary.billings.electricity.zones.center.dec,
+    //                 ],
+    //                 backgroundColor: "#8CFFD5",
+    //                 borderWidth: 1,
+    //               },
+    //               {
+    //                 label: "มหาชัย",
+    //                 data: [
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .jan,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .feb,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .mar,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .apr,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .may,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .jun,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .jul,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .aug,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .sep,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .oct,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .nov,
+    //                   data.result.summary.billings.electricity.zones.suranarai
+    //                     .dec,
+    //                 ],
+    //                 backgroundColor: "#F86D6D",
+    //               },
+    //               {
+    //                 label: "อัษฎางค์",
+    //                 data: [
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .jan,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .feb,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .mar,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .apr,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .may,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .jun,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .jul,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .aug,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .sep,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .oct,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .nov,
+    //                   data.result.summary.billings.electricity.zones.angtadang
+    //                     .dec,
+    //                 ],
+    //                 backgroundColor: "#2E36F0",
+    //               },
+    //             ],
+    //           },
+    //           options: {
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             locale: "th-TH",
+    //             layout: {
+    //               padding: 15,
+    //             },
+    //             legend: {
+    //               position: "top", // place legend on the right side of chart
+    //               plugins: {
+    //                 labels: {
+    //                   font: {
+    //                     size: 20,
+    //                     family: "Sarabun",
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //             scales: {
+    //               xAxes: [
+    //                 {
+    //                   stacked: true, // this should be set to make the bars stacked
+    //                 },
+    //               ],
+    //               yAxes: [
+    //                 {
+    //                   stacked: true, // this also..
+    //                 },
+    //               ],
+    //             },
+    //           },
+    //         });
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    // },
+
     // export with api
-    exportOverview(date, infoCardSelect) {
-      let payload = {
-        date_selected: date,
-        info_selected: infoCardSelect,
-      };
+    exportOverview() {
       var config = {
+        method: "post",
+        url: apiUrl + "/v1/overviews/export",
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
         },
+        responseType: "blob",
       };
-      return axios
-        .post(apiUrl + "/v1/overviews/exports", payload, config)
+      axios(config)
         .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            this.dialog = false;
-            this.statusAction = "Export สำเร็จ";
-            this.colorSnackbar = "agree";
-            this.snackbar = true;
-            this.date = new Date().toISOString().substr(0, 7);
-            this.infoCardSelect = [];
-          }
+          FileDownload(response.data, "report.xlsx");
+          this.dialog = false;
+          this.snackbar = true;
+          this.statusAction = "Export สำเร็จ";
+          this.colorSnackbar = "agree";
         })
-        .catch((error) => {
+        .catch(function (error) {
           console.log(error);
-          if (
-            error.response.data.error_message ===
-            "some record does not have calculated status"
-          ) {
-            this.statusAction = "บางบันทึกไม่มีสถานะการคำนวณ";
-            this.colorSnackbar = "warning";
-            this.snackbar = true;
-            this.dialog = false;
-            this.date = new Date().toISOString().substr(0, 7);
-            this.infoCardSelect = [];
-          } else {
-            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
-            this.colorSnackbar = "red";
-            this.snackbar = true;
-            this.dialog = false;
-            this.date = new Date().toISOString().substr(0, 7);
-            this.infoCardSelect = [];
-          }
+          this.dialog = false;
+          this.snackbar = true;
+          this.statusAction = "Export ไม่สำเร็จกรุณาติดต่อผู้จัดทำ";
+          this.colorSnackbar = "red";
         });
     },
     getRole() {
