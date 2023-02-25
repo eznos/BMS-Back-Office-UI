@@ -15,8 +15,6 @@
                 ตารางค่าน้ำประปา
               </h2>
             </div>
-            <!-- <span> {{ this.$date().format("YYYY/MM") }} </span>
-            <h2>{{ ((new Date().getMonth() + 1) % 12) - 1 }}</h2> -->
           </v-row>
         </div>
       </v-row>
@@ -77,7 +75,7 @@
                     class="filter"
                     :items="zones"
                     item-text="zone"
-                    item-value="id"
+                    item-value="value"
                     clearable
                   >
                   </v-autocomplete>
@@ -139,7 +137,7 @@
                     item-value="value"
                   ></v-select>
                 </v-col>
-                <!--  -->
+                <!-- Fillter for water price -->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-select
                     v-model="waterAverageFilterValue"
@@ -179,6 +177,27 @@
         <h3>ตารางค่าน้ำประปา</h3>
         <v-spacer></v-spacer>
         <div>
+          <!-- add bills in this month -->
+          <v-dialog v-model="dialogAddWater" persistent max-width="25%">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn color="#4CAF50" dark v-bind="attrs" v-on="on">
+                เพิ่มบิลค่าน้ำในเดือนนี้
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title> เพิ่มบิลค่าน้ำในเดือนนี้ </v-card-title>
+              <v-card-text></v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="warning" text @click="dialogAddWater = false">
+                  ยกเลิก
+                </v-btn>
+                <v-btn color="agree" text @click="createBillsInMonth">
+                  ตกลง
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <!-- water diff_price_cal -->
           <v-dialog
             v-model="differencePriceCalculate"
@@ -237,12 +256,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn
-                  color="warning"
-                  text
-                  @click="differencePriceCalculate = false"
-                  >ยกเลิก</v-btn
-                >
+                <v-btn color="warning" text @click="close">ยกเลิก</v-btn>
                 <v-btn
                   color="agree"
                   :disabled="!valid"
@@ -281,7 +295,7 @@
                       <!-- firstname -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.first_name"
+                          v-model="editedItem.firstName"
                           label="ชื่อ"
                           required
                           :rules="rules.name"
@@ -291,7 +305,7 @@
                       <!-- lasname -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.last_name"
+                          v-model="editedItem.lastName"
                           label="นามสกุล"
                           required
                           :rules="rules.name"
@@ -299,9 +313,9 @@
                         ></v-text-field>
                       </v-col>
                       <!-- meter group -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
-                          v-model="editedItem.water_zone"
+                          v-model="editedItem.waterZone"
                           :items="meterGroups"
                           label="สายของมิเตอร์น้ำ"
                           required
@@ -312,9 +326,9 @@
                           item-value="value"
                         >
                         </v-autocomplete>
-                      </v-col>
+                      </v-col> -->
                       <!-- zone -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="พื้นที่เขต"
                           v-model="editedItem.zone"
@@ -323,9 +337,9 @@
                           disabled
                         >
                         </v-autocomplete>
-                      </v-col>
+                      </v-col> -->
                       <!-- building -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="อาคาร"
                           v-model="editedItem.building"
@@ -334,9 +348,9 @@
                           disabled
                         >
                         </v-autocomplete>
-                      </v-col>
+                      </v-col> -->
                       <!-- room number -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
                           label="เลขห้องพัก"
                           v-model="editedItem.room"
@@ -346,9 +360,9 @@
                           disabled
                         >
                         </v-autocomplete>
-                      </v-col>
+                      </v-col> -->
                       <!-- water No -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.water_no"
                           label="เลขผู้ใช้น้ำ"
@@ -358,9 +372,9 @@
                           :rules="rules.waterNumber"
                           disabled
                         ></v-text-field>
-                      </v-col>
+                      </v-col> -->
                       <!-- water meter -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           v-model="editedItem.meter_no"
                           label="เลขมิเตอร์น้ำ"
@@ -370,7 +384,7 @@
                           disabled
                           :rules="rules.waterMeterNumber"
                         ></v-text-field>
-                      </v-col>
+                      </v-col> -->
                       <!-- water unit -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
@@ -394,13 +408,13 @@
                         ></v-text-field>
                       </v-col>
                       <!-- water price Diff -->
-                      <v-col cols="12" sm="6" md="4">
+                      <!-- <v-col cols="12" sm="6" md="4">
                         <v-text-field v-model="editedItem.price_diff" disabled>
                           <template v-slot:label>
                             ค่าน้ำส่วนนต่างเป็น {{ price_diff }}
                           </template>
                         </v-text-field>
-                      </v-col>
+                      </v-col> -->
                       <!-- status -->
                       <v-col cols="12" sm="6" md="4">
                         <v-select
@@ -469,6 +483,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+
           <!-- export excel -->
           <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
@@ -505,7 +520,7 @@
           v-model="selected"
           :headers="headers"
           :items="waterTables"
-          item-key="first_name"
+          item-key="id"
           :items-per-page="5"
           class="elevation-1 pa-6 th-1"
           :search="search"
@@ -516,19 +531,68 @@
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
         >
-          <template v-slot:[`item.total_pay`]="{ item }">
-            <v-chip :color="getColor(item.total_pay)">
-              {{ item.total_pay }}
+          <!-- zone -->
+          <template v-slot:[`item.accommodations[0].room.zone.name`]="{ item }">
+            <td v-if="item.accommodations[0].room.zone.name === 'center'">
+              {{ "เขตส่วนกลาง" }}
+            </td>
+            <td v-if="item.accommodations[0].room.zone.name === 'angtadang'">
+              {{ "เขตอัษฎางค์" }}
+            </td>
+            <td v-if="item.accommodations[0].room.zone.name === 'suranarai'">
+              {{ "เขตสุรนารายณ์" }}
+            </td>
+          </template>
+          <!-- price color -->
+          <template
+            v-slot:[`item.accommodations[0].billings[0].total_pay`]="{ item }"
+          >
+            <v-chip
+              :color="getColor(item.accommodations[0].billings[0].total_pay)"
+            >
+              {{ item.accommodations[0].billings[0].total_pay }}
             </v-chip>
           </template>
-          <template v-slot:[`item.status`]="{ item }">
+          <!-- date format -->
+          <template
+            v-slot:[`item.accommodations[0].billings[0].created_at`]="{ item }"
+          >
+            <span>{{
+              new Date(item.accommodations[0].billings[0].created_at)
+                .toISOString()
+                .substr(0, 7)
+            }}</span>
+          </template>
+          <!-- status color -->
+          <template
+            v-slot:[`item.accommodations[0].billings[0].status`]="{ item }"
+          >
             <v-chip :color="getColorForStatus(item.status)">
-              <td v-if="item.status == 'draft'">{{ "ร่าง" }}</td>
-              <td v-if="item.status == 'in_progess'">{{ "กำลังดำเนินการ" }}</td>
-              <td v-if="item.status == 'calculated'">{{ "คำนวนแล้ว" }}</td>
-              <td v-if="item.status == 'exported'">{{ "Export แล้ว" }}</td>
+              <td v-if="item.accommodations[0].billings[0].status === 'draft'">
+                {{ "ร่าง" }}
+              </td>
+              <td
+                v-if="
+                  item.accommodations[0].billings[0].status === 'in_progress'
+                "
+              >
+                {{ "กำลังดำเนินการ" }}
+              </td>
+              <td
+                v-if="
+                  item.accommodations[0].billings[0].status === 'calculated'
+                "
+              >
+                {{ "คำนวนแล้ว" }}
+              </td>
+              <td
+                v-if="item.accommodations[0].billings[0].status === 'exported'"
+              >
+                {{ "Export แล้ว" }}
+              </td>
             </v-chip>
           </template>
+          <!-- editor -->
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon @click="editItem(item)"> mdi-pencil </v-icon>
           </template>
@@ -554,9 +618,11 @@ import { apiUrl } from "../../utils/url";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import water_groups from "../../json/waterGroups.json";
 import NotFound from "../../components/notFound/Notfound.vue";
+import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    dialogAddWater: false,
     zonesBuildingsRoom: zonesBuildingsRoom,
     role: "",
     waterAverageFilterValue: "",
@@ -588,7 +654,7 @@ export default {
     meterGroups: water_groups,
     dialog: false,
     emailtarget: "",
-    date_now: new Date().toISOString().substr(0, 10),
+    date_now: new Date().toISOString().substr(0, 7),
     differencePriceCalculate: false,
     exportExcelwater: false,
     menu: false,
@@ -615,6 +681,7 @@ export default {
       water_meter_no: "",
       difference_price: "",
       billing_cycle: new Date().toISOString().substr(0, 7),
+      status: "",
     },
     defaultItem: {
       first_name: "",
@@ -626,7 +693,7 @@ export default {
       difference_price: "",
       sum_price: "",
       billing_cycle: new Date().toISOString().substr(0, 7),
-      status: "draft",
+      status: "",
     },
     rules: {
       format: [
@@ -656,7 +723,7 @@ export default {
   }),
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "เพิ่มผู้ใช้น้ำ" : "แก้ไขผู้ใช้น้ำ";
+      return this.editedIndex === -1 ? "เพิ่มค่าน้ำ" : "แก้ไขค่าน้ำ";
     },
     // header table
     headers() {
@@ -676,56 +743,56 @@ export default {
         },
         {
           text: "พื้นที่",
-          value: "zone",
+          value: "accommodations[0].room.zone.name",
           filter: this.zoneFilter,
         },
         {
           text: "สายของมิเตอร์",
-          value: "water_zone",
+          value: "accommodations[0].room.waterZone.name",
           filter: this.groupFilter,
         },
         {
           text: "อาคาร",
-          value: "building",
+          value: "accommodations[0].room.building.name",
           filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
-          value: "room",
+          value: "accommodations[0].room.roomNo",
         },
         {
           text: "เลขผู้ใช้น้ำ",
-          value: "water_no",
+          value: "accommodations[0].room.waterNo",
         },
         {
           text: "เลขมิเตอร์น้ำ",
-          value: "water_no",
+          value: "accommodations[0].room.waterMeterNo",
         },
         {
           text: "รอบบิล",
-          value: "billing_cycle",
+          value: "accommodations[0].billings[0].created_at",
           filter: this.dateFilter,
         },
         {
           text: "จำนวนหน่วย",
-          value: "unit",
+          value: "accommodations[0].billings[0].unit",
         },
         {
           text: "ค่าน้ำ",
-          value: "price",
+          value: "accommodations[0].billings[0].price",
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value: "price_diff",
+          value: "accommodations[0].billings[0].price_diff",
         },
         {
           text: "ค่าน้ำรวม",
-          value: "total_pay",
+          value: "accommodations[0].billings[0].total_pay",
           filter: this.waterAverageFilter,
         },
         {
           text: "สถานะ",
-          value: "status",
+          value: "accommodations[0].billings[0].status",
           filter: this.stateFilter,
         },
         {
@@ -985,10 +1052,11 @@ export default {
   },
 
   created() {
+    this.gettoken();
     this.getRole();
   },
 
-  mounted() {
+  beforeMount() {
     this.getWaterData();
   },
 
@@ -998,25 +1066,25 @@ export default {
       var role = localStorage.getItem("role");
       this.role = role;
     },
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     // get water data from api
     getWaterData() {
-      var config = {
+      const config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
-      // var date = "?date=" + this.date_now;
-      var date = "?date=2022-10-10";
       return axios
-        .get(apiUrl + "/v1/billings/water" + date, config)
+        .get(apiUrl + "/v1/billings/water", config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            console.log(data.result[0].accommodations[0].room)
-            console.log(data.result[0].accommodations[0].billings)
-            this.waterTables = data.result[0].accommodations;
             this.loadTable = false;
+            this.waterTables = data.result.billing;
           }
         })
         .catch((error) => {
@@ -1030,11 +1098,39 @@ export default {
       if (total_pay <= 150) return "#FFBB007C";
       else return "#FFFFFF00";
     },
+    // create bill this month
+    createBillsInMonth() {
+      var config = {
+        method: "post",
+        url: apiUrl + "/v1/billings/water/add",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+        },
+      };
+      axios(config)
+        .then(() => {
+          this.dialogAddWater = false;
+          this.getWaterData();
+          this.statusAction =
+            "เพิ่มบิลค่าน้ำประปาของรอบ " + this.date_now + " สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          this.statusAction =
+            "เพิ่มบิลค่าน้ำประปาของรอบ " + this.date_now + " ไม่สำเร็จ";
+          this.colorSnackbar = "warning";
+          this.snackbar = true;
+          this.dialogAddWater = false;
+          console.log(error);
+        });
+    },
     // color for status
     getColorForStatus(status) {
-      if (status == "draft") return "yellow";
-      if (status == "in_progess") return "red";
-      if (status == "calculated") return "gray";
+      if (status === "draft") return "yellow";
+      if (status === "in_progress") return "red";
+      if (status === "calculated") return "gray";
       else return "green";
     },
     // show delete as selected button
@@ -1060,28 +1156,29 @@ export default {
     calculateWaterPrice(meterZone) {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
-      let price = { price: meterZone };
-      const zoneID = this.waterGroupCalculate;
+      const price = { price: meterZone };
+      const zoneID = "?id=" + this.waterGroupCalculate;
       return axios
-        .post(apiUrl + "/v1/calculate/" + zoneID, price, config)
+        .post(apiUrl + "/v1/billings/water/diff" + zoneID, price, config)
+
         .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            this.statusAction = "คำนวนค่าน้ำส่วนต่าง" + "สำเร็จ";
-            this.waterGroupCalculate = "";
-            this.meterZone = "";
-            this.differencePriceCalculate = false;
-            this.colorSnackbar = "agree";
-            this.snackbar = true;
-          }
+          console.log(response);
+          this.statusAction = "คำนวนค่าน้ำส่วนต่าง" + "สำเร็จ";
+          this.waterGroupCalculate = "";
+          this.meterZone = "";
+          this.differencePriceCalculate = false;
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.getWaterData();
+          this.$refs.formDiffPrice.resetValidation();
         })
         .catch((error) => {
           console.log(error);
-          if (error.response.data.status === "unauthorized") {
+          if (error.response.data.status === "invalid refresh token") {
             this.statusAction =
               "คำวนวนค่าน้ำส่วนต่าง ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
@@ -1099,8 +1196,8 @@ export default {
     // get selected id
     getbillingsID() {
       if (this.selectItems == true) {
-        let billingsIDs = [];
-        for (var i = 0; i < this.selected.length; i++) {
+        const billingsIDs = [];
+        for (let i = 0; i < this.selected.length; i++) {
           billingsIDs.push(this.selected[i].id);
         }
         this.exportWater(billingsIDs);
@@ -1110,25 +1207,25 @@ export default {
     exportWater(billingsIDs) {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
+        responseType: "blob",
       };
-      const billings_id = { billings_id: billingsIDs };
+      const id = { id: billingsIDs };
       return axios
-        .post(apiUrl + "/v1/billings/water/exports", billings_id, config)
+        .post(apiUrl + "/v1/billings/water/export", id, config)
         .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            this.exportExcelwater = false;
-            this.statusAction =
-              "Export ข้อมูลผู้อยู่ใช้น้ำจำนวน " +
-              this.selected.length +
-              "คน สำเร็จ";
-            this.colorSnackbar = "agree";
-            this.snackbar = true;
-            this.selected = [];
-          }
+          FileDownload(response.data, "report.xlsx");
+          // this.getWaterData();
+          this.exportExcelwater = false;
+          this.statusAction =
+            "Export ข้อมูลผู้อยู่ใช้น้ำจำนวน " +
+            this.selected.length +
+            "คน สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.selected = [];
         })
         .catch((error) => {
           console.log(error);
@@ -1147,10 +1244,29 @@ export default {
             this.differencePriceCalculate = false;
           }
         });
+
+      // const id = JSON.stringify({ id: billingsIDs });
+      // const config = {
+      //   method: "post",
+      //   url: apiUrl + "/v1/billings/water/export",
+      //   headers: {
+      //     "x-api-key": process.env.apiKey,
+      //     "x-refresh-token": this.token,
+      //   },
+      //   id: id,
+      // };
+
+      // axios(config)
+      //   .then(function (response) {
+      //     console.log(JSON.stringify(response.data));
+      //   })
+      //   .catch(function (error) {
+      //     console.log(error);
+      //   });
     },
-    // edit billing via API 
+    // edit billing via API
     editWaterBilling(unit, price, status, billing_cycle) {
-      let idwater = "?id=" + JSON.stringify(this.WaterBillingID);
+      let idwater = "?id=" + this.WaterBillingID;
       const payload = {
         unit: unit,
         price: price,
@@ -1159,19 +1275,19 @@ export default {
       };
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       return axios
-        .patch(apiUrl + "/v1/billdings/water/edit/" + idwater, payload, config)
+        .patch(apiUrl + "/v1/billings/water/edit" + idwater, payload, config)
         .then(async () => {
+          console.log(apiUrl + "/v1/billings/water/edit" + idwater);
+          this.getWaterData();
         })
         .catch((error) => {
           console.log(error);
-          if (
-            error.response.data.status ===
-            "unauthorized"
-          ) {
+          if (error.response.data.status === "unauthorized") {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "warning";
             this.snackbar = true;
@@ -1184,6 +1300,7 @@ export default {
           }
         });
     },
+
     nameFilter(value) {
       // If this filter has no value we just skip the entire filter.
       if (!this.NamefilterValue) {
@@ -1201,10 +1318,10 @@ export default {
     },
     waterAverageFilter(value) {
       if (this.waterAverageFilterValue == "น้อยกว่าค่าเฉลี่ย") {
-        return value < 200;
+        return value <= 150;
       }
       if (this.waterAverageFilterValue == "มากกว่าค่าเฉลี่ย") {
-        return value > 200;
+        return value >= 200;
       }
       return true;
     },
@@ -1240,6 +1357,10 @@ export default {
     },
     close() {
       this.dialog = false;
+      this.differencePriceCalculate = false;
+      this.$refs.formDiffPrice.resetValidation();
+      this.$refs.formButton.resetValidation();
+      this.$refs.formEditwater.resetValidation();
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -1257,9 +1378,11 @@ export default {
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
+        this.$refs.formEditwater.resetValidation();
       } else {
         this.waterTables.push(this.editedItem);
       }
+      this.$refs.formEditwater.resetValidation();
       this.close();
     },
     clearFilter() {
