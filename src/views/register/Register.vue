@@ -279,11 +279,11 @@ export default {
       },
       username: [
         (v) => !!v || "กรุณากรอกข้อมูล",
-        (v) => (v && v.length >= 4) || "ชื่อผู้ใช้ต้องมีมากกว่า 6 ตัวอักษร",
+        (v) => (v && v.length >= 6) || "ชื่อผู้ใช้ต้องมีมากกว่า 6 ตัวอักษร",
       ],
       password: [
         (v) => !!v || "กรุณากรอกข้อมูล",
-        (v) => (v && v.length >= 6) || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
+        (v) => (v && v.length >= 8) || "รหัสผ่านต้องมีมากกว่า 8 ตัวอักษร",
       ],
       Avatar: [
         (value) =>
@@ -292,7 +292,15 @@ export default {
       zonesBuildingsRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
+  created() {
+    this.gettoken();
+  },
   methods: {
+    // get refreshToken
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     async submitRegister() {
       if (this.$refs.formRegister.validate()) {
         this.imageURL = await this.uploadProfileImageToStorage(
@@ -305,22 +313,18 @@ export default {
       const datas = {
         username: this.username,
         password: this.password,
-        role: this.role,
         rank: this.rank,
         affiliation: this.affiliation,
-        firstName: this.firstName,
-        lastName: this.lastName,
+        first_name: this.firstName,
+        last_name: this.lastName,
         gender: this.gender,
         email: this.email,
-        phoneNumber: this.phoneNumber,
-        profileUrl: this.imageURL,
-        deleted: this.deleted,
+        phone_number: this.phoneNumber,
+        profile_url: this.imageURL,
       };
       const config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
-          "Content-Type": "application/json",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios
@@ -342,11 +346,11 @@ export default {
             this.snackbarColor = "warning";
             this.text = "อีเมลนี้ ถูกใช้งานไปแล้ว";
           }
-          // else {
-          //   this.snackbar = true;
-          //   this.snackbarColor = "red";
-          //   this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
-          // }
+          else {
+            this.snackbar = true;
+            this.snackbarColor = "red";
+            this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+          }
         });
     },
     async uploadProfileImageToStorage(profileImage) {

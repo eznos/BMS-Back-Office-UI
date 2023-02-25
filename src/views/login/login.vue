@@ -97,8 +97,8 @@ export default {
       usernameRules: [(value) => !!value || "กรุณากรอก ชื่อผู้ใช้"],
       Password_Format: [
         (val) =>
-          (val || "").length >= 3 ||
-          "กรุณาใส่รหัสผ่านอย่างน้อย 3 ตัวหรือมากกว่า",
+          (val || "").length >= 8 ||
+          "กรุณาใส่รหัสผ่านอย่างน้อย 8 ตัวหรือมากกว่า",
       ],
     },
   }),
@@ -154,6 +154,10 @@ export default {
                 name: "overview",
               });
             }
+            if (data.result.role === "user") {
+              this.loginFail = "สิทธิ์ของคุณไม่พอ";
+            this.isLogin = false;
+            }
           }
         })
         .catch((error) => {
@@ -175,7 +179,7 @@ export default {
     async userLogin() {
       let headerAPI = {
         headers: {
-          "x-api-key": "339ea1bdb4c96a94b5291cec559b50e2",
+          "x-api-key": process.env.apiKey,
         },
         data: data,
       };
