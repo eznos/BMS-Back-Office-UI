@@ -32,9 +32,9 @@
                     >
                       <h2>
                         {{
-                          firstname != null ? firstname.substring(0, 1) : null
+                          firstName != null ? firstName.substring(0, 1) : null
                         }}
-                        {{ lastname != null ? lastname.substring(0, 1) : null }}
+                        {{ lastName != null ? lastName.substring(0, 1) : null }}
                       </h2>
                     </v-avatar>
                     <v-img
@@ -108,7 +108,7 @@
                   <!-- name -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
-                      v-model="firstname"
+                      v-model="firstName"
                       :rules="rules.nameRules"
                       label="ชื่อ"
                       prepend-icon="mdi-form-textbox"
@@ -119,7 +119,7 @@
                   <!-- last name -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
-                      v-model="lastname"
+                      v-model="lastName"
                       :rules="rules.nameRules"
                       label="นามสกุล"
                       prepend-icon="mdi-rename-box"
@@ -141,8 +141,8 @@
                   <!-- tel. -->
                   <v-col cols="12" sm="4" md="6" lg="4">
                     <v-text-field
-                      :rules="[rules.phone_number.regex]"
-                      v-model="phone_number"
+                      :rules="[rules.phoneNumber.regex]"
+                      v-model="phoneNumber"
                       :counter="10"
                       label="เบอร์โทร"
                       required
@@ -161,7 +161,6 @@
                       label="เพศ"
                       item-value="value"
                       item-text="name"
-                      item-id="id"
                     >
                     </v-select>
                   </v-col>
@@ -216,9 +215,6 @@
         {{ statusAction }}
       </div>
     </v-snackbar>
-    <v-container v-if="role == 'user'">
-      <NotFound />
-    </v-container>
   </v-app>
 </template>
 <script>
@@ -230,10 +226,8 @@ import axios from "axios";
 import ranks from "../../json/rank.json";
 import affiliations from "../../json/affiliations.json";
 import genders from "../../json/genders.json";
-import NotFound from "../../components/notFound/Notfound.vue";
 
 export default {
-  components: { NotFound },
   data: () => ({
     snackbar: false,
     statusAction: "",
@@ -252,17 +246,17 @@ export default {
     rank: "",
     ranks: ranks,
     affiliation: "",
-    firstname: "",
-    lastname: "",
+    firstName: "",
+    lastName: "",
     imageURL: "",
     defaultGender: {
       text: "ไม่ระบุ",
-      value: "",
+      value: "n/a",
     },
     genders: genders,
     tel: "",
     email: "",
-    phone_number: "",
+    phoneNumber: "",
     zone: null,
     building: null,
     room: null,
@@ -279,7 +273,7 @@ export default {
             v
           ) || "อีเมลไม่ถูกต้อง",
       },
-      phone_number: {
+      phoneNumber: {
         required: (v) => !!v || "กรุณาใส่เบอร์โทรศัพท์",
         regex: (v) =>
           /^(08[0-9]{8})|(06[0-9]{8})|(09[0-9]{8})$/.test(v) ||
@@ -306,9 +300,9 @@ export default {
       this.role = role;
       this.user_ID = user_ID;
     },
-    submit() {
+    async  submit() {
       if (this.$refs.formEdit.validate()) {
-        this.imageURL = this.uploadProfileImageToStorage(this.profileImage);
+        this.imageURL = await this.uploadProfileImageToStorage(this.profileImage);
         this.callAPIEditUser();
       }
     },
@@ -330,28 +324,32 @@ export default {
       const data = {
         rank: this.rank,
         affiliation: this.affiliation,
-        first_name: this.firstname,
-        last_name: this.lastname,
+        firstName: this.firstName,
+        lastName: this.lastName,
         email: this.email,
-        phone_number: this.phoneNumber,
+        phoneNumber: this.phoneNumber,
         gender: this.defaultGender,
-        profile_url: this.imageURL,
+        profileUrl: this.imageURL,
       };
-
+      // let id = "?id=" +  this.user_ID
       const config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "Content-Type": "application/json",
+          "x-api-key": process.env.apiKey,
         },
       };
       axios
-        .patch(apiUrl + "/v1/user/" + this.user_ID + "/edit", data, config)
+        .patch(
+          apiUrl + "/v1/user/users/edit-info" + "?id=" + this.user_ID,
+          data,
+          config
+        )
         .then(() => {
-          this.profileImage = null
+          console.log(this.imageURL)
           this.$refs.formEdit.reset();
           this.statusAction = "แก้ไขข้อมูลสำเร็จ";
           this.colorSnackbar = "agree";
           this.snackbar = true;
+          this.profileImage = null;
         })
         .catch((error) => {
           console.log(error);
