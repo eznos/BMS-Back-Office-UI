@@ -113,7 +113,7 @@
       <v-card-text>
         <v-row>
           <!-- electric -->
-          <v-col cols="6">
+          <!-- <v-col cols="6">
             <v-data-table
               v-model="selected"
               :headers="headersElectric"
@@ -135,16 +135,15 @@
                   new Date(item.created_at).toISOString().substr(0, 7)
                 }}</span>
               </template>
-              <!-- color of price on datatable  -->
               <template v-slot:[`item.price`]="{ item }">
                 <v-chip :color="getColor(item.price)">
                   {{ item.price }}
                 </v-chip>
               </template>
             </v-data-table>
-          </v-col>
+          </v-col> -->
           <!-- water -->
-          <v-col cols="6">
+          <v-col cols="12">
             <v-data-table
               v-model="selected"
               :headers="headersWater"
@@ -161,9 +160,9 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าน้ำประปา</h3>
               </template>
-              <template v-slot:item.created_at="{ item }">
+              <template v-slot:item.updated_at="{ item }">
                 <span>{{
-                  new Date(item.created_at).toISOString().substr(0, 7)
+                  new Date(item.updated_at).toISOString().substr(0, 7)
                 }}</span>
               </template>
               <!-- color of price on datatable  -->
@@ -236,33 +235,38 @@ export default {
     },
   }),
   computed: {
-    headersElectric() {
-      return [
-        {
-          text: "เดือน",
-          align: "left",
-          value: "created_at",
-        },
-        {
-          text: "จำนวยหน่วย",
-          value: "unit",
-        },
-        {
-          text: "ค่าใช้จ่าย",
-          value: "total_pay",
-        },
-      ];
-    },
+    // headersElectric() {
+    //   return [
+    //     {
+    //       text: "เดือน",
+    //       align: "left",
+    //       value: "created_at",
+    //     },
+    //     {
+    //       text: "จำนวยหน่วย",
+    //       value: "unit",
+    //     },
+    //     {
+    //       text: "ค่าใช้จ่าย",
+    //       value: "total_pay",
+    //     },
+    //   ];
+    // },
     headersWater() {
       return [
         {
           text: "เดือน",
           align: "left",
-          value: "created_at",
+          value: "updated_at",
         },
         {
           text: "จำนวยหน่วย",
           value: "unit",
+          align: "left",
+        },
+        {
+          text: "ค่าน้ำรวม",
+          value: "price",
           align: "left",
         },
         {
@@ -271,7 +275,7 @@ export default {
           align: "left",
         },
         {
-          text: "ค่าใช้จ่าย",
+          text: "ค่าใช้จ่ายรวม",
           value: "total_pay",
           align: "left",
         },
@@ -295,21 +299,20 @@ export default {
       try {
         let config = {
           headers: {
-            "x-api-key": "xxx-api-key",
-            "x-refresh-token": "xxx-refresh-token",
+            "x-api-key": process.env.apiKey,
           },
         };
         return axios
           .get(
-            `${apiUrl}/v1/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
+            `${apiUrl}/v1/billings/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
             config
           )
           .then((response) => {
             let data = response.data;
             if (data.status == "success") {
-              console.log(data);
-              this.electricHistoryTable =
-                data.result.electric.accommodations[0].billings;
+              console.log(data.result.water.accommodations);
+              // this.electricHistoryTable =
+              //   data.result.electric.accommodations[0].billings;
               this.waterHistoryTable =
                 data.result.water.accommodations[0].billings;
               this.loadTable = false;
@@ -322,8 +325,6 @@ export default {
               this.snackbar = true;
               this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
               this.colorSnackbar = "warning";
-            } else {
-              console.log("Ez");
             }
           })
           .catch((error) => {
