@@ -67,11 +67,6 @@
                     <v-icon>mdi-login</v-icon>เข้าสู่ระบบ
                   </v-btn>
                 </v-col>
-                <v-col cols="12">
-                  <v-btn text color="agree" @click="userLogin">
-                    <v-icon>mdi-login</v-icon>สำหรับผู้อยู่อาศัย
-                  </v-btn>
-                </v-col>
               </v-row>
             </v-card-actions>
           </div>
@@ -128,10 +123,30 @@ export default {
       axios
         .post(apiUrl + "/v1/auth/login", payload, headerAPI)
         .then(async (response) => {
-          console.log(response.data);
           let data = response.data;
+          console.log(data)
           if (data.status === "success") {
-            this.rank = data.result.rank;
+            if(data.result.role === "user"){
+              this.rank = data.result.rank;
+            this.fristName = data.result.firstName;
+            this.lastName = data.result.lastName;
+            this.image = data.result.profileUrl;
+            this.role = data.result.role;
+            this.affiliation = data.result.affiliation;
+            this.user_id = data.result.id;
+            localStorage.setItem("rank", this.rank);
+            localStorage.setItem("first_name", this.fristName);
+            localStorage.setItem("last_name", this.lastName);
+            localStorage.setItem("ImageURL", this.image);
+            localStorage.setItem("role", this.role);
+            localStorage.setItem("affiliation", this.affiliation);
+            localStorage.setItem("id", this.user_id);
+            this.$router.push({
+                name: "overview",
+              });
+            }
+            else{
+              this.rank = data.result.rank;
             this.fristName = data.result.firstName;
             this.lastName = data.result.lastName;
             this.image = data.result.profileUrl;
@@ -149,14 +164,9 @@ export default {
             localStorage.setItem("id", this.user_id);
             sessionStorage.setItem("refreshToken", this.refreshToken);
             sessionStorage.setItem("accessToken", this.accessToken);
-            if (data.result.role === "admin") {
-              this.$router.push({
+            this.$router.push({
                 name: "overview",
               });
-            }
-            if (data.result.role === "user") {
-              this.loginFail = "สิทธิ์ของคุณไม่พอ";
-            this.isLogin = false;
             }
           }
         })
@@ -169,38 +179,6 @@ export default {
             this.isLogin = false;
             console.log(error.response.data.error_message);
           } else {
-            this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
-            this.isLogin = false;
-            console.log(error.response.data.error_message);
-          }
-        });
-    },
-
-    async userLogin() {
-      let headerAPI = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-        data: data,
-      };
-      var data = "";
-      axios
-        .post(apiUrl + "/v1/auth/login-user", data, headerAPI)
-        .then(async (response) => {
-          let data = response.data;
-          if (data.status === "success") {
-            this.role = data.result.role;
-            localStorage.setItem("role", this.role);
-            if (data.result.role === "user") {
-              this.$router.push({
-                name: "overview",
-              });
-            }
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.response.data.error_message === "invalid API Key") {
             this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
             this.isLogin = false;
             console.log(error.response.data.error_message);

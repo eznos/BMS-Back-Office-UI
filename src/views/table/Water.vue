@@ -177,6 +177,227 @@
         <h3>ตารางค่าน้ำประปา</h3>
         <v-spacer></v-spacer>
         <div>
+          <!-- create old bill -->
+          <v-dialog v-model="dialogCreateOldBill" persistent max-width="60%">
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn
+                class="button-filter pt-5 pb-5"
+                color="#7A4579"
+                v-on="{ ...attrs }"
+              >
+                <v-icon> mdi-newspaper-plus </v-icon>
+                &nbsp; สร้างบิลของเดือนเก่า
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <v-icon> mdi-newspaper-plus </v-icon> &nbsp;
+                สร้างบิลของเดือนเก่า</v-card-title
+              >
+              <v-card-text>
+                <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
+                <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
+                  <v-row>
+                    <!-- rank -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="rankOldBill"
+                        :items="ranks"
+                        label="ยศ"
+                        autofocus
+                        required
+                        clearable
+                        :rules="rules.buildingRoom"
+                        item-text="name"
+                        item-value="name"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- first name -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="firstNameOldBill"
+                        label="ชื่อ"
+                        :items="firstNameOldBillData"
+                        required
+                        clearable
+                        :rules="rules.name"
+                        item-text="firstName"
+                        item-value="firstName"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- last name -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="lastNameOldBill"
+                        :items="lastNameOldBillData"
+                        label="นามสกุล"
+                        required
+                        clearable
+                        :rules="rules.name"
+                        item-text="lastName"
+                        item-value="lastName"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- zone -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="zoneOldbill"
+                        label="พื้นที่"
+                        required
+                        :items="zonesData"
+                        :rules="rules.zonesBuildingsRoom"
+                        clearable
+                        item-value="id"
+                        item-text="name"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- water zone -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="waterZoneOldbill"
+                        required
+                        :items="waterZonesData"
+                        label="สายของมิเตอร์น้ำ"
+                        :rules="rules.zonesBuildingsRoom"
+                        clearable
+                        item-text="name"
+                        item-value="id"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- building -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="buildingOldbill"
+                        label="อาคาร"
+                        required
+                        :items="buildinsData"
+                        item-text="name"
+                        item-value="id"
+                        :rules="rules.zonesBuildingsRoom"
+                        clearable
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- room number -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="roomNoOldbill"
+                        label="เลขห้องพัก"
+                        required
+                        @keypress="isNumber($event)"
+                        :items="roomsData"
+                        :rules="rules.zonesBuildingsRoom"
+                        item-text="roomNo"
+                        item-value="roomNo"
+                        clearable
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- bill cycle -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-dialog
+                        ref="dialog"
+                        v-model="modal"
+                        persistent
+                        width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="billCycleOldbill"
+                            label="รอบบิล"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="billCycleOldbill"
+                          type="month"
+                          locale="th-TH"
+                        >
+                          <v-spacer></v-spacer>
+                          <v-btn text color="warning" @click="modal = false">
+                            ยกเลิก
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="agree"
+                            @click="$refs.dialog.save(billCycleOldbill)"
+                          >
+                            ยืนยัน
+                          </v-btn>
+                        </v-date-picker>
+                      </v-dialog>
+                    </v-col>
+                    <!-- unit -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="unitOldbill"
+                        label="หน่วยน้ำ"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- price -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="priceOldbill"
+                        label="ค่าน้ำ"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- price diff -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="priceDiffOldBill"
+                        label="ค่าน้ำส่วนต่าง"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- total pay -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="totalPayOldBill"
+                        label="ค่าน้ำรวม"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="warning" text @click="dialogCreateOldBill = false"
+                  >ยกเลิก</v-btn
+                >
+                <v-btn
+                  color="agree"
+                  :disabled="!valid"
+                  text
+                  @click="createOldBill"
+                  >ยืนยันข้อมูล</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- end of create old bill -->
           <!-- add bills in this month -->
           <v-dialog v-model="dialogAddWater" persistent max-width="25%">
             <template v-slot:activator="{ on, attrs }">
@@ -267,7 +488,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <!-- edit user -->
+          <!-- edit water -->
           <v-dialog v-model="dialog" persistent max-width="75%">
             <v-card>
               <v-card-title>
@@ -312,79 +533,7 @@
                           disabled
                         ></v-text-field>
                       </v-col>
-                      <!-- meter group -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          v-model="editedItem.waterZone"
-                          :items="meterGroups"
-                          label="สายของมิเตอร์น้ำ"
-                          required
-                          clearable
-                          :rules="rules.buildingRoom"
-                          disabled
-                          item-text="name"
-                          item-value="value"
-                        >
-                        </v-autocomplete>
-                      </v-col> -->
-                      <!-- zone -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="พื้นที่เขต"
-                          v-model="editedItem.zone"
-                          :items="zones"
-                          :rules="rules.buildingRoom"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col> -->
-                      <!-- building -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="อาคาร"
-                          v-model="editedItem.building"
-                          :items="buildings"
-                          :rules="rules.buildingRoom"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col> -->
-                      <!-- room number -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="เลขห้องพัก"
-                          v-model="editedItem.room"
-                          :items="rooms"
-                          :rules="rules.buildingRoom"
-                          @keypress="isNumber($event)"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col> -->
-                      <!-- water No -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.water_no"
-                          label="เลขผู้ใช้น้ำ"
-                          @keypress="isNumber($event)"
-                          required
-                          counter="4"
-                          :rules="rules.waterNumber"
-                          disabled
-                        ></v-text-field>
-                      </v-col> -->
-                      <!-- water meter -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.meter_no"
-                          label="เลขมิเตอร์น้ำ"
-                          @keypress="isNumber($event)"
-                          required
-                          counter="4"
-                          disabled
-                          :rules="rules.waterMeterNumber"
-                        ></v-text-field>
-                      </v-col> -->
+
                       <!-- water unit -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
@@ -407,27 +556,7 @@
                           :value="this.priceOfwater"
                         ></v-text-field>
                       </v-col>
-                      <!-- water price Diff -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field v-model="editedItem.price_diff" disabled>
-                          <template v-slot:label>
-                            ค่าน้ำส่วนนต่างเป็น {{ price_diff }}
-                          </template>
-                        </v-text-field>
-                      </v-col> -->
-                      <!-- status -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-select
-                          v-model="editedItem.status"
-                          :items="statuses"
-                          label="สถานะ"
-                          required
-                          :rules="rules.buildingRoom"
-                          item-text="name"
-                          item-value="value"
-                        >
-                        </v-select>
-                      </v-col>
+
                       <!-- bill pay -->
                       <v-col cols="12" sm="6" md="4">
                         <v-dialog
@@ -483,7 +612,6 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-
           <!-- export excel -->
           <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
@@ -531,18 +659,6 @@
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
         >
-          <!-- zone -->
-          <template v-slot:[`item.accommodations[0].room.zone.name`]="{ item }">
-            <td v-if="item.accommodations[0].room.zone.name === 'center'">
-              {{ "เขตส่วนกลาง" }}
-            </td>
-            <td v-if="item.accommodations[0].room.zone.name === 'angtadang'">
-              {{ "เขตอัษฎางค์" }}
-            </td>
-            <td v-if="item.accommodations[0].room.zone.name === 'suranarai'">
-              {{ "เขตสุรนารายณ์" }}
-            </td>
-          </template>
           <!-- price color -->
           <template
             v-slot:[`item.accommodations[0].billings[0].total_pay`]="{ item }"
@@ -567,30 +683,22 @@
           <template
             v-slot:[`item.accommodations[0].billings[0].status`]="{ item }"
           >
-            <v-chip :color="getColorForStatus(item.status)">
-              <td v-if="item.accommodations[0].billings[0].status === 'draft'">
-                {{ "ร่าง" }}
-              </td>
-              <td
-                v-if="
-                  item.accommodations[0].billings[0].status === 'in_progress'
-                "
-              >
-                {{ "กำลังดำเนินการ" }}
-              </td>
-              <td
-                v-if="
-                  item.accommodations[0].billings[0].status === 'calculated'
-                "
-              >
-                {{ "คำนวนแล้ว" }}
-              </td>
-              <td
-                v-if="item.accommodations[0].billings[0].status === 'exported'"
-              >
-                {{ "Export แล้ว" }}
-              </td>
-            </v-chip>
+            <td v-if="item.accommodations[0].billings[0].status === 'draft'">
+              {{ "ร่าง" }}
+            </td>
+            <td
+              v-if="item.accommodations[0].billings[0].status === 'in_progress'"
+            >
+              {{ "กำลังดำเนินการ" }}
+            </td>
+            <td
+              v-if="item.accommodations[0].billings[0].status === 'calculated'"
+            >
+              {{ "คำนวนแล้ว" }}
+            </td>
+            <td v-if="item.accommodations[0].billings[0].status === 'exported'">
+              {{ "Export แล้ว" }}
+            </td>
           </template>
           <!-- editor -->
           <template v-slot:[`item.actions`]="{ item }">
@@ -622,6 +730,25 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    firstNameOldBillData: [],
+    lastNameOldBillData: [],
+    rankOldBill: "",
+    firstNameOldBill: "",
+    lastNameOldBill: "",
+    zoneOldbill: "",
+    waterZoneOldbill: "",
+    buildingOldbill: "",
+    roomNoOldbill: "",
+    billCycleOldbill: "",
+    unitOldbill: "",
+    priceOldbill: "",
+    priceDiffOldBill: "",
+    totalPayOldBill: "",
+    zonesData: [],
+    waterZonesData: [],
+    buildinsData: [],
+    roomsData: [],
+    dialogCreateOldBill: false,
     dialogAddWater: false,
     zonesBuildingsRoom: zonesBuildingsRoom,
     role: "",
@@ -655,6 +782,7 @@ export default {
     dialog: false,
     emailtarget: "",
     date_now: new Date().toISOString().substr(0, 7),
+    dateNow: new Date(),
     differencePriceCalculate: false,
     exportExcelwater: false,
     menu: false,
@@ -1054,13 +1182,152 @@ export default {
   created() {
     this.gettoken();
     this.getRole();
+    this.getNameForCreateOldBill();
   },
 
   beforeMount() {
     this.getWaterData();
+    this.getZonesdata();
+    this.getWaterZonesdata();
+    this.getBuildingsdatas();
+    this.getRoomsdatas();
   },
 
   methods: {
+    getNameForCreateOldBill() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/resident/name", config)
+        .then((response) => {
+          let data = response.data;
+          console.log(data.result.lastName);
+          this.firstNameOldBillData = data.result.firstName;
+          this.lastNameOldBillData = data.result.lastName;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // create old bill
+    createOldBill() {
+      var data = {
+        rank: this.rankOldBill,
+        firstName: this.firstNameOldBill,
+        lastName: this.lastNameOldBill,
+        zone: this.zoneOldbill,
+        waterZone: this.waterZoneOldbill,
+        building: this.buildingOldbill,
+        roomNo: this.roomNoOldbill,
+        date: this.billCycleOldbill,
+        unit: this.unitOldbill,
+        price: this.priceOldbill,
+        priceDiff: this.priceDiffOldBill,
+        totalPay: this.totalPayOldBill,
+      };
+      var config = {
+        method: "post",
+        url: apiUrl + "/v1/billings/water/add/old-bill",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+        },
+        data: data,
+      };
+      axios(config)
+        .then(() => {
+          this.dialogCreateOldBill = false;
+          this.snackbar = true;
+          this.statusAction =
+            "สร้างบิลค่าน้ำของเดือน" + this.billCycleOldbill + "สำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch((error) => {
+          console.log(error);
+          this.dialogCreateOldBill = false;
+        });
+    },
+    // data for select
+    // get zone data for select
+    getZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/zones", config)
+        .then((response) => {
+          let data = response.data;
+          const dataZones = data.result;
+          this.zonesData = dataZones;
+          return this.zonesData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // water zone data for select
+    getWaterZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/waterzone", config)
+        .then((response) => {
+          let data = response.data;
+          const dataWaterZones = data.result;
+          this.waterZonesData = dataWaterZones;
+          return this.waterZonesData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // buildings data for select
+    getBuildingsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/building", config)
+        .then((response) => {
+          let data = response.data;
+          const dataBuilding = data.result;
+          this.buildinsData = dataBuilding;
+          return this.buildinsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // rooms data for select
+    getRoomsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/room", config)
+        .then((response) => {
+          let data = response.data;
+          const dataRoom = data.result;
+          this.roomsData = dataRoom;
+          return this.roomsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // end of data for select
     // get role
     getRole() {
       var role = localStorage.getItem("role");
@@ -1216,7 +1483,7 @@ export default {
       return axios
         .post(apiUrl + "/v1/billings/water/export", id, config)
         .then((response) => {
-          FileDownload(response.data, "report.xlsx");
+          FileDownload(response.data, "ข้อมูลค่าน้ำ" + this.dateNow + ".xlsx" );
           // this.getWaterData();
           this.exportExcelwater = false;
           this.statusAction =
@@ -1244,33 +1511,13 @@ export default {
             this.differencePriceCalculate = false;
           }
         });
-
-      // const id = JSON.stringify({ id: billingsIDs });
-      // const config = {
-      //   method: "post",
-      //   url: apiUrl + "/v1/billings/water/export",
-      //   headers: {
-      //     "x-api-key": process.env.apiKey,
-      //     "x-refresh-token": this.token,
-      //   },
-      //   id: id,
-      // };
-
-      // axios(config)
-      //   .then(function (response) {
-      //     console.log(JSON.stringify(response.data));
-      //   })
-      //   .catch(function (error) {
-      //     console.log(error);
-      //   });
     },
     // edit billing via API
-    editWaterBilling(unit, price, status, billing_cycle) {
+    editWaterBilling(unit, price, billing_cycle) {
       let idwater = "?id=" + this.WaterBillingID;
       const payload = {
         unit: unit,
         price: price,
-        status: status,
         billing_cycle: billing_cycle,
       };
       var config = {

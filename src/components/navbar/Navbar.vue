@@ -130,6 +130,27 @@
           </p>
         </v-flex>
       </v-layout>
+      <v-layout v-if="role === 'user'" column align-center>
+        <v-flex class="mt-5">
+          <router-link to="/edit">
+            <v-avatar v-if="!profileImage" size="100" color="#DFDDDD">
+              <h2>
+                {{ first_name != null ? first_name.substring(0, 1) : null }}
+                {{ last_name != null ? last_name.substring(0, 1) : null }}
+              </h2>
+            </v-avatar>
+            <v-avatar v-if="profileImage" size="100">
+              <img v-bind:src="imageSrc" alt="" />
+            </v-avatar>
+          </router-link>
+        </v-flex>
+        <v-flex class="mt-3">
+          <p class="white--text subheading mt-1 text-center">ผู้เข้าใช้งาน</p>
+          <p class="white--text subheading mt-1 text-center">
+            {{ rank }} {{ first_name }} {{ last_name }}
+          </p>
+        </v-flex>
+      </v-layout>
       <!-- แถบเมนูด้านข้าง -->
       <!-- for admin -->
       <v-list v-if="role === 'admin'">
@@ -194,12 +215,12 @@ export default {
       },
       {
         icon: "mdi-water",
-        text: "ตารางค่าน้ำประปา",
+        text: "จัดการบิล",
         route: "/waterbill",
       },
       {
         icon: "mdi-lightning-bolt",
-        text: "ตารางค่าไฟฟ้า",
+        text: "จัดการบิลไฟฟ้า",
         route: "/electricbill",
       },
       {
@@ -219,14 +240,19 @@ export default {
       },
       {
         icon: "mdi-clipboard-text-clock",
-        text: "ประวัติ",
+        text: "ภาพรวมการใช้น้ำประปา",
         route: "/history",
       },
       {
-        icon: "mdi-google-maps",
-        text: "แผนที่",
-        route: "/map",
+        icon: "mdi-history",
+        text: "ประวัติค่าใช้จ่าย",
+        route: "/historyUser",
       },
+      // {
+      //   icon: "mdi-google-maps",
+      //   text: "แผนที่",
+      //   route: "/map",
+      // },
     ],
     items: [
       {
@@ -248,15 +274,10 @@ export default {
         route: "/overview",
       },
       {
-        icon: "mdi-clipboard-text-clock",
-        text: "ประวัติ",
-        route: "/history",
-      },
-      {
-        icon: " mdi-google-maps",
-        text: "แผนที่",
-        route: "/map",
-      },
+        icon: "mdi-history",
+        text: "ประวัติค่าใช้จ่าย",
+        route: "/historyUser",
+      }
     ],
     itemsUser: [
       {

@@ -1,6 +1,6 @@
 <template>
   <v-app id="app">
-    <v-card class="mx-auto" elevation="10" width="100%" v-if="role === 'admin'">
+    <v-card class="mx-auto" elevation="10" width="100%">
       <v-card-title>
         <div class="ml-3 mt-2 title">
           <h3>

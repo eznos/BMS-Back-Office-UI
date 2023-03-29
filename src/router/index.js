@@ -13,6 +13,7 @@ import Building from "../views/table/Building.vue";
 import Manage_user from "../views/table/Manageuser.vue";
 import Maps from "../views/map/Map.vue";
 import History from "../views/table/History.vue"
+import History_user from "../views/table/History_Users.vue"
 
 Vue.use(VueRouter);
 
@@ -109,6 +110,14 @@ const routes = [
     path: "/history",
     name: "History",
     component: History,
+    meta: {
+      requiresAuthAdmin: true,
+    },
+  },
+  {
+    path: "/historyUser",
+    name: "History_user",
+    component: History_user,
     meta: {
       requiresAuthAdmin: true,
     },

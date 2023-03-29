@@ -52,7 +52,7 @@
               <v-container>
                 <v-form ref="formAdduser" v-model="valid" lazy-validation>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-autocomplete
                         label="ยศ"
                         :items="ranks"
@@ -117,16 +117,17 @@
                         :rules="[rules.phoneNumber.regex]"
                         disabled
                       ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    </v-col> -->
+                    <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.email"
                         label="อีเมล"
                         required
+                        clearable
                         :rules="[rules.email.regex]"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-select
                         v-model="editedItem.role"
                         label="ตำแหน่ง"
@@ -138,7 +139,7 @@
                         disabled
                       >
                       </v-select>
-                    </v-col>
+                    </v-col> -->
                   </v-row>
                 </v-form>
               </v-container>
@@ -207,7 +208,7 @@
         v-model="selected"
         :headers="headers"
         :items="userTable"
-        item-key="first_name"
+        item-key="id"
         :items-per-page="itemsPerPage"
         class="elevation-1 pa-6"
         :search="search"
@@ -226,7 +227,7 @@
         <template v-slot:[`item.gender`]="{ item }">
           <td v-if="item.gender == 'male'">{{ "ชาย" }}</td>
           <td v-if="item.gender == 'female'">{{ "หญิง" }}</td>
-          <td v-if="item.gender == ''">{{ "ไม่ระบุ" }}</td>
+          <td v-if="item.gender == 'n/a'">{{ "ไม่ระบุ" }}</td>
         </template>
         <!-- data -->
         <template v-slot:[`item.actions`]="{ item }">
@@ -425,12 +426,17 @@ export default {
       };
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       return axios
-        .patch(apiUrl + "/v1/users/edit/" + user_ID, payload, config)
-        .then(async () => {})
+        .patch(apiUrl + "/v1/user/users/edit" + user_ID, payload, config)
+        .then(async () => {
+          this.valid = true;
+          // this.$refs.formAdduser.reset()
+          this.$refs.formAdduser.resetValidation();
+        })
         .catch((error) => {
           console.log(error);
           if (error.response.data.status === "unauthorized") {
@@ -446,34 +452,33 @@ export default {
           }
         });
     },
+
     // delete user
     deleteUserAPI(userIDs) {
+      var axios = require("axios");
+      var data = JSON.stringify({
+        id: userIDs,
+      });
+
       var config = {
+        method: "delete",
+        url: apiUrl + "/v1/user/users/delete",
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+          "Content-Type": "application/json",
         },
+        data: data,
       };
-      const users_id = { users_id: userIDs };
-      const userIDS = "?users_id=" + JSON.stringify(users_id);
-      return axios
-        .delete(apiUrl + "/v1/users/delete/" + userIDS, config)
-        .then((response) => {
-          let data = response.data;
-          if (confirm) {
-            if (data.status == "success") {
-              this.statusAction =
-                "ลบข้อมูลผู้อยู่อาศัยจำนวน " +
-                this.selected.length +
-                "คน สำเร็จ";
-              this.colorSnackbar = "agree";
-              this.snackbar = true;
-              this.selected = [];
-            }
-          }
+      axios(config)
+        .then(async () => {
+          this.statusAction =
+            "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.selected = [];
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(function (error) {
           if (error.response.data.error_message === "bad_request") {
             this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
             this.colorSnackbar = "warning";
@@ -503,6 +508,8 @@ export default {
     },
     close() {
       this.dialog = false;
+      this.$refs.formAdduser.resetValidation();
+      this.valid = true;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -522,10 +529,16 @@ export default {
         this.snackbar = true;
         this.statusAction = "แก้ไขข้อมูลสำเร็จ";
         this.colorSnackbar = "agree";
+        this.$refs.formAdduser.resetValidation();
+        this.valid = true;
       } else {
         this.userTable.push(this.editedItem);
+        this.$refs.formAdduser.resetValidation();
+        this.valid = true;
       }
       this.close();
+      this.$refs.formAdduser.resetValidation();
+      this.valid = true;
     },
     filterOnlyCapsText(value, search) {
       return (

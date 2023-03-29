@@ -155,6 +155,12 @@
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
         <h3>ตารางค่าไฟฟ้า</h3>
+        <v-text-field
+          v-model="defineUnitPrice"
+          label="กำหนดคราคาหน่วยค่าไฟ"
+        ></v-text-field>
+        <v-btn v-model="sumbit" outlined  @click="sumbit == true">ยืนยันหน่วยค่าไฟ</v-btn>
+        <v-btn v-model="cancel" v-if="sumbit == true" outlined>ยกเลิกราคาต่อหน่วย</v-btn>
         <v-spacer></v-spacer>
         <div>
           <!-- edit user -->
@@ -363,6 +369,33 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <!-- add bill in this month -->
+          <v-dialog v-model="addElectricBills" persistent max-width="50%">
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn
+                color="agree"
+                class="button-filter pt-5 pb-5"
+                v-on="{ ...attrs }"
+              >
+                <v-icon> mdi-clipboard-plus-outline </v-icon>
+                &nbsp; เพิ่มบิลไฟฟ้าในเดือนนี้
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                ต้องการสร้างบิลไฟฟ้าในเดือนนี้หรือไม่ ?
+              </v-card-title>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="warning" text @click="addElectricBills = false">
+                  ยกเลิก
+                </v-btn>
+                <v-btn color="agree" text @click="createElectricityBill">
+                  ยืนยัน
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <!-- export -->
           <v-dialog v-model="exportExcelElectric" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
@@ -415,19 +448,40 @@
           @input="enterSelect($event)"
         >
           <!-- color of price on datatable  -->
-          <template v-slot:[`item.price`]="{ item }">
-            <v-chip :color="getColor(item.price)">
-              {{ item.price }}
+          <template
+            v-slot:[`item.accommodations[0].billings[0].total_pay`]="{ item }"
+          >
+            <v-chip
+              :color="getColor(item.accommodations[0].billings[0].total_pay)"
+            >
+              {{ item.accommodations[0].billings[0].total_pay }}
             </v-chip>
           </template>
-          <!-- status text and status color -->
-          <template v-slot:[`item.status`]="{ item }">
-            <v-chip :color="getColorForStatus(item.status)">
-              <td v-if="item.status == 'draft'">{{ "ร่าง" }}</td>
-              <td v-if="item.status == 'in_progess'">{{ "กำลังดำเนินการ" }}</td>
-              <td v-if="item.status == 'calculated'">{{ "คำนวนแล้ว" }}</td>
-              <td v-if="item.status == 'exported'">{{ "Export แล้ว" }}</td>
-            </v-chip>
+          <!-- date format -->
+          <template
+            v-slot:[`item.accommodations[0].billings[0].created_at`]="{ item }"
+          >
+            <span>{{
+              new Date(item.accommodations[0].billings[0].created_at)
+                .toISOString()
+                .substr(0, 7)
+            }}</span>
+          </template>
+          <!-- status color -->
+          <template
+            v-slot:[`item.accommodations[0].billings[0].status`]="{ item }"
+          >
+            <td v-if="item.accommodations[0].billings[0].status === 'draft'">
+              {{ "ร่าง" }}
+            </td>
+            <td
+              v-if="item.accommodations[0].billings[0].status === 'in_progress'"
+            >
+              {{ "กำลังดำเนินการ" }}
+            </td>
+            <td v-if="item.accommodations[0].billings[0].status === 'exported'">
+              {{ "Export แล้ว" }}
+            </td>
           </template>
           <!-- editor data -->
           <template v-slot:[`item.actions`]="{ item }">
@@ -457,6 +511,8 @@ import NotFound from "../../components/notFound/Notfound.vue";
 export default {
   components: { NotFound },
   data: () => ({
+    priceOfUnit: "",
+    addElectricBills: false,
     zonesBuildingsRoom: zonesBuildingsRoom,
     el: "#app",
     snackbar: false,
@@ -557,52 +613,52 @@ export default {
         },
         {
           text: "ชื่อ",
-          value: "first_name",
+          value: "firstName",
         },
         {
           text: "นามสกุล",
-          value: "last_name",
+          value: "lastName",
         },
         {
           text: "พื้นที่",
-          value: "zone",
+          value: "accommodations[0].room.zone.name",
           filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
-          value: "building",
+          value: "accommodations[0].room.building.name",
           filter: this.buildingFilter,
         },
         {
           text: "เลขห้องพัก",
-          value: "room_no",
+          value: "accommodations[0].room.roomNo",
         },
         {
           text: "เลขผู้ใช้ไฟ",
-          value: "electricity_no",
+          value: "accommodations[0].room.electricityNo",
         },
         {
           text: "เลขมิเตอร์ไฟ",
-          value: "electricity_meter_no",
+          value: "accommodations[0].room.electricityMeterNo",
         },
         {
           text: "เดือน",
-          value: "billing_cycle",
+          value: "accommodations[0].billings[0].created_at",
           filter: this.dateFilter,
         },
         {
           text: "หน่วย",
-          value: "unit",
+          value: "accommodations[0].billings[0].unit",
           filterable: false,
         },
         {
           text: "ค่าไฟฟ้า",
-          value: "price",
+          value: "accommodations[0].billings[0].price",
           filter: this.electricAverageFilter,
         },
         {
           text: "สถานะ",
-          value: "status",
+          value: "accommodations[0].billings[0].status",
           filter: this.stateFilter,
         },
         {
@@ -845,6 +901,7 @@ export default {
   },
   created() {
     this.getRole();
+    this.gettoken();
   },
   mounted() {
     this.getElectricData();
@@ -855,22 +912,25 @@ export default {
       var role = localStorage.getItem("role");
       this.role = role;
     },
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     // get electric
     getElectricData() {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       // var date = "?date=" + this.dateNow;
-      var date = "?date=2022-07-29";
       return axios
-        .get(apiUrl + "/v1/billings/electric" + date, config)
+        .get(apiUrl + "/v1/billings/electric", config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            this.electricTable = data.result.billings;
+            this.electricTable = data.result.billing;
             this.loadTable = false;
           }
         })
@@ -930,7 +990,7 @@ export default {
         });
     },
     // edit billing via API
-    editElectricBilling(unit, price, status, billing_cycle) {
+    editElectricBilling(unit, price, billing_cycle) {
       let idelectric = "?id=" + JSON.stringify(this.ElectricBillingID);
       const payload = {
         unit: unit,
@@ -940,7 +1000,8 @@ export default {
       };
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       return axios
@@ -962,6 +1023,39 @@ export default {
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.differencePriceCalculate = false;
+          }
+        });
+    },
+    // create bills
+    createElectricityBill() {
+      var config = {
+        method: "post",
+        url: apiUrl + "/v1/billings/electric/add",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+        },
+      };
+      axios(config)
+        .then(async () => {
+          this.getElectricData();
+          this.statusAction = "สร้างบิลสำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.addElectricBills = false;
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response.data.status === "unauthorized") {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.addElectricBills = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.addElectricBills = false;
           }
         });
     },
@@ -1083,16 +1177,16 @@ export default {
       }
     },
     // color of price
-    getColor(price) {
-      if (price == 0) return "#FF606090";
-      if (price >= 300) return "#E6FF007C";
-      if (price <= 260) return "#FFBB007C";
+    getColor(total_pay) {
+      if (total_pay == 0) return "#FF606090";
+      if (total_pay >= 300) return "#E6FF007C";
+      if (total_pay <= 260) return "#FFBB007C";
       else return "#FFFFFF00";
     },
     // status color
     getColorForStatus(status) {
       if (status == "draft") return "yellow";
-      if (status == "in_progess") return "red";
+      if (status == "in_progress") return "red";
       if (status == "calculated") return "gray";
       else return "green";
     },

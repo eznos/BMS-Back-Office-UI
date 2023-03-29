@@ -255,7 +255,6 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            console.log(data);
             return new Chart(water, {
               type: "bar",
               data: {
@@ -532,7 +531,7 @@ export default {
       };
       axios(config)
         .then((response) => {
-          FileDownload(response.data, "report.xlsx");
+          FileDownload(response.data, "ข้อมูลภาพรวม.xlsx");
           this.dialog = false;
           this.snackbar = true;
           this.statusAction = "Export สำเร็จ";

@@ -17,88 +17,6 @@
           </v-row>
         </div>
       </v-row>
-      <!-- search history -->
-      <v-card class="card-filter px-6 py-6">
-        <v-card-title>
-          <v-icon size="35px" class="icon"
-            >mdi-format-list-bulleted-triangle</v-icon
-          >
-          &nbsp;&nbsp;
-          <h3>เครื่องมือค้นหา</h3>
-          <!-- button -->
-          <v-spacer></v-spacer>
-        </v-card-title>
-        <!-- search history -->
-        <v-form lazy-validation ref="history">
-          <v-row justify="space-between" class="px-3">
-            <!-- rank -->
-            <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-              <v-autocomplete
-                v-model="rank"
-                prepend-icon="mdi-map-legend"
-                label="ยศ"
-                class="filter"
-                :items="ranks"
-                clearable
-                item-text="name"
-                item-value="value"
-                :rules="rules.autocomplete"
-                name="rank"
-                autofocus
-              >
-              </v-autocomplete>
-            </v-col>
-            <!--frist name-->
-            <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-              <v-text-field
-                v-model="firstName"
-                label="ชื่อ"
-                class="filter"
-                clearable
-                :rules="rules.name"
-                name="firstName"
-                v-on:keyup="checkEnterPressedToSubmit"
-              ></v-text-field>
-            </v-col>
-            <!-- last name -->
-            <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-              <v-text-field
-                v-model="lastName"
-                label="นามสกุล"
-                class="filter"
-                clearable
-                name="lastName"
-                :rules="rules.name"
-                v-on:keyup="checkEnterPressedToSubmit"
-              ></v-text-field>
-            </v-col>
-            <v-row> </v-row>
-            <!-- btn search -->
-            <v-col cols="12" justify="space-between" class="px-3">
-              <v-btn
-                outlined
-                color="agree"
-                width="140"
-                class="button-filter pt-6 pb-6"
-                @click="submit()"
-              >
-                <v-icon>mdi-magnify</v-icon>
-                &nbsp; ค้นหา
-              </v-btn>
-              <v-btn
-                outlined
-                color="error"
-                width="140"
-                class="button-filter pt-6 pb-6"
-                @click="resetTable()"
-              >
-                <v-icon>mdi-delete-sweep</v-icon>
-                &nbsp; ล้างข้อมูล
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-card>
     </div>
     <div></div>
     <!-- data table and button -->
@@ -135,34 +53,34 @@
         <v-row>
           <!-- electric -->
           <!-- <v-col cols="6">
-            <v-data-table
-              v-model="selected"
-              :headers="headersElectric"
-              :items="electricHistoryTable"
-              item-key="first_name"
-              :items-per-page="itemsPerPage"
-              class="elevation-1 pa-6"
-              :loading="loadTable"
-              loading-text="กำลังโหลด... โปรดรอสักครู่"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @input="enterSelect($event)"
-            >
-              <template v-slot:top>
-                <h3>ตารางประวัติค่าไฟฟ้า</h3>
-              </template>
-              <template v-slot:item.created_at="{ item }">
-                <span>{{
-                  new Date(item.created_at).toISOString().substr(0, 7)
-                }}</span>
-              </template>
-              <template v-slot:[`item.price`]="{ item }">
-                <v-chip :color="getColor(item.price)">
-                  {{ item.price }}
-                </v-chip>
-              </template>
-            </v-data-table>
-          </v-col> -->
+              <v-data-table
+                v-model="selected"
+                :headers="headersElectric"
+                :items="electricHistoryTable"
+                item-key="first_name"
+                :items-per-page="itemsPerPage"
+                class="elevation-1 pa-6"
+                :loading="loadTable"
+                loading-text="กำลังโหลด... โปรดรอสักครู่"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                @input="enterSelect($event)"
+              >
+                <template v-slot:top>
+                  <h3>ตารางประวัติค่าไฟฟ้า</h3>
+                </template>
+                <template v-slot:item.created_at="{ item }">
+                  <span>{{
+                    new Date(item.created_at).toISOString().substr(0, 7)
+                  }}</span>
+                </template>
+                <template v-slot:[`item.price`]="{ item }">
+                  <v-chip :color="getColor(item.price)">
+                    {{ item.price }}
+                  </v-chip>
+                </template>
+              </v-data-table>
+            </v-col> -->
           <!-- water -->
           <v-col cols="12">
             <v-data-table
@@ -181,9 +99,9 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าน้ำประปา</h3>
               </template>
-              <template v-slot:item.created_at="{ item }">
+              <template v-slot:item.updated_at="{ item }">
                 <span>{{
-                  new Date(item.created_at).toISOString().substr(0, 7)
+                  new Date(item.updated_at).toISOString().substr(0, 7)
                 }}</span>
               </template>
               <!-- color of price on datatable  -->
@@ -210,8 +128,6 @@
   </v-app>
 </template>
 <script>
-import statuses from "../../json/statuses.json";
-import ranks from "../../json/rank.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import FileDownload from "js-file-download";
@@ -220,6 +136,7 @@ export default {
     datenow: new Date().toISOString().substr(0, 4),
     firstName: "",
     lastName: "",
+    rank: "",
     el: "#app",
     snackbar: false,
     statusAction: "",
@@ -241,9 +158,6 @@ export default {
     emailtarget: "",
     importExcel: false,
     exportExcelElectric: false,
-    rank: "",
-    ranks: ranks,
-    statuses: statuses,
     electricHistoryTable: [],
     waterHistoryTable: [],
     historyElectric: "",
@@ -279,7 +193,7 @@ export default {
         {
           text: "เดือน",
           align: "left",
-          value: "created_at",
+          value: "updated_at",
         },
         {
           text: "จำนวยหน่วย",
@@ -305,9 +219,20 @@ export default {
     },
   },
   watch: {},
-  created() {},
+  created() {
+    this.getUserData();
+    this.getUserHistory();
+  },
   mounted() {},
   methods: {
+    getUserData() {
+      var rank = localStorage.getItem("rank");
+      var firstName = localStorage.getItem("first_name");
+      var lastName = localStorage.getItem("last_name");
+      this.rank = rank;
+      this.firstName = firstName;
+      this.lastName = lastName;
+    },
     async checkEnterPressedToSubmit(e) {
       if (e.keyCode === 13) this.submit();
     },
@@ -317,47 +242,53 @@ export default {
       }
     },
     // get electric
-    async getUserHistory() {
-      try {
-        let config = {
-          headers: {
-            "x-api-key": process.env.apiKey,
-          },
-        };
-        return axios
-          .get(
-            `${apiUrl}/v1/billings/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
-            config
-          )
-          .then((response) => {
-            let data = response.data;
-            if (data.status == "success") {
-              // this.electricHistoryTable =
-              //   data.result.electric.accommodations[0].billings;
-              this.waterHistoryTable =
-                data.result.water.accommodations[0].billings;
-              this.loadTable = false;
-              this.snackbar = true;
-              this.statusAction = "ค้นหาเรียบร้อย";
-              this.colorSnackbar = "agree";
-            }
-            if (data.status == "success no data") {
-              this.loadTable = false;
-              this.snackbar = true;
-              this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
-              this.colorSnackbar = "warning";
-            }
-          })
-          .catch((error) => {
+    getUserHistory() {
+      let config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          `${apiUrl}/v1/billings/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          if (data.status == "success") {
+            // this.electricHistoryTable =
+            //   data.result.electric.accommodations[0].billings;
+            this.waterHistoryTable =
+              data.result.water.accommodations[0].billings;
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ค้นหาเรียบร้อย";
+            this.colorSnackbar = "agree";
+          }
+          if (data.status == "success no data") {
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
+            this.colorSnackbar = "warning";
+          }
+        })
+        .catch((error) => {
+          if (
+            error ==
+            "TypeError: Cannot read properties of null (reading 'accommodations')"
+          ) {
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ไม่พบบิล";
+            this.colorSnackbar = "warning";
+          } else {
             this.loadTable = false;
             this.snackbar = true;
             this.statusAction = "ค้นหาไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
-            this.colorSnackbar = "warning";
+            this.colorSnackbar = "red";
             console.log(error);
-          });
-      } catch (error) {
-        console.log(error);
-      }
+          }
+        });
     },
     // get selected id
     getbillingsID() {
@@ -380,7 +311,6 @@ export default {
         .post(apiUrl + "/v1/billings/history/export", config)
         .then((response) => {
           FileDownload(response.data, "ข้อมูลผู้อยู่อาศัย.xlsx");
-
           this.exportExcelElectric = false;
           this.statusAction = "Export สำเร็จ";
           this.colorSnackbar = "agree";
@@ -403,12 +333,6 @@ export default {
             this.exportExcelElectric = false;
           }
         });
-    },
-    resetTable() {
-      this.electricHistoryTable = [];
-      this.waterHistoryTable = [];
-      this.$refs.history.reset();
-      this.loadTable = true;
     },
     // color of price
     getColor(price) {
