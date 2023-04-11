@@ -188,12 +188,23 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <template v-slot:append> 
+        <div class="pa-2">
+          <v-btn
+            href="https://forms.gle/pMfAwXNhktJNUu4SA"
+            target="_blank"
+            color="#262A56"
+            block
+          >
+            แบบสอบถาม
+          </v-btn>
+        </div>
+      </template>
     </v-navigation-drawer>
   </nav>
 </template>
 
 <script>
-
 export default {
   name: "Toolbar",
   data: () => ({
@@ -217,11 +228,6 @@ export default {
         icon: "mdi-water",
         text: "จัดการบิล",
         route: "/waterbill",
-      },
-      {
-        icon: "mdi-lightning-bolt",
-        text: "จัดการบิลไฟฟ้า",
-        route: "/electricbill",
       },
       {
         icon: " mdi-home-circle",
@@ -248,11 +254,6 @@ export default {
         text: "ประวัติค่าใช้จ่าย",
         route: "/historyUser",
       },
-      // {
-      //   icon: "mdi-google-maps",
-      //   text: "แผนที่",
-      //   route: "/map",
-      // },
     ],
     items: [
       {
@@ -277,7 +278,7 @@ export default {
         icon: "mdi-history",
         text: "ประวัติค่าใช้จ่าย",
         route: "/historyUser",
-      }
+      },
     ],
     itemsUser: [
       {
@@ -297,8 +298,13 @@ export default {
   created() {
     this.getUserData();
     this.getImageURL();
+    this.gettoken();
   },
   methods: {
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
+    },
     logout() {
       var axios = require("axios");
       var config = {
@@ -306,7 +312,7 @@ export default {
         url: "http://localhost:3000/auth/v1/logout",
         headers: {
           "x-api-key": process.env.apiKey,
-          "x-refresh-token": "xxx-refresh-token",
+          "x-refresh-token": this.token,
         },
       };
       axios(config)

@@ -52,14 +52,14 @@
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-autocomplete
                     item-text="name"
-                    item-value="value"
+                    item-value="name"
                     v-model="waterGroupFilterValue"
                     prepend-icon="mdi-water-circle"
                     type="text"
                     label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
                     clearable
                     class="filter"
-                    :items="water_groups"
+                    :items="waterZonesData"
                   >
                   </v-autocomplete>
                 </v-col>
@@ -73,7 +73,7 @@
                     clearable
                     class="filter"
                     item-text="name"
-                    item-value="id"
+                    item-value="name"
                     :items="zonesData"
                   >
                   </v-autocomplete>
@@ -87,10 +87,9 @@
                     label="ค้นหาด้วยอาคาร"
                     clearable
                     class="filter"
-                    :disabled="!zoneFilterValue"
                     :items="buildinsData"
                     item-text="name"
-                    item-value="id"
+                    item-value="name"
                   >
                   </v-autocomplete>
                 </v-col>
@@ -682,7 +681,6 @@
 
 <script>
 import room_statuses from "../../json/roomStatuses.json";
-import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
@@ -738,7 +736,6 @@ export default {
     water_meter_no: "",
     roomType: "",
     status: "",
-    water_groups: water_groups,
     room_types: room_types,
     room_statuses: room_statuses,
     search: "",
@@ -844,14 +841,6 @@ export default {
           text: "เลขมิเตอร์น้ำประปา",
           value: "waterMeterNo",
         },
-        // {
-        //   text: "เลขผู้ใช้ไฟฟ้า",
-        //   value: "electricityNo",
-        // },
-        // {
-        //   text: "เลขมิเตอร์ไฟฟ้า",
-        //   value: "electricityMeterNo",
-        // },
         {
           text: "ประเภทห้องพัก",
           value: "roomType",
@@ -938,7 +927,6 @@ export default {
         },
         data: data,
       };
-      console.log(this.addZoneInWaterZone);
       axios(config)
         .then(() => {
           this.dialogAddWaterZone = false;
@@ -1046,24 +1034,6 @@ export default {
           console.log(error);
         });
     },
-    // get data to table
-    getBuildingdata() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(apiUrl + "/v1/building/data/zones", config)
-        .then((response) => {
-          let data = response.data;
-          const dataZones = data.result;
-          console.log(dataZones);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
     // get refreshToken
     gettoken() {
       var token = sessionStorage.getItem("refreshToken");
@@ -1086,7 +1056,6 @@ export default {
         .get(apiUrl + "/v1/building/buildings", config)
         .then((response) => {
           let data = response.data;
-          console.log(data);
           if (data.status == "success") {
             this.buildingTable = data.result;
             this.loadTable = false;
@@ -1171,7 +1140,6 @@ export default {
         .delete(apiUrl + "/v1/building/buildings/delete", config)
         .then(() => {
           if (confirm) {
-            console.log(this.selected);
             this.statusAction =
               "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
             this.colorSnackbar = "agree";
@@ -1271,13 +1239,11 @@ export default {
             this.colorSnackbar = "warning";
             this.snackbar = true;
             this.differencePriceCalculate = false;
-            console.log(payload);
           } else {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.differencePriceCalculate = false;
-            console.log(payload);
           }
         });
     },

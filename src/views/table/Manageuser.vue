@@ -409,7 +409,6 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
-            console.log(data);
             this.userTable = data.result;
             this.loadTable = false;
           }

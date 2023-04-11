@@ -155,21 +155,230 @@
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
         <h3>ตารางค่าไฟฟ้า</h3>
-        <v-text-field
-          v-model="defineUnitPrice"
-          label="กำหนดคราคาหน่วยค่าไฟ"
-        ></v-text-field>
-        <v-btn v-model="sumbit" outlined  @click="sumbit == true">ยืนยันหน่วยค่าไฟ</v-btn>
-        <v-btn v-model="cancel" v-if="sumbit == true" outlined>ยกเลิกราคาต่อหน่วย</v-btn>
+        <v-form v-model="isFormValid">
+          <v-text-field
+            v-model="defineUnitPrice"
+            label="กำหนดคราคาหน่วยค่าน้ำ"
+            clearable
+            @keypress="isNumber($event)"
+            :rules="rules.priceRule"
+            required
+            :disabled="this.GGG == true"
+            class="shrink mx-4"
+          ></v-text-field>
+        </v-form>
+
+        <v-btn
+          color="green"
+          v-if="this.GGG == false"
+          outlined
+          :disabled="!isFormValid"
+          @click="setPrice()"
+          >ยืนยันหน่วยค่าน้ำ</v-btn
+        >
+        <v-btn
+          color="red"
+          v-if="this.GGG == true"
+          outlined
+          @click="clearPrice()"
+          >ยกเลิกราคาต่อหน่วย</v-btn
+        >
         <v-spacer></v-spacer>
         <div>
-          <!-- edit user -->
+          <!-- create old bill -->
+          <v-dialog v-model="dialogCreateOldBill" persistent max-width="60%">
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn
+                class="button-filter pt-5 pb-5"
+                color="#7A4579"
+                v-on="{ ...attrs }"
+              >
+                <v-icon> mdi-newspaper-plus </v-icon>
+                &nbsp; สร้างบิลของเดือนเก่า
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <v-icon> mdi-newspaper-plus </v-icon> &nbsp;
+                สร้างบิลของเดือนเก่า</v-card-title
+              >
+              <v-card-text>
+                <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
+                  <v-row>
+                    <!-- rank -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="rankOldBill"
+                        :items="ranks"
+                        label="ยศ"
+                        autofocus
+                        required
+                        clearable
+                        :rules="rules.buildingRoom"
+                        item-text="name"
+                        item-value="name"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- first name -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="firstNameOldBill"
+                        label="ชื่อ"
+                        :items="firstNameOldBillData"
+                        required
+                        clearable
+                        :rules="rules.name"
+                        item-text="firstName"
+                        item-value="firstName"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- last name -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="lastNameOldBill"
+                        :items="lastNameOldBillData"
+                        label="นามสกุล"
+                        required
+                        clearable
+                        :rules="rules.name"
+                        item-text="lastName"
+                        item-value="lastName"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- zone -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="zoneOldbill"
+                        label="พื้นที่"
+                        required
+                        :items="zonesData"
+                        :rules="rules.zonesBuildingsRoom"
+                        clearable
+                        item-value="id"
+                        item-text="name"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- building -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="buildingOldbill"
+                        label="อาคาร"
+                        required
+                        :items="buildinsData"
+                        item-text="name"
+                        item-value="id"
+                        :rules="rules.zonesBuildingsRoom"
+                        clearable
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- room number -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-autocomplete
+                        v-model="roomNoOldbill"
+                        label="เลขห้องพัก"
+                        required
+                        @keypress="isNumber($event)"
+                        :items="roomsData"
+                        :rules="rules.zonesBuildingsRoom"
+                        item-text="roomNo"
+                        item-value="roomNo"
+                        clearable
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- bill cycle -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-dialog
+                        ref="dialog"
+                        v-model="modal"
+                        persistent
+                        width="290px"
+                      >
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="billCycleOldbill"
+                            label="รอบบิล"
+                            prepend-icon="mdi-calendar"
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          ></v-text-field>
+                        </template>
+                        <v-date-picker
+                          v-model="billCycleOldbill"
+                          type="month"
+                          locale="th-TH"
+                        >
+                          <v-spacer></v-spacer>
+                          <v-btn text color="warning" @click="modal = false">
+                            ยกเลิก
+                          </v-btn>
+                          <v-btn
+                            text
+                            color="agree"
+                            @click="$refs.dialog.save(billCycleOldbill)"
+                          >
+                            ยืนยัน
+                          </v-btn>
+                        </v-date-picker>
+                      </v-dialog>
+                    </v-col>
+                    <!-- unit -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="unitOldbill"
+                        label="หน่วยไฟฟ้า"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- price -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="priceOldbill"
+                        label="ค่าไฟฟ้า"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="warning" text @click="dialogCreateOldBill = false"
+                  >ยกเลิก</v-btn
+                >
+                <v-btn
+                  color="agree"
+                  :disabled="!valid"
+                  text
+                  @click="createOldBill"
+                  >ยืนยันข้อมูล</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- edit bill -->
           <v-dialog v-model="dialog" persistent max-width="75%">
             <v-card>
               <v-card-title>
                 <!-- title add user -->
                 <span>{{ formTitle }}</span>
+                <v-if> </v-if>
               </v-card-title>
+              <v-card-subtitle v-if="this.GGG == false">
+                <span> กรุณากำหนดราคาหน่วยค่าไฟฟ้า</span>
+              </v-card-subtitle>
               <v-card-text>
                 <v-container>
                   <!-- edit user -->
@@ -183,7 +392,6 @@
                           v-model="editedItem.rank"
                           label="ยศ"
                           required
-                          autofocus
                           :rules="rules.name"
                           :items="ranks"
                           disabled
@@ -193,7 +401,7 @@
                       <!-- name -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.first_name"
+                          v-model="editedItem.firstName"
                           label="ชื่อ"
                           required
                           :rules="rules.name"
@@ -203,70 +411,10 @@
                       <!-- lastname -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
-                          v-model="editedItem.last_name"
+                          v-model="editedItem.lastName"
                           label="นามสกุล"
                           required
                           :rules="rules.name"
-                          disabled
-                        ></v-text-field>
-                      </v-col>
-                      <!-- zone -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="พื้นที่"
-                          :items="zones"
-                          required
-                          :rules="rules.buildingRoom"
-                          v-model="editedItem.zone"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col>
-                      <!-- building -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="อาคาร"
-                          :items="buildings"
-                          required
-                          :rules="rules.buildingRoom"
-                          v-model="editedItem.building"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col>
-                      <!-- room_no  -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          label="เลขห้องพัก"
-                          v-model="editedItem.room_no"
-                          :items="rooms"
-                          required
-                          :rules="rules.buildingRoom"
-                          disabled
-                        >
-                        </v-autocomplete>
-                      </v-col>
-                      <!-- electricNumber -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.electricity_no"
-                          label="เลขผู้ใช้ไฟฟ้า"
-                          required
-                          counter="12"
-                          :rules="rules.electricNumber"
-                          disabled
-                          @keypress="isNumber($event)"
-                        ></v-text-field>
-                      </v-col>
-                      <!-- electricMeterNumber -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.electricity_meter_no"
-                          label="เลขมิเตอร์ไฟฟ้า"
-                          required
-                          counter="11"
-                          :rules="rules.electricMeterNumber"
-                          @keypress="isNumber($event)"
                           disabled
                         ></v-text-field>
                       </v-col>
@@ -279,32 +427,8 @@
                           :rules="rules.buildingRoom"
                           @keypress="isNumber($event)"
                           clearable
+                          :disabled="this.GGG == false"
                         ></v-text-field>
-                      </v-col>
-                      <!-- price -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.price"
-                          label="ค่าไฟฟ้า"
-                          required
-                          :rules="rules.buildingRoom"
-                          @keypress="isNumber($event)"
-                          clearable
-                        ></v-text-field>
-                      </v-col>
-                      <!-- status -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-select
-                          v-model="editedItem.status"
-                          :items="statuses"
-                          label="สถานะ"
-                          required
-                          :rules="rules.buildingRoom"
-                          item-text="name"
-                          item-value="value"
-                          clearable
-                        >
-                        </v-select>
                       </v-col>
                       <!-- date pay -->
                       <v-col cols="12" sm="6" md="4">
@@ -321,11 +445,11 @@
                               prepend-icon="mdi-calendar"
                               readonly
                               required
+                              autofocus
                               :rules="rules.buildingRoom"
                               v-bind="attrs"
                               v-on="on"
                               clearable
-                              disabled
                             ></v-text-field>
                           </template>
                           <v-date-picker
@@ -436,7 +560,7 @@
           v-model="selected"
           :headers="headers"
           :items="electricTable"
-          item-key="first_name"
+          item-key="id"
           :items-per-page="itemsPerPage"
           class="elevation-1 pa-6"
           :search="search"
@@ -508,9 +632,29 @@ import zonesBuildingsRoom from "../../json/zonesBuildings.json";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import NotFound from "../../components/notFound/Notfound.vue";
+import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    zonesData: [],
+    buildinsData: [],
+    roomsData: [],
+    dialogCreateOldBill: false,
+    firstNameOldBillData: [],
+    lastNameOldBillData: [],
+    rankOldBill: "",
+    firstNameOldBill: "",
+    lastNameOldBill: "",
+    zoneOldbill: "",
+    buildingOldbill: "",
+    roomNoOldbill: "",
+    billCycleOldbill: "",
+    unitOldbill: "",
+    totalPayOldBill: "",
+    priceOldbill: "",
+    modal: false,
+    isFormValid: false,
+    GGG: false,
     priceOfUnit: "",
     addElectricBills: false,
     zonesBuildingsRoom: zonesBuildingsRoom,
@@ -524,7 +668,7 @@ export default {
     timeout: 2000,
     valid: true,
     loadTable: true,
-    sortBy: "first_name",
+    sortBy: "id",
     sortDesc: false,
     modalAddDate: false,
     modalfilter: false,
@@ -555,8 +699,10 @@ export default {
     statuses: statuses,
     electricTable: [],
     editedIndex: -1,
+    pricePerUnit: "",
+    defineUnitPrice: "",
     editedItem: {
-      first_name: "",
+      firstName: "",
       zone: "",
       room_no: "",
       electricity_no: "",
@@ -565,7 +711,7 @@ export default {
       billing_cycle: new Date().toISOString().substr(0, 7),
     },
     defaultItem: {
-      first_name: "",
+      firstName: "",
       zone: "",
       room_no: "",
       electricity_no: "",
@@ -597,6 +743,7 @@ export default {
             v
           ) || "อีเมลไม่ถูกต้อง",
       },
+      priceRule: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
   computed: {
@@ -902,11 +1049,134 @@ export default {
   created() {
     this.getRole();
     this.gettoken();
+    this.getZonesdata();
+    this.getBuildingsdatas();
+    this.getRoomsdatas();
+    this.getNameForCreateOldBill();
   },
   mounted() {
     this.getElectricData();
   },
   methods: {
+    setPrice() {
+      this.pricePerUnit = this.defineUnitPrice;
+      this.GGG = true;
+    },
+    clearPrice() {
+      this.defineUnitPrice = null;
+      this.GGG = false;
+      this.$refs.isFormValid.reset();
+    },
+    // data for select
+    // get name data
+    getNameForCreateOldBill() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/resident/name", config)
+        .then((response) => {
+          let data = response.data;
+          this.firstNameOldBillData = data.result.firstName;
+          this.lastNameOldBillData = data.result.lastName;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // get zone data for select
+    getZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/zones", config)
+        .then((response) => {
+          let data = response.data;
+          const dataZones = data.result;
+          this.zonesData = dataZones;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // buildings data for select
+    getBuildingsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/building", config)
+        .then((response) => {
+          let data = response.data;
+          const dataBuilding = data.result;
+          this.buildinsData = dataBuilding;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // rooms data for select
+    getRoomsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/room", config)
+        .then((response) => {
+          let data = response.data;
+          const dataRoom = data.result;
+          this.roomsData = dataRoom;
+          return this.roomsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // create old bill
+    createOldBill() {
+      var data = {
+        rank: this.rankOldBill,
+        firstName: this.firstNameOldBill,
+        lastName: this.lastNameOldBill,
+        zone: this.zoneOldbill,
+        building: this.buildingOldbill,
+        roomNo: this.roomNoOldbill,
+        date: this.billCycleOldbill,
+        unit: this.unitOldbill,
+        price: this.priceOldbill,
+        totalPay: this.priceOldbill,
+      };
+      var config = {
+        method: "post",
+        url: apiUrl + "/v1/billings/water/add/old-bill",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+        },
+        data: data,
+      };
+      axios(config)
+        .then(() => {
+          this.dialogCreateOldBill = false;
+          this.snackbar = true;
+          this.statusAction =
+            "สร้างบิลค่าน้ำของเดือน" + this.billCycleOldbill + "สำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch((error) => {
+          console.log(error);
+          this.dialogCreateOldBill = false;
+        });
+    },
     // get role for user
     getRole() {
       var role = localStorage.getItem("role");
@@ -952,25 +1222,27 @@ export default {
     exportElectric(billingsIDs) {
       var config = {
         headers: {
-          "x-api-key": "xxx-api-key",
-          "x-refresh-token": "xxx-refresh-token",
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
+        responseType: "blob",
       };
-      const billings_id = { billings_id: billingsIDs };
+      const id = { id: billingsIDs };
       return axios
-        .post(apiUrl + "/v1/billings/electric/exports", billings_id, config)
+        .post(apiUrl + "/v1/billings/electric/export", id, config)
         .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            this.exportExcelElectric = false;
-            this.statusAction =
-              "Export ข้อมูลผู้อยู่ใช้ไฟจำนวน " +
-              this.selected.length +
-              "คน สำเร็จ";
-            this.colorSnackbar = "agree";
-            this.snackbar = true;
-            this.selected = [];
-          }
+          FileDownload(
+            response.data,
+            "ข้อมูลค่าไฟฟ้า" + this.dateNow + ".xlsx"
+          );
+          this.exportExcelElectric = false;
+          this.statusAction =
+            "Export ข้อมูลผู้อยู่ใช้ไฟจำนวน " +
+            this.selected.length +
+            "คน สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.selected = [];
         })
         .catch((error) => {
           if (
@@ -990,12 +1262,11 @@ export default {
         });
     },
     // edit billing via API
-    editElectricBilling(unit, price, billing_cycle) {
-      let idelectric = "?id=" + JSON.stringify(this.ElectricBillingID);
+    editElectricBilling(unit, billing_cycle) {
+      let idelectric = "?id=" + this.ElectricBillingID;
       const payload = {
         unit: unit,
-        price: price,
-        status: status,
+        unitPrice: this.pricePerUnit,
         billing_cycle: billing_cycle,
       };
       var config = {
@@ -1006,23 +1277,23 @@ export default {
       };
       return axios
         .patch(
-          apiUrl + "/v1/billdings/electric/edit/" + idelectric,
+          apiUrl + "/v1/billings/electric/edit" + idelectric,
           payload,
           config
         )
-        .then(async () => {})
+        .then(() => {
+          this.getElectricData();
+        })
         .catch((error) => {
           console.log(error);
           if (error.response.data.status === "unauthorized") {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "warning";
             this.snackbar = true;
-            this.differencePriceCalculate = false;
           } else {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
             this.snackbar = true;
-            this.differencePriceCalculate = false;
           }
         });
     },
@@ -1120,8 +1391,6 @@ export default {
         Object.assign(this.electricTable[this.editedIndex], this.editedItem);
         this.editElectricBilling(
           this.editedItem.unit,
-          this.editedItem.price,
-          this.editedItem.status,
           this.editedItem.billing_cycle
         );
         this.snackbar = true;

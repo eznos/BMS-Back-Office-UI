@@ -36,7 +36,6 @@
 </template>
 
 <script>
-
 import Navbar from "../src/components/navbar/Navbar.vue";
 import Footer from "../src/components/footer/Footer.vue";
 export default {
@@ -67,7 +66,7 @@ export default {
   },
 };
 </script>
-  
+
 <style lang="scss">
 #app {
   @import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@700&display=swap");
@@ -105,7 +104,12 @@ export default {
   font-family: "Sarabun", sans-serif;
 }
 .v-text-field {
-  height: 30px;
+  height: 40px;
+  font-size: 20px;
+  margin: 20px;
+}
+.v-select {
+  height: 40px;
   font-size: 20px;
   margin: 20px;
 }

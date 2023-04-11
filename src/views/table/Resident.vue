@@ -299,7 +299,9 @@
               class="filter"
               prepend-icon="mdi-map-marker"
               v-model="zoneFilterValue"
-              :items="zones"
+              :items="zonesData"
+              item-text="name"
+              item-value="name"
               label="ค้นหาด้วยพื้นที่"
               clearable
             >
@@ -308,11 +310,12 @@
           <!-- filter for building -->
           <v-col cols="12" xs="12" sm="12" md="4" lg="4">
             <v-autocomplete
-              :disabled="!zoneFilterValue"
               class="filter"
               prepend-icon="mdi-office-building"
               v-model="buildingFilterValue"
-              :items="buildings"
+              :items="buildinsData"
+              item-text="name"
+              item-value="name"
               label="ค้นหาด้วยอาคาร"
               clearable
             >
@@ -372,7 +375,6 @@ import ranks from "../../json/rank.json";
 import water_groups from "../../json/waterGroups.json";
 import room_types from "../../json/roomTypes.json";
 import zonesBuildingsRoom from "../../json/zonesBuildings.json";
-
 import NotFound from "../../components/notFound/Notfound.vue";
 import FileDownload from "js-file-download";
 export default {
@@ -527,7 +529,6 @@ export default {
         },
       ];
     },
-
   },
 
   watch: {
@@ -651,7 +652,6 @@ export default {
           if (data.status == "success") {
             this.residentTable = data.result;
             this.loadTable = false;
-            console.log(data.result);
           }
         })
         .catch((error) => {
@@ -666,7 +666,6 @@ export default {
           residentsIDs.push(this.selected[i].id);
         }
         if (this.exportExcelResident == true) {
-          console.log(residentsIDs);
           this.exportResident(residentsIDs);
         }
         if (this.exportExcelResident == false) {
@@ -855,7 +854,6 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
       this.resident_id = item.id;
-      console.log(this.resident_id);
     },
     deleteItem(item) {
       this.editedIndex = this.residentTable.indexOf(item);

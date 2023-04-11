@@ -73,9 +73,9 @@
                     prepend-icon="mdi-map-legend"
                     label="ค้นหาด้วยด้วยเขต"
                     class="filter"
-                    :items="zones"
-                    item-text="zone"
-                    item-value="value"
+                    :items="zonesData"
+                    item-text="name"
+                    item-value="name"
                     clearable
                   >
                   </v-autocomplete>
@@ -87,42 +87,45 @@
                     prepend-icon="mdi-office-building"
                     label="ค้นหาด้วยด้วยอาคาร"
                     class="filter"
-                    :items="buildings"
+                    :items="buildingsData"
+                    item-text="name"
+                    item-value="name"
                     clearable
-                    :disabled="!zoneFilterValue"
                   >
                   </v-autocomplete>
                 </v-col>
                 <!-- filter by date -->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-                  <v-menu
-                    v-model="menuDatefilter"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
+                  <v-dialog
+                    ref="dialog"
+                    v-model="dateFilter"
+                    :return-value.sync="date"
+                    persistent
+                    width="290px"
                   >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on }">
                       <v-text-field
                         v-model="dateFilterValue"
-                        label="ค้นหาด้วยด้วยรอบบิล"
-                        prepend-icon="mdi-calendar"
+                        label="Picker in dialog"
+                        prepend-icon="event"
                         readonly
-                        v-bind="attrs"
                         v-on="on"
-                        class="filter"
-                        clearable
                       ></v-text-field>
                     </template>
                     <v-date-picker
                       v-model="dateFilterValue"
                       type="month"
-                      locale="th-TH"
                       scrollable
-                      @input="menuDatefilter = false"
-                    ></v-date-picker>
-                  </v-menu>
+                    >
+                      <v-spacer></v-spacer>
+                      <v-btn text color="warning" @click="dateFilter = false"
+                        >Cancel</v-btn
+                      >
+                      <v-btn text color="agree" @click="getWaterData()"
+                        >OK</v-btn
+                      >
+                    </v-date-picker>
+                  </v-dialog>
                 </v-col>
                 <!-- Filter for  status-->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
@@ -175,6 +178,36 @@
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
         <h3>ตารางค่าน้ำประปา</h3>
+        <v-form v-model="isFormValid">
+          <v-responsive max-width="344">
+            <v-text-field
+              v-model="defineUnitPrice"
+              label="กำหนดคราคาหน่วยค่าน้ำ"
+              clearable
+              @keypress="isNumber($event)"
+              :rules="rules.priceRule"
+              required
+              max-width="300px"
+              :disabled="this.GGG == true"
+            ></v-text-field>
+          </v-responsive>
+        </v-form>
+
+        <v-btn
+          color="green"
+          v-if="this.GGG == false"
+          outlined
+          :disabled="!isFormValid"
+          @click="setPrice()"
+          >ยืนยันหน่วยค่าน้ำ</v-btn
+        >
+        <v-btn
+          color="red"
+          v-if="this.GGG == true"
+          outlined
+          @click="clearPrice()"
+          >ยกเลิกหน่วยค่าน้ำ</v-btn
+        >
         <v-spacer></v-spacer>
         <div>
           <!-- create old bill -->
@@ -275,7 +308,7 @@
                         v-model="buildingOldbill"
                         label="อาคาร"
                         required
-                        :items="buildinsData"
+                        :items="buildingsData"
                         item-text="name"
                         item-value="id"
                         :rules="rules.zonesBuildingsRoom"
@@ -494,6 +527,9 @@
               <v-card-title>
                 <span>{{ formTitle }}</span>
               </v-card-title>
+              <v-card-subtitle v-if="this.GGG == false">
+                <span style="color: red"> กรุณากำหนดราคาหน่วยค่าไฟฟ้า</span>
+              </v-card-subtitle>
               <v-card-text>
                 <v-container>
                   <v-form ref="formEditwater" v-model="valid" lazy-validation>
@@ -504,7 +540,6 @@
                           v-model="editedItem.rank"
                           :items="ranks"
                           label="ยศ"
-                          autofocus
                           required
                           :rules="rules.buildingRoom"
                           disabled
@@ -533,10 +568,10 @@
                           disabled
                         ></v-text-field>
                       </v-col>
-
                       <!-- water unit -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
+                          autofocus
                           v-model="editedItem.unit"
                           label="หน่วยน้ำ"
                           @keypress="isNumber($event)"
@@ -545,18 +580,6 @@
                           :rules="rules.buildingRoom"
                         ></v-text-field>
                       </v-col>
-                      <!-- water price -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.price"
-                          label="ค่าน้ำ"
-                          @keypress="isNumber($event)"
-                          required
-                          :rules="rules.buildingRoom"
-                          :value="this.priceOfwater"
-                        ></v-text-field>
-                      </v-col>
-
                       <!-- bill pay -->
                       <v-col cols="12" sm="6" md="4">
                         <v-dialog
@@ -605,7 +628,16 @@
                 <v-spacer></v-spacer>
                 <v-form ref="formButton" v-model="valid" lazy-validation>
                   <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
-                  <v-btn color="agree" :disabled="!valid" text @click="save()">
+                  <v-btn v-if="this.GGG == false" color="agree" disabled text>
+                    ยืนยัน
+                  </v-btn>
+                  <v-btn
+                    v-if="this.GGG == true"
+                    color="agree"
+                    :disabled="!valid"
+                    text
+                    @click="save()"
+                  >
                     ยืนยัน
                   </v-btn>
                 </v-form>
@@ -658,6 +690,8 @@
           :sort-by.sync="sortBy"
           :sort-desc.sync="sortDesc"
           @input="enterSelect($event)"
+          id="virtual-scroll-table"
+          v-scroll:#virtual-scroll-table="onScroll"
         >
           <!-- price color -->
           <template
@@ -730,6 +764,10 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    dateFilter: false,
+    dateFilterValue: new Date().toISOString().substr(0, 7),
+    GGG: false,
+    isFormValid: false,
     firstNameOldBillData: [],
     lastNameOldBillData: [],
     rankOldBill: "",
@@ -746,7 +784,7 @@ export default {
     totalPayOldBill: "",
     zonesData: [],
     waterZonesData: [],
-    buildinsData: [],
+    buildingsData: [],
     roomsData: [],
     dialogCreateOldBill: false,
     dialogAddWater: false,
@@ -793,13 +831,17 @@ export default {
     waterGroupCalculate: "",
     buildingFilterValue: "",
     zoneFilterValue: "",
-    dateFilterValue: "",
     date: "",
     WaterBillingID: "",
     stateFilterValue: "",
     statuses: statuses,
+    pricePerUnit: "",
+    defineUnitPrice: "",
     waterTables: [],
     editedIndex: -1,
+    start: 0,
+    rowHeight: 24,
+    perPage: 25,
     editedItem: {
       first_name: "",
       zone: "",
@@ -847,6 +889,7 @@ export default {
         (v) => (v && v.length == 4) || "กรอกเลขมิเตอร์น้ำประปาไม่ครบ 4 ตัว",
       ],
       buildingRoom: [(v) => !!v || "กรุณากรอกข้อมูล"],
+      priceRule: [(v) => !!v || "กรุณากรอกข้อมูล"],
     },
   }),
   computed: {
@@ -899,7 +942,6 @@ export default {
         {
           text: "รอบบิล",
           value: "accommodations[0].billings[0].created_at",
-          filter: this.dateFilter,
         },
         {
           text: "จำนวนหน่วย",
@@ -941,235 +983,14 @@ export default {
         return "0.00";
       }
     },
-    // autocomplete  [] {} () <>
-    zones() {
-      const zones = zonesBuildingsRoom;
-      const zonedata = zones.map((x) => x.zone);
-      return zonedata;
+    dessertsLimited() {
+      return this.waterTables.slice(this.start, this.perPage + this.start);
     },
-    buildings() {
-      if (this.zoneFilterValue == "เขตส่วนกลาง") {
-        const buiding = zonesBuildingsRoom;
-        const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.buildingName);
-        return buildingCenter;
-      }
-      if (this.zoneFilterValue == "เขตอัษฎางค์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
-        return buildingAngtadang;
-      }
-      if (this.zoneFilterValue == "เขตสุรนารายณ์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
-        return buildingSuranarai;
-      }
-      if (this.editedItem.zone == "เขตส่วนกลาง") {
-        const buiding = zonesBuildingsRoom;
-        const buildingcenters = buiding[0].buildingcenter;
-        const buildingCenter = buildingcenters.map((x) => x.buildingName);
-        return buildingCenter;
-      }
-      if (this.editedItem.zone == "เขตอัษฎางค์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingAngtadangs = buiding[1].buildingangtadang;
-        const buildingAngtadang = buildingAngtadangs.map((x) => x.buildingName);
-        return buildingAngtadang;
-      }
-      if (this.editedItem.zone == "เขตสุรนารายณ์") {
-        const buiding = zonesBuildingsRoom;
-        const buildingSuranarais = buiding[2].buildingsuranarai;
-        const buildingSuranarai = buildingSuranarais.map((x) => x.buildingName);
-        return buildingSuranarai;
-      } else {
-        return ["ไม่มีข้อมูล"];
-      }
+    startHeight() {
+      return this.start * this.rowHeight - 32;
     },
-    rooms() {
-      if (this.editedItem.building == "2/11") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/12") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/13") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/14") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/15") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/16") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/17") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/18") {
-        const buildingcenters = zonesBuildingsRoom[0].buildingcenter[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/19") {
-        const buildingcenters =
-          zonesBuildingsRoom[1].buildingangtadang[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/20") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[0].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/21") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[1].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/22") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[2].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/23") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[3].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/24") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[4].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/25") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[5].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/26") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[6].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/27") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[7].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/28") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[8].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/29") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[9].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/31") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[10].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/32") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[11].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/33") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[12].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/34") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[13].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/35") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[14].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/36") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[15].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/37") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[16].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/38") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[17].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/39") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[18].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/40") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[19].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      }
-      if (this.editedItem.building == "2/41") {
-        const buildingcenters =
-          zonesBuildingsRoom[2].buildingsuranarai[20].rooms;
-        const buildingCenter = buildingcenters.map((x) => x.id);
-        return buildingCenter;
-      } else {
-        return ["ไม่มีข้อมูล"];
-      }
-    },
-    priceOfwater: function () {
-      const unit = this.editedItem.water_unit;
-      if (unit) {
-        return (4 * parseInt(unit)).toFixed(2);
-      } else {
-        return "0.00";
-      }
+    endHeight() {
+      return this.rowHeight * (this.waterTables.length - this.start);
     },
   },
 
@@ -1194,6 +1015,15 @@ export default {
   },
 
   methods: {
+    setPrice() {
+      this.pricePerUnit = this.defineUnitPrice;
+      this.GGG = true;
+    },
+    clearPrice() {
+      this.defineUnitPrice = null;
+      this.GGG = false;
+      this.$refs.isFormValid.reset();
+    },
     getNameForCreateOldBill() {
       var config = {
         headers: {
@@ -1204,7 +1034,6 @@ export default {
         .get(apiUrl + "/v1/resident/name", config)
         .then((response) => {
           let data = response.data;
-          console.log(data.result.lastName);
           this.firstNameOldBillData = data.result.firstName;
           this.lastNameOldBillData = data.result.lastName;
         })
@@ -1301,8 +1130,8 @@ export default {
         .then((response) => {
           let data = response.data;
           const dataBuilding = data.result;
-          this.buildinsData = dataBuilding;
-          return this.buildinsData;
+          this.buildingsData = dataBuilding;
+          return this.buildingsData;
         })
         .catch((error) => {
           console.log(error);
@@ -1339,6 +1168,7 @@ export default {
     },
     // get water data from api
     getWaterData() {
+      let date = "?date=" + this.dateFilterValue;
       const config = {
         headers: {
           "x-api-key": process.env.apiKey,
@@ -1346,12 +1176,14 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/billings/water", config)
+        .get(apiUrl + "/v1/billings/water" + date, config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            this.waterTables = [];
             this.loadTable = false;
             this.waterTables = data.result.billing;
+            this.dateFilter = false;
           }
         })
         .catch((error) => {
@@ -1432,8 +1264,7 @@ export default {
       return axios
         .post(apiUrl + "/v1/billings/water/diff" + zoneID, price, config)
 
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           this.statusAction = "คำนวนค่าน้ำส่วนต่าง" + "สำเร็จ";
           this.waterGroupCalculate = "";
           this.meterZone = "";
@@ -1483,7 +1314,7 @@ export default {
       return axios
         .post(apiUrl + "/v1/billings/water/export", id, config)
         .then((response) => {
-          FileDownload(response.data, "ข้อมูลค่าน้ำ" + this.dateNow + ".xlsx" );
+          FileDownload(response.data, "ข้อมูลค่าน้ำ" + this.dateNow + ".xlsx");
           // this.getWaterData();
           this.exportExcelwater = false;
           this.statusAction =
@@ -1513,11 +1344,11 @@ export default {
         });
     },
     // edit billing via API
-    editWaterBilling(unit, price, billing_cycle) {
+    editWaterBilling(unit, billing_cycle) {
       let idwater = "?id=" + this.WaterBillingID;
       const payload = {
         unit: unit,
-        price: price,
+        unitPrice: this.pricePerUnit,
         billing_cycle: billing_cycle,
       };
       var config = {
@@ -1528,8 +1359,7 @@ export default {
       };
       return axios
         .patch(apiUrl + "/v1/billings/water/edit" + idwater, payload, config)
-        .then(async () => {
-          console.log(apiUrl + "/v1/billings/water/edit" + idwater);
+        .then(() => {
           this.getWaterData();
         })
         .catch((error) => {
@@ -1590,12 +1420,6 @@ export default {
       }
       return value === this.stateFilterValue;
     },
-    dateFilter(value) {
-      if (!this.dateFilterValue) {
-        return true;
-      }
-      return value == this.dateFilterValue;
-    },
     editItem(item) {
       this.editedIndex = this.waterTables.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -1637,8 +1461,7 @@ export default {
         (this.waterGroupfilterValue = ""),
         (this.buildingFilterValue = ""),
         (this.stateFilterValue = ""),
-        (this.dateFilterValue = "");
-      this.zoneFilterValue = "";
+        (this.zoneFilterValue = "");
       this.search = "";
       this.waterAverageFilterValue = "";
     },
@@ -1664,6 +1487,24 @@ export default {
         return true;
       }
     },
+    onScroll(e) {
+      // debounce if scrolling fast
+      this.timeout && clearTimeout(this.timeout);
+
+      this.timeout = setTimeout(() => {
+        const { scrollTop } = e.target;
+        const rows = Math.ceil(scrollTop / this.rowHeight);
+
+        this.start =
+          rows + this.perPage > this.waterTables.length
+            ? this.waterTables.length - this.perPage
+            : rows;
+
+        this.$nextTick(() => {
+          e.target.scrollTop = scrollTop;
+        });
+      }, 20);
+    },
   },
 };
 </script>
@@ -1673,6 +1514,10 @@ export default {
   font-size: 25px;
   padding: 10px;
   font-family: Sarabun;
+}
+#virtual-scroll-table {
+  max-height: 400px;
+  overflow: auto;
 }
 .button-filter {
   margin: 10px;

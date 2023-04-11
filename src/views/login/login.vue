@@ -124,7 +124,6 @@ export default {
         .post(apiUrl + "/v1/auth/login", payload, headerAPI)
         .then(async (response) => {
           let data = response.data;
-          console.log(data)
           if (data.status === "success") {
             if(data.result.role === "user"){
               this.rank = data.result.rank;
