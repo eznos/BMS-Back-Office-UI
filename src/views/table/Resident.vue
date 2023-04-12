@@ -336,6 +336,8 @@
         loading-text="กำลังโหลด... โปรดรอสักครู่"
         show-select
         @input="enterSelect($event)"
+        id="virtual-scroll-table"
+        v-scroll:#virtual-scroll-table="onScroll"
       >
         <!-- room_type -->
         <template v-slot:[`item.accommodations[0].room.roomType`]="{ item }">
@@ -425,6 +427,9 @@ export default {
     date: "",
     residentTable: [],
     editedIndex: -1,
+    start: 0,
+    rowHeight: 24,
+    perPage: 25,
     editedItem: {
       firstName: "",
       roomNo: "",
@@ -528,6 +533,12 @@ export default {
           sortable: false,
         },
       ];
+    },
+    startHeight() {
+      return this.start * this.rowHeight - 32;
+    },
+    endHeight() {
+      return this.rowHeight * (this.residentTable.length - this.start);
     },
   },
 
@@ -964,6 +975,21 @@ export default {
         this.deleteResident(residentsIDs);
       }
     },
+    onScroll(e) {
+      // debounce if scrolling fast
+      this.timeout && clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const { scrollTop } = e.target;
+        const rows = Math.ceil(scrollTop / this.rowHeight);
+        this.start =
+          rows + this.perPage > this.residentTable.length
+            ? this.residentTable.length - this.perPage
+            : rows;
+        this.$nextTick(() => {
+          e.target.scrollTop = scrollTop;
+        });
+      }, 20);
+    },
   },
 };
 </script>
@@ -983,5 +1009,9 @@ export default {
 }
 .v-data-table {
   font-size: 20px;
+}
+#virtual-scroll-table {
+  max-height: 400px;
+  overflow: auto;
 }
 </style>

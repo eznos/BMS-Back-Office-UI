@@ -636,6 +636,8 @@
               loading-text="กำลังโหลด... โปรดรอสักครู่"
               show-select
               @input="enterSelect($event)"
+              id="virtual-scroll-table"
+              v-scroll:#virtual-scroll-table="onScroll"
             >
               <!-- color status on datatable  -->
               <template v-slot:[`item.status`]="{ item }">
@@ -749,6 +751,9 @@ export default {
     roomFilterValue: null,
     buildingTable: [],
     editedIndex: -1,
+    start: 0,
+    rowHeight: 24,
+    perPage: 25,
     editedItem: {
       waterZone: "",
       zone: "",
@@ -859,6 +864,12 @@ export default {
         },
       ];
     },
+    startHeight() {
+      return this.start * this.rowHeight - 32;
+    },
+    endHeight() {
+      return this.rowHeight * (this.buildingTable.length - this.start);
+    },
   },
   watch: {
     dialog(val) {
@@ -916,7 +927,6 @@ export default {
         zoneId: this.addZoneInWaterZone,
         name: this.addWaterZone,
       });
-
       const config = {
         method: "post",
         url: apiUrl + "/v1/building/buildings/add/water-zone",
@@ -1430,6 +1440,21 @@ export default {
         this.deleteRoom(roomsIDs);
       }
     },
+    onScroll(e) {
+      // debounce if scrolling fast
+      this.timeout && clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const { scrollTop } = e.target;
+        const rows = Math.ceil(scrollTop / this.rowHeight);
+        this.start =
+          rows + this.perPage > this.buildingTable.length
+            ? this.buildingTable.length - this.perPage
+            : rows;
+        this.$nextTick(() => {
+          e.target.scrollTop = scrollTop;
+        });
+      }, 20);
+    },
   },
 };
 </script>
@@ -1511,5 +1536,9 @@ export default {
   to {
     transform: rotate(360deg);
   }
+}
+#virtual-scroll-table {
+  max-height: 400px;
+  overflow: auto;
 }
 </style>

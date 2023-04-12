@@ -216,6 +216,8 @@
         loading-text="กำลังโหลด... โปรดรอสักครู่"
         show-select
         @input="enterSelect($event)"
+        id="virtual-scroll-table"
+        v-scroll:#virtual-scroll-table="onScroll"
       >
         <!-- color of roles on datatable  -->
         <template v-slot:[`item.role`]="{ item }">
@@ -288,6 +290,9 @@ export default {
     itemsPerPage: 5,
     userTable: [],
     editedIndex: -1,
+    start: 0,
+    rowHeight: 24,
+    perPage: 25,
     editedItem: {
       first_name: "",
       role: "",
@@ -362,6 +367,12 @@ export default {
           sortable: false,
         },
       ];
+    },
+    startHeight() {
+      return this.start * this.rowHeight - 32;
+    },
+    endHeight() {
+      return this.rowHeight * (this.userTable.length - this.start);
     },
   },
   watch: {
@@ -572,6 +583,19 @@ export default {
       if (role == "admin") return "red";
       else return "green";
     },
+    onScroll(e) {
+      // debounce if scrolling fast
+      this.timeout && clearTimeout(this.timeout);
+      this.timeout = setTimeout(() => {
+        const { scrollTop } = e.target;
+        const rows = Math.ceil(scrollTop / this.rowHeight);
+        this.start = rows + this.perPage > this.userTable.length ?
+          this.userTable.length - this.perPage: rows;
+        this.$nextTick(() => {
+          e.target.scrollTop = scrollTop;
+        });
+      }, 20);
+    }
   },
 };
 </script>
@@ -599,5 +623,9 @@ export default {
 
 .v-data-table {
   font-size: 20px;
+}
+#virtual-scroll-table {
+  max-height: 400px;
+  overflow: auto;
 }
 </style>
