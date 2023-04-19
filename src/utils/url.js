@@ -1,4 +1,4 @@
-const apiUrl = "http://0.0.0.0:3000";
+const apiUrl = "https://bms-back-office-api.onrender.com";
 //"https://mbs-mockoon.herokuapp.com";
 // http://localhost:3000
 export { apiUrl };

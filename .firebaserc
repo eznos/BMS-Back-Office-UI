@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "bsm-project-test"
+  },
+  "hosting": {
+    "public": "dist",
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
   }
 }
