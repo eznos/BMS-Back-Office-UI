@@ -133,6 +133,7 @@ export default {
             this.role = data.result.role;
             this.affiliation = data.result.affiliation;
             this.user_id = data.result.id;
+            this.refreshToken = data.token.refresh_token;
             localStorage.setItem("rank", this.rank);
             localStorage.setItem("first_name", this.fristName);
             localStorage.setItem("last_name", this.lastName);
@@ -140,6 +141,7 @@ export default {
             localStorage.setItem("role", this.role);
             localStorage.setItem("affiliation", this.affiliation);
             localStorage.setItem("id", this.user_id);
+            sessionStorage.setItem("refreshToken", this.refreshToken);
             this.$router.push({
                 name: "overview",
               });

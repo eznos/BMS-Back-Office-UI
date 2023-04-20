@@ -205,6 +205,7 @@
 </template>
 
 <script>
+import { apiUrl } from "../../utils/url";
 export default {
   name: "Toolbar",
   data: () => ({
@@ -309,7 +310,7 @@ export default {
       var axios = require("axios");
       var config = {
         method: "post",
-        url: "http://localhost:3000/auth/v1/logout",
+        url: apiUrl  + "/v1/auth/logout",
         headers: {
           "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,
