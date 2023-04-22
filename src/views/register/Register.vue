@@ -325,6 +325,7 @@ export default {
       const config = {
         headers: {
           "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
         },
       };
       axios

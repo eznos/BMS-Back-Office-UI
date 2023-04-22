@@ -177,7 +177,7 @@
                 </template>
                 <v-card>
                   <v-card-title>
-                    <span>{{ formTitle }}</span>
+                    เพิ่มพื้นที่
                   </v-card-title>
                   <v-card-text>
                     <v-container>
@@ -234,7 +234,7 @@
                 </template>
                 <v-card>
                   <v-card-title>
-                    <span>{{ formTitle }}</span>
+                    เพิ่มพื้นที่น้ำ
                   </v-card-title>
                   <v-card-text>
                     <v-container>

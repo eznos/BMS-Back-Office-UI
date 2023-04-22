@@ -484,7 +484,7 @@
                         label="สายของมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
                         required
-                        :items="meterGroups"
+                        :items="waterZonesData"
                         :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="id"
