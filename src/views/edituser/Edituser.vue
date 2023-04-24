@@ -229,6 +229,7 @@ import genders from "../../json/genders.json";
 
 export default {
   data: () => ({
+    user_ID:"",
     snackbar: false,
     statusAction: "",
     colorSnackbar: "",
@@ -291,6 +292,7 @@ export default {
   computed: {},
   created() {
     this.getRole();
+    this.gettoken();
   },
 
   methods: {
@@ -305,6 +307,10 @@ export default {
         this.imageURL = await this.uploadProfileImageToStorage(this.profileImage);
         this.callAPIEditUser();
       }
+    },
+    gettoken() {
+      var token = sessionStorage.getItem("refreshToken");
+      this.token = token;
     },
     async uploadProfileImageToStorage(profileImage) {
       const metadata = { contentType: "image/jpeg" };
@@ -335,16 +341,17 @@ export default {
       const config = {
         headers: {
           "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
         },
       };
       axios
         .patch(
-          apiUrl + "/v1/user/users/edit-info" + "?id=" + this.user_ID,
+          apiUrl + "/v1/auth/edit-info" + "?id=" + this.user_ID,
           data,
           config
         )
         .then(() => {
-          console.log(this.imageURL)
+          console.log(this.user_ID)
           this.$refs.formEdit.reset();
           this.statusAction = "แก้ไขข้อมูลสำเร็จ";
           this.colorSnackbar = "agree";

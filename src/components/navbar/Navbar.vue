@@ -4,7 +4,7 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="text-uppercase">
         <span class="font-weight-light"
-          >ระบบจัดการค่าน้ำค่าไฟ อาคารบ้านพักตำรวจภูธรภาค 3 (ส่วนกลาง)</span
+          >ระบบจัดการค่าน้ำประปาอาคารบ้านพักตำรวจภูธรภาค 3 (ส่วนกลาง)</span
         >
       </v-toolbar-title>
       <v-spacer></v-spacer>
