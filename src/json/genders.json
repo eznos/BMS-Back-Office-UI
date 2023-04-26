@@ -1,14 +1,14 @@
 [
-    {
-        "name": "ชาย",
-        "value": "male"
-    },
-    {
-        "name": "หญิง",
-        "value": "female"
-    },
-    {
-        "name": "ไม่ระบุ",
-        "value": "n/a"
-    }
+  {
+    "name": "ชาย",
+    "value": "male"
+  },
+  {
+    "name": "หญิง",
+    "value": "female"
+  },
+  {
+    "name": "ไม่ระบุ",
+    "value": "n/a"
+  }
 ]

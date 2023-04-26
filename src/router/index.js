@@ -12,8 +12,8 @@ import Edit_user from "../views/edituser/Edituser.vue";
 import Building from "../views/table/Building.vue";
 import Manage_user from "../views/table/Manageuser.vue";
 import Maps from "../views/map/Map.vue";
-import History from "../views/table/History.vue"
-import History_user from "../views/table/History_Users.vue"
+import History from "../views/table/History.vue";
+import History_user from "../views/table/History_Users.vue";
 
 Vue.use(VueRouter);
 
@@ -125,8 +125,8 @@ const routes = [
   {
     // catch all 404 - define at the very end
     path: "*",
-    component: () => import("../components/notFound/Notfound.vue")
-    }
+    component: () => import("../components/notFound/Notfound.vue"),
+  },
 ];
 
 const router = new VueRouter({

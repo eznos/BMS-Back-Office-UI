@@ -288,7 +288,7 @@
               v-model="search"
               prepend-icon="mdi-magnify"
               type="text"
-              label="ค้นหาด้วย"
+              label="ค้นหา"
               class="filter"
               clearable
             ></v-text-field>
@@ -302,7 +302,7 @@
               :items="zonesData"
               item-text="name"
               item-value="name"
-              label="ค้นหาด้วยพื้นที่"
+              label="เขตพื้นที่"
               clearable
             >
             </v-autocomplete>
@@ -316,7 +316,7 @@
               :items="buildinsData"
               item-text="name"
               item-value="name"
-              label="ค้นหาด้วยอาคาร"
+              label="อาคาร"
               clearable
             >
             </v-autocomplete>
@@ -490,7 +490,7 @@ export default {
           value: "lastName",
         },
         {
-          text: "พื้นที่",
+          text: "เขตพื้นที่",
           value: "accommodations[0].room.zone.name",
           filter: this.zoneFilter,
         },
@@ -528,7 +528,7 @@ export default {
           value: "accommodations[0].room.roomType",
         },
         {
-          text: "การจัดการ",
+          text: "แก้ไข",
           value: "actions",
           sortable: false,
         },

@@ -1,11 +1,6 @@
 <template>
   <v-footer dark padless app inset>
-    <v-card class="flex" flat tile color="#DFDDDD">
-      <v-card-text class="py-2 black--text text-center">
-        {{ new Date().getFullYear()+543 }} —
-        <strong>Eznos°˖✧◝(⁰▿⁰)◜✧˖° And TheSunSet copyright</strong>
-      </v-card-text>
-    </v-card>
+    <v-card class="flex" flat tile color="#DFDDDD"> </v-card>
   </v-footer>
 </template>
 

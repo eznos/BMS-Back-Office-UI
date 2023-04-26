@@ -362,7 +362,7 @@ export default {
           filter: this.statusFilter,
         },
         {
-          text: "การจัดการ",
+          text: "แก้ไข",
           value: "actions",
           sortable: false,
         },
@@ -589,13 +589,15 @@ export default {
       this.timeout = setTimeout(() => {
         const { scrollTop } = e.target;
         const rows = Math.ceil(scrollTop / this.rowHeight);
-        this.start = rows + this.perPage > this.userTable.length ?
-          this.userTable.length - this.perPage: rows;
+        this.start =
+          rows + this.perPage > this.userTable.length
+            ? this.userTable.length - this.perPage
+            : rows;
         this.$nextTick(() => {
           e.target.scrollTop = scrollTop;
         });
       }, 20);
-    }
+    },
   },
 };
 </script>

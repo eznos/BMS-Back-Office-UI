@@ -265,7 +265,7 @@ export default {
     //       value: "created_at",
     //     },
     //     {
-    //       text: "จำนวยหน่วย",
+    //       text: "จำนวนหน่วย",
     //       value: "unit",
     //     },
     //     {
@@ -282,12 +282,12 @@ export default {
           value: "created_at",
         },
         {
-          text: "จำนวยหน่วย",
+          text: "หน่วย",
           value: "unit",
           align: "left",
         },
         {
-          text: "ค่าน้ำรวม",
+          text: "ค่าน้ำ",
           value: "price",
           align: "left",
         },

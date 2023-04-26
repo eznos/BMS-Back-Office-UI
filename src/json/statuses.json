@@ -1,23 +1,22 @@
 [
-    {
-        "id": "622e5b80-fc66-47b4-9ccc-c6d04040fadf",
-        "name": "ร่าง",
-        "value": "draft"
-    },
-    {
-        "id": "40b6f267-eb60-4ad1-9405-4a3fbcd37f93",
-        "name": "กำลังดำเนินการ",
-        "value": "in_progress"
-    },
-    {
-        "id": "0b6ad07a-94b2-4e0c-8afc-62e22d79508f",
-        "name": "Export แล้ว",
-        "value": "exported"
-    },
-    {
-        "id": "26b2e75c-8726-4596-bf4d-ec2132e89e79",
-        "name": "คำนวนแล้ว",
-        "value": "calculated"
-    }
-
+  {
+    "id": "622e5b80-fc66-47b4-9ccc-c6d04040fadf",
+    "name": "ร่าง",
+    "value": "draft"
+  },
+  {
+    "id": "40b6f267-eb60-4ad1-9405-4a3fbcd37f93",
+    "name": "กำลังดำเนินการ",
+    "value": "in_progress"
+  },
+  {
+    "id": "0b6ad07a-94b2-4e0c-8afc-62e22d79508f",
+    "name": "Export แล้ว",
+    "value": "exported"
+  },
+  {
+    "id": "26b2e75c-8726-4596-bf4d-ec2132e89e79",
+    "name": "คำนวนแล้ว",
+    "value": "calculated"
+  }
 ]

@@ -188,7 +188,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <template v-slot:append> 
+      <template v-slot:append>
         <div class="pa-2">
           <v-btn
             href="https://forms.gle/pMfAwXNhktJNUu4SA"
@@ -310,7 +310,7 @@ export default {
       var axios = require("axios");
       var config = {
         method: "post",
-        url: apiUrl  + "/v1/auth/logout",
+        url: apiUrl + "/v1/auth/logout",
         headers: {
           "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,

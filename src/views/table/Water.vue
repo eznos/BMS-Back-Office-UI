@@ -52,11 +52,25 @@
                     clearable
                   ></v-text-field>
                 </v-col>
+                <!-- Filter for  zone-->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    v-model="zoneFilterValue"
+                    prepend-icon="mdi-map-legend"
+                    label="เขตพื้นที่"
+                    class="filter"
+                    :items="zonesData"
+                    item-text="name"
+                    item-value="name"
+                    clearable
+                  >
+                  </v-autocomplete>
+                </v-col>
                 <!-- Filter for waterGroup-->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-autocomplete
                     v-model="waterGroupfilterValue"
-                    label="ค้นหาด้วยด้วยสายมิเตอร์"
+                    label="สายมิเตอร์"
                     prepend-icon="mdi-home-group"
                     :items="meterGroups"
                     class="filter"
@@ -66,26 +80,13 @@
                   >
                   </v-autocomplete>
                 </v-col>
-                <!-- Filter for  zone-->
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-                  <v-autocomplete
-                    v-model="zoneFilterValue"
-                    prepend-icon="mdi-map-legend"
-                    label="ค้นหาด้วยด้วยเขต"
-                    class="filter"
-                    :items="zonesData"
-                    item-text="name"
-                    item-value="name"
-                    clearable
-                  >
-                  </v-autocomplete>
-                </v-col>
+
                 <!-- Filter for  building-->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-autocomplete
                     v-model="buildingFilterValue"
                     prepend-icon="mdi-office-building"
-                    label="ค้นหาด้วยด้วยอาคาร"
+                    label="อาคาร"
                     class="filter"
                     :items="buildingsData"
                     item-text="name"
@@ -106,7 +107,7 @@
                     <template v-slot:activator="{ on }">
                       <v-text-field
                         v-model="dateFilterValue"
-                        label="Picker in dialog"
+                        label="รอบบิล"
                         prepend-icon="event"
                         readonly
                         v-on="on"
@@ -133,7 +134,7 @@
                     v-model="stateFilterValue"
                     :items="statuses"
                     prepend-icon="mdi-list-status"
-                    label="ค้นหาด้วยด้วยสถานะ"
+                    label="สถานะ"
                     class="filter"
                     clearable
                     item-text="name"
@@ -146,7 +147,7 @@
                     v-model="waterAverageFilterValue"
                     :items="waterAverages"
                     prepend-icon="mdi-list-status"
-                    label="ค้นหาด้วยค่าน้ำ"
+                    label="ค่าน้ำเฉลี่ย"
                     class="filter"
                     clearable
                   ></v-select>
@@ -182,7 +183,7 @@
           <v-responsive max-width="344">
             <v-text-field
               v-model="defineUnitPrice"
-              label="กำหนดคราคาหน่วยค่าน้ำ"
+              label="กำหนดหน่วยค่าน้ำ"
               clearable
               @keypress="isNumber($event)"
               :rules="rules.priceRule"
@@ -199,7 +200,7 @@
           outlined
           :disabled="!isFormValid"
           @click="setPrice()"
-          >ยืนยันหน่วยค่าน้ำ</v-btn
+          >ยืนยัน</v-btn
         >
         <v-btn
           color="red"
@@ -219,7 +220,7 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-newspaper-plus </v-icon>
-                &nbsp; สร้างบิลของเดือนเก่า
+                &nbsp; สร้างบิลย้อนหลัง
               </v-btn>
             </template>
             <v-card>
@@ -278,7 +279,7 @@
                     <v-col cols="12" sm="6" md="4">
                       <v-autocomplete
                         v-model="zoneOldbill"
-                        label="พื้นที่"
+                        label="เขตพื้นที่"
                         required
                         :items="zonesData"
                         :rules="rules.zonesBuildingsRoom"
@@ -294,7 +295,7 @@
                         v-model="waterZoneOldbill"
                         required
                         :items="waterZonesData"
-                        label="สายของมิเตอร์น้ำ"
+                        label="สายมิเตอร์น้ำ"
                         :rules="rules.zonesBuildingsRoom"
                         clearable
                         item-text="name"
@@ -435,7 +436,7 @@
           <v-dialog v-model="dialogAddWater" persistent max-width="25%">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="#4CAF50" dark v-bind="attrs" v-on="on">
-                เพิ่มบิลค่าน้ำในเดือนนี้
+                สร้างบิลเดือนปัจจุบัน
               </v-btn>
             </template>
             <v-card>
@@ -481,7 +482,7 @@
                     <v-col cols="6">
                       <v-select
                         v-model="waterGroupCalculate"
-                        label="สายของมิเตอร์น้ำ"
+                        label="สายมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
                         required
                         :items="waterZonesData"
@@ -913,7 +914,7 @@ export default {
           value: "lastName",
         },
         {
-          text: "พื้นที่",
+          text: "เขตพื้นที่",
           value: "accommodations[0].room.zone.name",
           filter: this.zoneFilter,
         },
@@ -966,7 +967,7 @@ export default {
           filter: this.stateFilter,
         },
         {
-          text: "การจัดการ",
+          text: "แก้ไข",
           value: "actions",
           sortable: false,
         },

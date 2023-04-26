@@ -120,7 +120,7 @@
                   </v-sheet>
                 </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="text-right mb-3">จำนวนผู้ย้ายออกในเดือนนี้</div>
+                  <div class="text-right mb-3">จำนวนผู้ย้ายออกเดือนนี้</div>
                   <v-list-item-title class="headline mb-3 text-right">
                     <div class="font">{{ move_out }} คน</div>
                   </v-list-item-title>
@@ -293,7 +293,7 @@ export default {
                     borderWidth: 1,
                   },
                   {
-                    label: "มหาชัย",
+                    label: "สุรนารายณ์",
                     data: [
                       data.result.billings.zone.Suranarai.jan,
                       data.result.billings.zone.Suranarai.feb,

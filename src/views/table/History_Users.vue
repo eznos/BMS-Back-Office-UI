@@ -27,27 +27,6 @@
         &nbsp;&nbsp;
         <h3>ตารางประวัติค่าใช้จ่าย</h3>
         <v-spacer></v-spacer>
-        <v-dialog v-model="dialogExport" persistent max-width="290">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn :disabled="!submit" color="agree" v-bind="attrs" v-on="on">
-              Export ข้อมูล
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="text-h5">
-              ต้องการ Export ข้อมูลประวัติการใช้ เป็นไฟล์ Excel หรือไม่
-            </v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialogExport = false">
-                ยกเลิก
-              </v-btn>
-              <v-btn color="green darken-1" text @click="exportHistory">
-                ยืนยัน
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-card-title>
       <v-card-text>
         <v-row>
@@ -196,12 +175,12 @@ export default {
           value: "updated_at",
         },
         {
-          text: "จำนวยหน่วย",
+          text: "หน่วย",
           value: "unit",
           align: "left",
         },
         {
-          text: "ค่าน้ำรวม",
+          text: "ค่าน้ำ",
           value: "price",
           align: "left",
         },

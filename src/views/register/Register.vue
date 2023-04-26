@@ -346,8 +346,7 @@ export default {
             this.snackbar = true;
             this.snackbarColor = "warning";
             this.text = "อีเมลนี้ ถูกใช้งานไปแล้ว";
-          }
-          else {
+          } else {
             this.snackbar = true;
             this.snackbarColor = "red";
             this.text = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";

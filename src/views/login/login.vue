@@ -125,47 +125,46 @@ export default {
         .then(async (response) => {
           let data = response.data;
           if (data.status === "success") {
-            if(data.result.role === "user"){
+            if (data.result.role === "user") {
               this.rank = data.result.rank;
-            this.fristName = data.result.firstName;
-            this.lastName = data.result.lastName;
-            this.image = data.result.profileUrl;
-            this.role = data.result.role;
-            this.affiliation = data.result.affiliation;
-            this.user_id = data.result.id;
-            this.refreshToken = data.token.refresh_token;
-            localStorage.setItem("rank", this.rank);
-            localStorage.setItem("first_name", this.fristName);
-            localStorage.setItem("last_name", this.lastName);
-            localStorage.setItem("ImageURL", this.image);
-            localStorage.setItem("role", this.role);
-            localStorage.setItem("affiliation", this.affiliation);
-            localStorage.setItem("id", this.user_id);
-            sessionStorage.setItem("refreshToken", this.refreshToken);
-            this.$router.push({
+              this.fristName = data.result.firstName;
+              this.lastName = data.result.lastName;
+              this.image = data.result.profileUrl;
+              this.role = data.result.role;
+              this.affiliation = data.result.affiliation;
+              this.user_id = data.result.id;
+              this.refreshToken = data.token.refresh_token;
+              localStorage.setItem("rank", this.rank);
+              localStorage.setItem("first_name", this.fristName);
+              localStorage.setItem("last_name", this.lastName);
+              localStorage.setItem("ImageURL", this.image);
+              localStorage.setItem("role", this.role);
+              localStorage.setItem("affiliation", this.affiliation);
+              localStorage.setItem("id", this.user_id);
+              sessionStorage.setItem("refreshToken", this.refreshToken);
+              this.$router.push({
                 name: "overview",
               });
-            }
-            else{
+            } else {
               this.rank = data.result.rank;
-            this.fristName = data.result.firstName;
-            this.lastName = data.result.lastName;
-            this.image = data.result.profileUrl;
-            this.role = data.result.role;
-            this.affiliation = data.result.affiliation;
-            this.user_id = data.result.id;
-            this.refreshToken = data.token.refresh_token;
-            this.accessToken = data.token.access_token;
-            localStorage.setItem("rank", this.rank);
-            localStorage.setItem("first_name", this.fristName);
-            localStorage.setItem("last_name", this.lastName);
-            localStorage.setItem("ImageURL", this.image);
-            localStorage.setItem("role", this.role);
-            localStorage.setItem("affiliation", this.affiliation);
-            localStorage.setItem("id", this.user_id);
-            sessionStorage.setItem("refreshToken", this.refreshToken);
-            sessionStorage.setItem("accessToken", this.accessToken);
-            this.$router.push({
+              this.fristName = data.result.firstName;
+              this.lastName = data.result.lastName;
+              this.image = data.result.profileUrl;
+              this.role = data.result.role;
+              this.affiliation = data.result.affiliation;
+              this.user_id = data.result.id;
+              this.refreshToken = data.token.refresh_token;
+              this.accessToken = data.token.access_token;
+              localStorage.setItem("rank", this.rank);
+              localStorage.setItem("first_name", this.fristName);
+              localStorage.setItem("last_name", this.lastName);
+              localStorage.setItem("ImageURL", this.image);
+              localStorage.setItem("role", this.role);
+              localStorage.setItem("affiliation", this.affiliation);
+              localStorage.setItem("id", this.user_id);
+              sessionStorage.setItem("refreshToken", this.refreshToken);
+              sessionStorage.setItem("accessToken", this.accessToken);
+              this.$router.push({
                 name: "overview",
               });
             }

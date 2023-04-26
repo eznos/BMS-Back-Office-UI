@@ -229,7 +229,7 @@ import genders from "../../json/genders.json";
 
 export default {
   data: () => ({
-    user_ID:"",
+    user_ID: "",
     snackbar: false,
     statusAction: "",
     colorSnackbar: "",
@@ -302,9 +302,11 @@ export default {
       this.role = role;
       this.user_ID = user_ID;
     },
-    async  submit() {
+    async submit() {
       if (this.$refs.formEdit.validate()) {
-        this.imageURL = await this.uploadProfileImageToStorage(this.profileImage);
+        this.imageURL = await this.uploadProfileImageToStorage(
+          this.profileImage
+        );
         this.callAPIEditUser();
       }
     },
@@ -351,7 +353,7 @@ export default {
           config
         )
         .then(() => {
-          console.log(this.user_ID)
+          console.log(this.user_ID);
           this.$refs.formEdit.reset();
           this.statusAction = "แก้ไขข้อมูลสำเร็จ";
           this.colorSnackbar = "agree";

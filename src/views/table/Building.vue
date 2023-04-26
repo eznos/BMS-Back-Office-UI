@@ -176,9 +176,7 @@
                   </v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>
-                    เพิ่มพื้นที่
-                  </v-card-title>
+                  <v-card-title> เพิ่มพื้นที่ </v-card-title>
                   <v-card-text>
                     <v-container>
                       <v-form ref="addZone" v-model="valid" lazy-validation>
@@ -229,13 +227,11 @@
                     class="button-filter pt-5 pb-5"
                   >
                     <v-icon> mdi-water-plus-outline </v-icon>
-                    &nbsp; เพิ่มพื้นที่น้ำ
+                    &nbsp; เพิ่มสายมิเตอร์น้ำ
                   </v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>
-                    เพิ่มพื้นที่น้ำ
-                  </v-card-title>
+                  <v-card-title> เพิ่มสายมิเตอร์น้ำ </v-card-title>
                   <v-card-text>
                     <v-container>
                       <v-form ref="addZone" v-model="valid" lazy-validation>
@@ -246,15 +242,16 @@
                               item-text="name"
                               item-value="id"
                               :items="zonesData"
-                              label="พื้นที่"
+                              label="เขตพื้นที่"
                               required
+                              @click="getWaterZonesdata()"
                             >
                             </v-autocomplete>
                           </v-col>
                           <v-col cols="12">
                             <v-text-field
                               v-model="addWaterZone"
-                              label="พื้นที่น้ำ"
+                              label="สายมิเตอร์น้ำ"
                               clearable
                               required
                             ></v-text-field>
@@ -315,8 +312,10 @@
                               item-text="name"
                               item-value="id"
                               :items="zonesData"
-                              label="พื้นที่"
+                              label="เขตพื้นที่"
                               required
+                              @click="getWaterZoneIdForcreateBuilding()"
+                              v-case
                             >
                             </v-autocomplete>
                           </v-col>
@@ -327,7 +326,7 @@
                               item-text="name"
                               item-value="id"
                               :items="waterZonesData"
-                              label="เขตมิเตอร์"
+                              label="สายมิเตอร์น้ำ"
                               required
                             >
                             </v-autocomplete>
@@ -412,21 +411,6 @@
                     <v-container>
                       <v-form ref="formNewdata" v-model="valid" lazy-validation>
                         <v-row>
-                          <!-- water group -->
-                          <v-col cols="12" sm="6" md="4">
-                            <v-select
-                              v-model="editedItem.waterZone"
-                              item-text="name"
-                              item-value="id"
-                              :items="waterZonesData"
-                              label="สายของมิเตอร์น้ำ"
-                              required
-                              autofocus
-                              clearable
-                              :rules="rules.zonesBuildingsRoom"
-                            >
-                            </v-select>
-                          </v-col>
                           <!-- zone -->
                           <v-col cols="12" sm="6" md="4">
                             <v-autocomplete
@@ -434,12 +418,29 @@
                               item-text="name"
                               item-value="id"
                               :items="zonesData"
-                              label="พื้นที่"
+                              label="เขตพื้นที่"
+                              required
+                              clearable
+                              autofocus
+                              :rules="rules.zonesBuildingsRoom"
+                              @click="getwaterDataAutofill()"
+                            >
+                            </v-autocomplete>
+                          </v-col>
+                          <!-- water group -->
+                          <v-col cols="12" sm="6" md="4">
+                            <v-select
+                              v-model="editedItem.waterZone"
+                              item-text="name"
+                              item-value="id"
+                              :items="waterZonesData"
+                              label="สายมิเตอร์น้ำ"
                               required
                               clearable
                               :rules="rules.zonesBuildingsRoom"
+                              @click="getBuildingIdForCreateRoom()"
                             >
-                            </v-autocomplete>
+                            </v-select>
                           </v-col>
                           <!-- building -->
                           <v-col cols="12" sm="6" md="4">
@@ -467,19 +468,6 @@
                             >
                             </v-text-field>
                           </v-col>
-                          <!-- electricityNo -->
-                          <!-- <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="editedItem.electricityNo"
-                              label="เลขผู้ใช้ไฟฟ้า"
-                              @keypress="isNumber($event)"
-                              clearable
-                              required
-                              counter="12"
-                              maxlength="12"
-                              :rules="rules.electricNumber"
-                            ></v-text-field> 
-                          </v-col> -->
                           <!-- waterNo -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
@@ -493,24 +481,11 @@
                               :rules="rules.waterNumber"
                             ></v-text-field>
                           </v-col>
-                          <!-- electricityMeterNo -->
-                          <!-- <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="editedItem.electricityMeterNo"
-                              label="เลขมิเตอร์น้ำไฟฟ้า"
-                              @keypress="isNumber($event)"
-                              clearable
-                              required
-                              counter="11"
-                              maxlength="11"
-                              :rules="rules.electricMeterNumber"
-                            ></v-text-field>
-                          </v-col> -->
                           <!-- water_meter_no -->
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
                               v-model="editedItem.waterMeterNo"
-                              label="เลขมิเตอร์น้ำประปา"
+                              label="เลขมิเตอร์น้ำ"
                               @keypress="isNumber($event)"
                               clearable
                               required
@@ -691,6 +666,9 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    waterZoneIds: "",
+    zoneIds: "",
+    waterIds: "",
     zonesDatas: "",
     waterZonesDatas: "",
     buildingDatas: "",
@@ -754,6 +732,7 @@ export default {
     start: 0,
     rowHeight: 24,
     perPage: 25,
+    zoneId: "",
     editedItem: {
       waterZone: "",
       zone: "",
@@ -820,14 +799,14 @@ export default {
     headers() {
       return [
         {
+          text: "เขตพื้นที่",
+          value: "zone.name",
+          filter: this.zoneFilter,
+        },
+        {
           text: "สายมิเตอร์น้ำ",
           value: "waterZone.name",
           filter: this.waterGroupFilter,
-        },
-        {
-          text: "พื้นที่",
-          value: "zone.name",
-          filter: this.zoneFilter,
         },
         {
           text: "อาคาร",
@@ -843,7 +822,7 @@ export default {
           value: "waterNo",
         },
         {
-          text: "เลขมิเตอร์น้ำประปา",
+          text: "เลขมิเตอร์น้ำ",
           value: "waterMeterNo",
         },
         {
@@ -857,7 +836,7 @@ export default {
           filter: this.statusFilter,
         },
         {
-          text: "การจัดการ",
+          text: "แก้ไข",
           value: "actions",
           align: "center",
           sortable: false,
@@ -892,9 +871,8 @@ export default {
   methods: {
     createZone() {
       var data = JSON.stringify({
-        name: this.addZone,
+        name: this.addZone.trim(),
       });
-
       var config = {
         method: "post",
         url: apiUrl + "/v1/building/buildings/add/zone",
@@ -905,7 +883,6 @@ export default {
         },
         data: data,
       };
-
       axios(config)
         .then(() => {
           this.dialogAddZone = false;
@@ -913,19 +890,30 @@ export default {
           this.colorSnackbar = "agree";
           this.snackbar = true;
           this.getZonesdata();
+          this.addZone = null;
         })
-        .catch(function (error) {
-          console.log(error);
-          this.statusAction = "เพิ่มพื้นที่ไม่สำเร็จ";
-          this.colorSnackbar = "red";
-          this.snackbar = true;
-          this.dialogAddZone = false;
+        .catch((error) => {
+          console.log(error.response.data.error_message);
+          if (error.response.data.error_message === "Unprocessable Entity") {
+            this.dialogAddZone = false;
+            this.statusAction = "เพิ่มพื้นที่ไม่สำเร็จเพราะข้อมูลซ้ำกัน";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.dialogAddZone = false;
+            this.addZone = null;
+          } else {
+            this.statusAction = "เพิ่มพื้นที่ไม่สำเร็จ";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.dialogAddZone = false;
+            this.addZone = null;
+          }
         });
     },
     createWaterZone() {
       const data = JSON.stringify({
         zoneId: this.addZoneInWaterZone,
-        name: this.addWaterZone,
+        name: this.addWaterZone.trim(),
       });
       const config = {
         method: "post",
@@ -940,17 +928,19 @@ export default {
       axios(config)
         .then(() => {
           this.dialogAddWaterZone = false;
-          this.statusAction = "เพิ่มพื้นที่น้ำสำเร็จ";
+          this.statusAction = "เพิ่มสายมิเตอร์น้ำสำเร็จ";
           this.colorSnackbar = "agree";
           this.snackbar = true;
           this.getWaterZonesdata();
+          this.addWaterZone = null;
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.log(error);
-          this.statusAction = "เพิ่มพื้นที่น้ำไม่สำเร็จ";
+          this.statusAction = "เพิ่มสายมิเตอร์น้ำไม่สำเร็จ";
           this.colorSnackbar = "red";
           this.snackbar = true;
           this.dialogAddWaterZone = false;
+          this.addWaterZone = null;
         });
     },
     createbuilding() {
@@ -978,6 +968,9 @@ export default {
           this.colorSnackbar = "agree";
           this.snackbar = true;
           this.getBuildingsdatas();
+          this.addBuilding = null;
+          this.lat = null;
+          this.lng = null;
         })
         .catch((error) => {
           console.log(error);
@@ -985,7 +978,27 @@ export default {
           this.colorSnackbar = "red";
           this.snackbar = true;
           this.dialogAddbuilding = false;
+          this.addBuilding = null;
+          this.lat = null;
+          this.lng = null;
         });
+    },
+    getWaterZoneIdForcreateBuilding() {
+      this.zoneIds = "";
+      this.zoneIds = this.addZoneInBuilding;
+      this.getWaterZonesdata();
+    },
+    getBuildingIdForCreateRoom() {
+      this.waterZoneIds = "";
+      this.waterZoneIds = this.editedItem.waterZone;
+      this.getBuildingsdatas();
+    },
+    getwaterDataAutofill() {
+      if (this.editedItem.zone != null) {
+        this.zoneIds = "";
+        this.zoneIds = this.editedItem.zone;
+        this.getWaterZonesdata();
+      }
     },
     // get zone data for select
     getZonesdata() {
@@ -1014,7 +1027,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/waterzone", config)
+        .get(
+          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataWaterZones = data.result;
@@ -1033,7 +1049,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/building", config)
+        .get(
+          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataBuilding = data.result;
