@@ -264,11 +264,7 @@
               </v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn
-                  color="error"
-                  text
-                  @click="exportExcelResident = false"
-                >
+                <v-btn color="error" text @click="exportExcelResident = false">
                   ยกเลิก
                 </v-btn>
                 <v-btn color="agree" text @click="getResidentsID()">

@@ -155,14 +155,12 @@
       <!-- for admin -->
       <v-list v-if="role === 'admin'">
         <v-list-item
-        
           v-for="link in links"
           color="#669DF6"
           :key="link.text"
           router
           :to="link.route"
           active-class="border"
-
         >
           <v-list-item-action>
             <v-icon>{{ link.icon }}</v-icon>
@@ -351,18 +349,30 @@ export default {
   border-left: 5px solid #110f0f;
 }
 .background {
-  background: linear-gradient(90deg, rgba(12,71,98,1) 21%, rgba(12,71,98,1) 78%);
+  background: linear-gradient(
+    90deg,
+    rgba(12, 71, 98, 1) 21%,
+    rgba(12, 71, 98, 1) 78%
+  );
 }
 .background2 {
-  background: linear-gradient(90deg, rgba(12,71,98,1) 21%, rgba(12,71,98,1) 78%);
+  background: linear-gradient(
+    90deg,
+    rgba(12, 71, 98, 1) 21%,
+    rgba(12, 71, 98, 1) 78%
+  );
 }
 .button-menu {
   margin-bottom: 10px;
 }
 .user-card {
-  background-image: linear-gradient(90deg, rgba(12,71,98,1) 21%, rgba(244,238,238,1) 78%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(12, 71, 98, 1) 21%,
+    rgba(244, 238, 238, 1) 78%
+  );
 }
 .active_list .v-list-group .v-list-item--active {
-    color: #110f0f !important;
-  }
+  color: #110f0f !important;
+}
 </style>

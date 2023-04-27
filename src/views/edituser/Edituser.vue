@@ -13,165 +13,166 @@
         <v-form ref="formEdit" v-model="valid" class="form" lazy-validation>
           <v-responsive>
             <v-row>
-            <!-- avatar upload and preview -->
-            <v-col cols="12" sm="12" md="2" lg="2">
-              <v-hover v-slot="{ hover }">
-                <v-card
-                  color="#DFDDDD"
-                  height="142"
-                  max-width="230"
-                  tile
-                  class="px-3 mb-2 uploadimg"
-                >
-                  <v-row style="height: 100%" justify="center" align="center">
-                    <v-avatar
-                      v-if="!profileImage"
-                      tile
-                      height="142"
-                      width="230"
-                      color="#DFDDDD"
-                    >
-                      <h2>
-                        {{
-                          firstName != null ? firstName.substring(0, 1) : null
-                        }}
-                        {{ lastName != null ? lastName.substring(0, 1) : null }}
-                      </h2>
-                    </v-avatar>
-                    <v-img
-                      v-if="profileImage !== ''"
-                      :src="profileImage"
-                      height="142"
-                      width="230"
-                    >
-                    </v-img>
-                    <v-expand-transition>
-                      <div
-                        v-if="hover"
-                        class="d-flex v-card--reveal"
-                        style="height: 100%"
+              <!-- avatar upload and preview -->
+              <v-col cols="12" sm="12" md="2" lg="2">
+                <v-hover v-slot="{ hover }">
+                  <v-card
+                    color="#DFDDDD"
+                    height="142"
+                    max-width="230"
+                    tile
+                    class="px-3 mb-2 uploadimg"
+                  >
+                    <v-row style="height: 100%" justify="center" align="center">
+                      <v-avatar
+                        v-if="!profileImage"
+                        tile
+                        height="142"
+                        width="230"
+                        color="#DFDDDD"
                       >
-                        <div>
-                          <v-btn
-                            fab
-                            color="#F5F5F5"
-                            class="mr-2"
-                            @click="handleImageButtonClick"
-                          >
-                            <v-icon size="30">mdi-file-image-outline</v-icon>
-                          </v-btn>
-                          <input
-                            type="file"
-                            ref="image"
-                            @change="onImageSelected"
-                            style="display: none"
-                            accept="image/png, image/jpeg"
-                          />
+                        <h2>
+                          {{
+                            firstName != null ? firstName.substring(0, 1) : null
+                          }}
+                          {{
+                            lastName != null ? lastName.substring(0, 1) : null
+                          }}
+                        </h2>
+                      </v-avatar>
+                      <v-img
+                        v-if="profileImage !== ''"
+                        :src="profileImage"
+                        height="142"
+                        width="230"
+                      >
+                      </v-img>
+                      <v-expand-transition>
+                        <div
+                          v-if="hover"
+                          class="d-flex v-card--reveal"
+                          style="height: 100%"
+                        >
+                          <div>
+                            <v-btn
+                              fab
+                              color="#F5F5F5"
+                              class="mr-2"
+                              @click="handleImageButtonClick"
+                            >
+                              <v-icon size="30">mdi-file-image-outline</v-icon>
+                            </v-btn>
+                            <input
+                              type="file"
+                              ref="image"
+                              @change="onImageSelected"
+                              style="display: none"
+                              accept="image/png, image/jpeg"
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </v-expand-transition>
+                      </v-expand-transition>
+                    </v-row>
+                  </v-card>
+                </v-hover>
+              </v-col>
+              <v-col col="12">
+                <v-container>
+                  <v-row>
+                    <!-- rank -->
+                    <v-col cols="12" sm="4" md="6" lg="2">
+                      <v-autocomplete
+                        item-text="name"
+                        item-value="name"
+                        v-model="rank"
+                        :items="ranks"
+                        label="ยศ"
+                        required
+                        :rules="rules.nomalRules"
+                        autofocus
+                        clearable
+                        prepend-icon="mdi-chevron-triple-up"
+                      >
+                      </v-autocomplete>
+                    </v-col>
+                    <!-- affi -->
+                    <v-col cols="12" sm="4" md="6" lg="2">
+                      <v-autocomplete
+                        item-text="name"
+                        item-value="name"
+                        v-model="affiliation"
+                        :items="affiliations"
+                        :rules="rules.nomalRules"
+                        label="สังกัด"
+                        required
+                        prepend-icon="mdi-format-list-group"
+                      ></v-autocomplete>
+                    </v-col>
+                    <!-- name -->
+                    <v-col cols="12" sm="4" md="6" lg="4">
+                      <v-text-field
+                        v-model="firstName"
+                        :rules="rules.nameRules"
+                        label="ชื่อ"
+                        prepend-icon="mdi-form-textbox"
+                        required
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <!-- last name -->
+                    <v-col cols="12" sm="4" md="6" lg="4">
+                      <v-text-field
+                        v-model="lastName"
+                        :rules="rules.nameRules"
+                        label="นามสกุล"
+                        prepend-icon="mdi-rename-box"
+                        required
+                        clearable
+                      ></v-text-field>
+                    </v-col>
+                    <!-- email -->
+                    <v-col cols="12" sm="4" md="6" lg="4">
+                      <v-text-field
+                        v-model="email"
+                        :rules="[rules.email.regex]"
+                        label="อีเมล"
+                        prepend-icon="mdi-email"
+                        clearable
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <!-- tel. -->
+                    <v-col cols="12" sm="4" md="6" lg="4">
+                      <v-text-field
+                        :rules="[rules.phoneNumber.regex]"
+                        v-model="phoneNumber"
+                        :counter="10"
+                        label="เบอร์โทร"
+                        required
+                        clearable
+                        prepend-icon="mdi-card-account-phone"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- gender -->
+                    <v-col cols="12" sm="4" md="6" lg="4">
+                      <v-select
+                        v-model="defaultGender"
+                        prepend-icon="mdi-gender-male-female"
+                        item-color="red"
+                        :items="genders"
+                        label="เพศ"
+                        item-value="value"
+                        item-text="name"
+                      >
+                      </v-select>
+                    </v-col>
                   </v-row>
-                </v-card>
-              </v-hover>
-            </v-col>
-            <v-col col="12">
-              <v-container>
-                <v-row>
-                  <!-- rank -->
-                  <v-col cols="12" sm="4" md="6" lg="2">
-                    <v-autocomplete
-                      item-text="name"
-                      item-value="name"
-                      v-model="rank"
-                      :items="ranks"
-                      label="ยศ"
-                      required
-                      :rules="rules.nomalRules"
-                      autofocus
-                      clearable
-                      prepend-icon="mdi-chevron-triple-up"
-                    >
-                    </v-autocomplete>
-                  </v-col>
-                  <!-- affi -->
-                  <v-col cols="12" sm="4" md="6" lg="2">
-                    <v-autocomplete
-                      item-text="name"
-                      item-value="name"
-                      v-model="affiliation"
-                      :items="affiliations"
-                      :rules="rules.nomalRules"
-                      label="สังกัด"
-                      required
-                      prepend-icon="mdi-format-list-group"
-                    ></v-autocomplete>
-                  </v-col>
-                  <!-- name -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-text-field
-                      v-model="firstName"
-                      :rules="rules.nameRules"
-                      label="ชื่อ"
-                      prepend-icon="mdi-form-textbox"
-                      required
-                      clearable
-                    ></v-text-field>
-                  </v-col>
-                  <!-- last name -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-text-field
-                      v-model="lastName"
-                      :rules="rules.nameRules"
-                      label="นามสกุล"
-                      prepend-icon="mdi-rename-box"
-                      required
-                      clearable
-                    ></v-text-field>
-                  </v-col>
-                  <!-- email -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-text-field
-                      v-model="email"
-                      :rules="[rules.email.regex]"
-                      label="อีเมล"
-                      prepend-icon="mdi-email"
-                      clearable
-                      required
-                    ></v-text-field>
-                  </v-col>
-                  <!-- tel. -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-text-field
-                      :rules="[rules.phoneNumber.regex]"
-                      v-model="phoneNumber"
-                      :counter="10"
-                      label="เบอร์โทร"
-                      required
-                      clearable
-                      prepend-icon="mdi-card-account-phone"
-                      @keypress="isNumber($event)"
-                    ></v-text-field>
-                  </v-col>
-                  <!-- gender -->
-                  <v-col cols="12" sm="4" md="6" lg="4">
-                    <v-select
-                      v-model="defaultGender"
-                      prepend-icon="mdi-gender-male-female"
-                      item-color="red"
-                      :items="genders"
-                      label="เพศ"
-                      item-value="value"
-                      item-text="name"
-                    >
-                    </v-select>
-                  </v-col>
-                </v-row>
-                <v-row> </v-row>
-              </v-container>
-            </v-col>
-          </v-row>
+                  <v-row> </v-row>
+                </v-container>
+              </v-col>
+            </v-row>
           </v-responsive>
-
         </v-form>
       </v-card-text>
       <v-card-actions>

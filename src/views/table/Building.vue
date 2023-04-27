@@ -582,7 +582,11 @@
                   </v-card-title>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="error" text @click="exportExcelBuliding = false">
+                    <v-btn
+                      color="error"
+                      text
+                      @click="exportExcelBuliding = false"
+                    >
                       ยกเลิก
                     </v-btn>
                     <v-btn class="ma-2" text color="agree" @click="getRoomsID">

@@ -124,9 +124,7 @@
               <v-btn color="error" text @click="dialogExport = false">
                 ยกเลิก
               </v-btn>
-              <v-btn color="agree" text @click="exportHistory">
-                ยืนยัน
-              </v-btn>
+              <v-btn color="agree" text @click="exportHistory"> ยืนยัน </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
