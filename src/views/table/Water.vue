@@ -27,12 +27,6 @@
           >
           &nbsp;&nbsp;
           <h3>เครื่องมือค้นหา</h3>
-          <v-chip color="#F3FF83" class="ma-2">
-            ค่าน้ำประปารวมมากกว่าค่าเฉลี่ย
-          </v-chip>
-          <v-chip color="#FFDE83" class="ma-2">
-            ค่าประปารวมน้อยกว่าค่าเฉลี่ย
-          </v-chip>
           <v-spacer></v-spacer>
         </v-card-title>
         <!-- filter -->
@@ -216,7 +210,7 @@
             <template v-slot:activator="{ on: attrs }">
               <v-btn
                 class="button-filter pt-5 pb-5"
-                color="#7A4579"
+                color="error"
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-newspaper-plus </v-icon>
@@ -418,7 +412,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="dialogCreateOldBill = false"
+                <v-btn color="error" text @click="dialogCreateOldBill = false"
                   >ยกเลิก</v-btn
                 >
                 <v-btn
@@ -426,7 +420,7 @@
                   :disabled="!valid"
                   text
                   @click="createOldBill"
-                  >ยืนยันข้อมูล</v-btn
+                  >ยืนยัน</v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -435,7 +429,7 @@
           <!-- add bills in this month -->
           <v-dialog v-model="dialogAddWater" persistent max-width="25%">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="#4CAF50" dark v-bind="attrs" v-on="on">
+              <v-btn color="agree" dark v-bind="attrs" v-on="on">
                 สร้างบิลเดือนปัจจุบัน
               </v-btn>
             </template>
@@ -444,7 +438,7 @@
               <v-card-text></v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="dialogAddWater = false">
+                <v-btn color="error" text @click="dialogAddWater = false">
                   ยกเลิก
                 </v-btn>
                 <v-btn color="agree" text @click="createBillsInMonth">
@@ -463,6 +457,7 @@
               <v-btn
                 class="button-filter pt-5 pb-5"
                 color="#1B99A1"
+                dark
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-calculator </v-icon>
@@ -511,13 +506,13 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="close">ยกเลิก</v-btn>
+                <v-btn color="error" text @click="close">ยกเลิก</v-btn>
                 <v-btn
                   color="agree"
                   :disabled="!valid"
                   text
                   @click="validateDiffprice"
-                  >ยืนยันข้อมูล</v-btn
+                  >ยืนยัน</v-btn
                 >
               </v-card-actions>
             </v-card>
@@ -649,13 +644,13 @@
           <v-dialog v-model="exportExcelwater" max-width="75%" persistent>
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="agree"
+                color="#f8ce01"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
                 :disabled="!selectItems"
               >
                 <v-icon> mdi-file-export-outline </v-icon>
-                &nbsp; Export ข้อมูล Excel
+                &nbsp; Export ข้อมูล
               </v-btn>
             </template>
             <v-card>
@@ -664,7 +659,7 @@
               </v-card-title>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="exportExcelwater = false">
+                <v-btn color="error" text @click="exportExcelwater = false">
                   ยกเลิก
                 </v-btn>
                 <v-btn color="agree" text @click="getbillingsID">
@@ -1193,7 +1188,7 @@ export default {
     },
     // color of price
     getColor(total_pay) {
-      if (total_pay == 0) return "#FF606090";
+      if (total_pay == 0) return "error";
       if (total_pay >= 200) return "#E6FF007C";
       if (total_pay <= 150) return "#FFBB007C";
       else return "#FFFFFF00";

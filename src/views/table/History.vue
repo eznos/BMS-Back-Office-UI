@@ -107,24 +107,24 @@
         <!-- title -->
         <v-icon size="35px" class="icon">mdi-table-large</v-icon>
         &nbsp;&nbsp;
-        <h3>ตารางประวัติค่าใช้จ่าย</h3>
+        <h3>ตารางประวัติการใช้น้ำประปา</h3>
         <v-spacer></v-spacer>
-        <v-dialog v-model="dialogExport" persistent max-width="290">
+        <v-dialog v-model="dialogExport" persistent max-width="75%">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn :disabled="!submit" color="agree" v-bind="attrs" v-on="on">
+            <v-btn :disabled="!submit" color="#f8ce01" v-bind="attrs" v-on="on">
               Export ข้อมูล
             </v-btn>
           </template>
           <v-card>
-            <v-card-title class="text-h5">
-              ต้องการ Export ข้อมูลประวัติการใช้ เป็นไฟล์ Excel หรือไม่
+            <v-card-title>
+              ต้องการ Export ข้อมูลเป็นไฟล์ Excel หรือไม่
             </v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="green darken-1" text @click="dialogExport = false">
+              <v-btn color="error" text @click="dialogExport = false">
                 ยกเลิก
               </v-btn>
-              <v-btn color="green darken-1" text @click="exportHistory">
+              <v-btn color="agree" text @click="exportHistory">
                 ยืนยัน
               </v-btn>
             </v-card-actions>
@@ -133,36 +133,6 @@
       </v-card-title>
       <v-card-text>
         <v-row>
-          <!-- electric -->
-          <!-- <v-col cols="6">
-            <v-data-table
-              v-model="selected"
-              :headers="headersElectric"
-              :items="electricHistoryTable"
-              item-key="first_name"
-              :items-per-page="itemsPerPage"
-              class="elevation-1 pa-6"
-              :loading="loadTable"
-              loading-text="กำลังโหลด... โปรดรอสักครู่"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              @input="enterSelect($event)"
-            >
-              <template v-slot:top>
-                <h3>ตารางประวัติค่าไฟฟ้า</h3>
-              </template>
-              <template v-slot:item.created_at="{ item }">
-                <span>{{
-                  new Date(item.created_at).toISOString().substr(0, 7)
-                }}</span>
-              </template>
-              <template v-slot:[`item.price`]="{ item }">
-                <v-chip :color="getColor(item.price)">
-                  {{ item.price }}
-                </v-chip>
-              </template>
-            </v-data-table>
-          </v-col> -->
           <!-- water -->
           <v-col cols="12">
             <v-data-table

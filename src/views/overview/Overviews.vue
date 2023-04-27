@@ -19,9 +19,9 @@
             max-width="70%"
           >
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="agree" v-bind="attrs" v-on="on">
+              <v-btn color="#f8ce01" v-bind="attrs" v-on="on">
                 <v-icon> mdi-application-export </v-icon>
-                &nbsp; Export ข้อมูลภาพรวม
+                &nbsp; Export ข้อมูล
               </v-btn>
             </template>
             <v-card>

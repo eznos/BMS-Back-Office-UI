@@ -24,10 +24,6 @@
         >
         &nbsp;&nbsp;
         <h3>เครื่องมือค้นหา</h3>
-        <v-chip color="agree" class="ma-2" @click="statusFilterValue = scales">
-          ห้องว่าง
-        </v-chip>
-        <v-chip color="red" class="ma-2"> ห้องไม่ว่าง </v-chip>
         <v-spacer></v-spacer>
       </v-card-title>
       <v-expansion-panels>
@@ -198,7 +194,7 @@
                     <v-form ref="form" v-model="valid" lazy-validation>
                       <v-btn
                         large
-                        color="warning"
+                        color="error"
                         text
                         @click="dialogAddZone = false"
                       >
@@ -221,7 +217,7 @@
               <v-dialog v-model="dialogAddWaterZone" persistent max-width="40%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="#00BBF0"
+                    color="#1B99A1"
                     dark
                     v-on="{ ...attrs }"
                     class="button-filter pt-5 pb-5"
@@ -265,7 +261,7 @@
                     <v-form ref="form" v-model="valid" lazy-validation>
                       <v-btn
                         large
-                        color="warning"
+                        color="error"
                         text
                         @click="dialogAddWaterZone = false"
                       >
@@ -288,7 +284,7 @@
               <v-dialog v-model="dialogAddbuilding" persistent max-width="75%">
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="#3B0000"
+                    color="agree"
                     dark
                     v-on="{ ...attrs }"
                     class="button-filter pt-5 pb-5"
@@ -344,7 +340,7 @@
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
                               v-model="lat"
-                              label="ลัดติจูด"
+                              label="ละติจูด"
                               @keypress="isNumber($event)"
                               clearable
                               required
@@ -355,7 +351,7 @@
                           <v-col cols="12" sm="6" md="4">
                             <v-text-field
                               v-model="lng"
-                              label="ลองติจูด"
+                              label="ลองจิจูด"
                               @keypress="isNumber($event)"
                               clearable
                               :rules="[rules.longitudeRules.regex]"
@@ -371,7 +367,7 @@
                     <v-form ref="form" v-model="valid" lazy-validation>
                       <v-btn
                         large
-                        color="warning"
+                        color="error"
                         text
                         @click="dialogAddbuilding = false"
                       >
@@ -529,7 +525,7 @@
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-btn large color="warning" text @click="close">
+                      <v-btn large color="error" text @click="close">
                         ยกเลิก
                       </v-btn>
                       <v-btn
@@ -553,7 +549,7 @@
                   >
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="warning" text @click="closeDelete"
+                    <v-btn color="error" text @click="closeDelete"
                       >ยกเลิก</v-btn
                     >
                     <v-btn color="agree" text @click="deleteItemConfirm"
@@ -571,13 +567,13 @@
               >
                 <template v-slot:activator="{ on: attrs }">
                   <v-btn
-                    color="agree"
+                    color="#f8ce01"
                     class="button-filter pt-5 pb-5"
                     v-on="{ ...attrs }"
                     :disabled="!selectItems"
                   >
                     <v-icon> mdi-file-export-outline </v-icon>
-                    &nbsp; Export ข้อมูล Excel
+                    &nbsp; Export ข้อมูล
                   </v-btn>
                 </template>
                 <v-card>
@@ -586,11 +582,11 @@
                   </v-card-title>
                   <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="warning" @click="exportExcelBuliding = false">
+                    <v-btn color="error" text @click="exportExcelBuliding = false">
                       ยกเลิก
                     </v-btn>
-                    <v-btn class="ma-2" color="agree" @click="getRoomsID">
-                      ยืนยันข้อมูล
+                    <v-btn class="ma-2" text color="agree" @click="getRoomsID">
+                      ยืนยัน
                     </v-btn>
                   </v-card-actions>
                 </v-card>
@@ -1140,7 +1136,7 @@ export default {
             "some record does not have calculated status"
           ) {
             this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
-            this.colorSnackbar = "warning";
+            this.colorSnackbar = "error";
             this.snackbar = true;
             this.exportExcelBuliding = false;
           } else {
@@ -1180,7 +1176,7 @@ export default {
           console.log(error);
           if (error.response.data.error_message === "bad_request") {
             this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
-            this.colorSnackbar = "warning";
+            this.colorSnackbar = "error";
             this.snackbar = true;
           } else {
             this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
@@ -1265,7 +1261,7 @@ export default {
           console.log(error);
           if (error.response.data.status === "unauthorized") {
             this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
-            this.colorSnackbar = "warning";
+            this.colorSnackbar = "error";
             this.snackbar = true;
             this.differencePriceCalculate = false;
           } else {

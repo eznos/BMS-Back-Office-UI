@@ -11,7 +11,8 @@
       </v-card-title>
       <v-card-text>
         <v-form ref="formEdit" v-model="valid" class="form" lazy-validation>
-          <v-row>
+          <v-responsive>
+            <v-row>
             <!-- avatar upload and preview -->
             <v-col cols="12" sm="12" md="2" lg="2">
               <v-hover v-slot="{ hover }">
@@ -169,21 +170,24 @@
               </v-container>
             </v-col>
           </v-row>
+          </v-responsive>
+
         </v-form>
       </v-card-text>
       <v-card-actions>
         <div class="mx-auto">
           <v-form v-model="valid" ref="formButton" @submit.prevent="submit">
-            <!-- clear form -->
+            <!-- submit form -->
             <v-btn
               class="mr-4"
-              @click="clear"
-              outlined
+              color="agree"
               width="200px"
               large
-              color="error"
+              :disabled="!valid"
+              @click="submit()"
+              dark
             >
-              ล้างข้อมูล
+              ยืนยันการลงทะเบียน
             </v-btn>
             <!-- cancel form -->
             <v-btn
@@ -195,16 +199,16 @@
             >
               ยกเลิกการลงทะเบียน
             </v-btn>
-            <!-- submit form -->
+            <!-- clear form -->
             <v-btn
               class="mr-4"
-              color="agree"
+              @click="clear"
+              outlined
               width="200px"
               large
-              :disabled="!valid"
-              @click="submit()"
+              color="error"
             >
-              ยืนยันการลงทะเบียน
+              ล้างข้อมูล
             </v-btn>
           </v-form>
         </div>

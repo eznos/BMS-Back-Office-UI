@@ -221,7 +221,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-form ref="form" v-model="valid" lazy-validation>
-                  <v-btn color="warning" text @click="close"> ยกเลิก </v-btn>
+                  <v-btn color="error" text @click="close"> ยกเลิก </v-btn>
                   <v-btn color="agree" :disabled="!valid" text @click="save()">
                     ยืนยัน
                   </v-btn>
@@ -237,7 +237,7 @@
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="warning" text @click="closeDelete">ยกเลิก</v-btn>
+                <v-btn color="error" text @click="closeDelete">ยกเลิก</v-btn>
                 <v-btn color="agree" text @click="deleteItemConfirm"
                   >ยืนยัน</v-btn
                 >
@@ -249,13 +249,13 @@
           <v-dialog v-model="exportExcelResident" persistent max-width="75%">
             <template v-slot:activator="{ on: attrs }">
               <v-btn
-                color="agree"
+                color="#f8ce01"
                 class="button-filter pt-5 pb-5"
                 v-on="{ ...attrs }"
                 :disabled="!selectItems"
               >
                 <v-icon> mdi-file-export-outline </v-icon>
-                &nbsp; Export ข้อมูล Excel
+                &nbsp; Export ข้อมูล
               </v-btn>
             </template>
             <v-card>
@@ -265,14 +265,14 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
-                  color="warning"
+                  color="error"
                   text
                   @click="exportExcelResident = false"
                 >
                   ยกเลิก
                 </v-btn>
                 <v-btn color="agree" text @click="getResidentsID()">
-                  ยืนยันข้อมูล
+                  ยืนยัน
                 </v-btn>
               </v-card-actions>
             </v-card>

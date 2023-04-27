@@ -221,7 +221,7 @@
       >
         <!-- color of roles on datatable  -->
         <template v-slot:[`item.role`]="{ item }">
-          <v-chip :color="getColor(item.role)">
+          <v-chip :color="getColor(item.role)" dark>
             <td v-if="item.role == 'admin'">{{ "เจ้าหน้าที่" }}</td>
             <td v-if="item.role == 'user'">{{ "ผู้ใช้งาน" }}</td>
           </v-chip>
