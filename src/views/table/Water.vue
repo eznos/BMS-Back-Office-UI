@@ -57,6 +57,7 @@
                     item-text="name"
                     item-value="name"
                     clearable
+
                   >
                   </v-autocomplete>
                 </v-col>
@@ -74,7 +75,6 @@
                   >
                   </v-autocomplete>
                 </v-col>
-
                 <!-- Filter for  building-->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-autocomplete
@@ -280,6 +280,7 @@
                         clearable
                         item-value="id"
                         item-text="name"
+                        :search-input.sync="search1"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -294,6 +295,7 @@
                         clearable
                         item-text="name"
                         item-value="id"
+                        :search-input.sync="search2"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -308,6 +310,7 @@
                         item-value="id"
                         :rules="rules.zonesBuildingsRoom"
                         clearable
+                        :search-input.sync="search3"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -760,6 +763,12 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    waterZoneIds: "",
+    buildingIds: "",
+    search1: "",
+    search2: "",
+    search3: "",
+    search4: "",
     dateFilter: false,
     dateFilterValue: new Date().toISOString().substr(0, 7),
     GGG: false,
@@ -994,6 +1003,18 @@ export default {
     dialog(val) {
       val || this.close();
     },
+    search1: function () {
+      this.zoneIds = this.zoneOldbill;
+      this.getWaterZonesdata();
+    },
+    search2: function () {
+      this.waterZoneIds = this.waterZoneOldbill;
+      this.getBuildingsdatas();
+    },
+    search3: function () {
+      this.buildingIds = this.buildingOldbill;
+      this.getRoomsdatas();
+    },
   },
 
   created() {
@@ -1103,7 +1124,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/waterzone", config)
+        .get(
+          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataWaterZones = data.result;
@@ -1122,7 +1146,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/building", config)
+        .get(
+          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataBuilding = data.result;
@@ -1141,7 +1168,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/room", config)
+        .get(
+          apiUrl + "/v1/building/data/room" + "?id=" + this.buildingIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataRoom = data.result;

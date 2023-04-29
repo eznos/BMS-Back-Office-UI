@@ -95,20 +95,6 @@
                           clearable
                         ></v-text-field>
                       </v-col>
-                      <!-- watergroup -->
-                      <v-col cols="12" sm="6" md="4">
-                        <v-autocomplete
-                          v-model="editedItem.water_zone"
-                          required
-                          :items="waterZonesData"
-                          label="สายของมิเตอร์น้ำ"
-                          :rules="rules.zonesBuildingsRoom"
-                          clearable
-                          item-text="name"
-                          item-value="id"
-                        >
-                        </v-autocomplete>
-                      </v-col>
                       <!-- zone -->
                       <v-col cols="12" sm="6" md="4">
                         <v-autocomplete
@@ -120,6 +106,22 @@
                           clearable
                           item-value="id"
                           item-text="name"
+                          :search-input.sync="search1"
+                        >
+                        </v-autocomplete>
+                      </v-col>
+                      <!-- watergroup -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-autocomplete
+                          v-model="editedItem.water_zone"
+                          required
+                          :items="waterZonesData"
+                          label="สายของมิเตอร์น้ำ"
+                          :rules="rules.zonesBuildingsRoom"
+                          clearable
+                          item-text="name"
+                          item-value="id"
+                          :search-input.sync="search2"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -134,6 +136,7 @@
                           item-value="id"
                           :rules="rules.zonesBuildingsRoom"
                           clearable
+                          :search-input.sync="search3"
                         >
                         </v-autocomplete>
                       </v-col>
@@ -152,68 +155,6 @@
                         >
                         </v-autocomplete>
                       </v-col>
-                      <!-- electric_no -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.electricity_no"
-                          label="เลขผู้ใช้ไฟฟ้า"
-                          @keypress="isNumber($event)"
-                          clearable
-                          required
-                          counter="12"
-                          maxlength="12"
-                        ></v-text-field>
-                      </v-col> -->
-                      <!-- electric_meter_no -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.electricity_meter_no"
-                          label="เลขมิเตอร์ไฟฟ้า"
-                          @keypress="isNumber($event)"
-                          clearable
-                          required
-                          counter="11"
-                          maxlength="11"
-                        ></v-text-field>
-                      </v-col> -->
-                      <!-- water_no -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.water_no"
-                          label="เลขผู้ใช้น้ำประปา"
-                          @keypress="isNumber($event)"
-                          clearable
-                          required
-                          counter="4"
-                          maxlength="4"
-                        ></v-text-field>
-                      </v-col> -->
-                      <!-- water_meter_no -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-text-field
-                          v-model="editedItem.water_meter_no"
-                          label="เลขมิเตอร์น้ำประปา"
-                          @keypress="isNumber($event)"
-                          clearable
-                          required
-                          counter="4"
-                          maxlength="4"
-                        ></v-text-field>
-                      </v-col> -->
-                      <!-- room_type -->
-                      <!-- <v-col cols="12" sm="6" md="4">
-                        <v-select
-                          v-model="editedItem.room_type"
-                          :items="room_types"
-                          label="ประเภทห้อง"
-                          clearable
-                          required
-                          :rules="rules.zonesBuildingsRoom"
-                          item-text="name"
-                          item-value="value"
-                        >
-                        </v-select>
-                      </v-col> -->
                     </v-row>
                   </v-form>
                 </v-container>
@@ -378,6 +319,12 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    zoneIds: "",
+    waterZoneIds: "",
+    buildingIds: "",
+    search1: "",
+    search2: "",
+    search3: "",
     zonesDatas: "",
     waterZonesDatas: "",
     buildingDatas: "",
@@ -545,6 +492,18 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
+    search1: function () {
+      this.zoneIds = this.editedItem.zone;
+      this.getWaterZonesdata();
+    },
+    search2: function () {
+      this.waterZoneIds = this.editedItem.water_zone;
+      this.getBuildingsdatas();
+    },
+    search3: function () {
+      this.buildingIds = this.editedItem.building;
+      this.getRoomsdatas();
+    },
   },
   created() {
     this.getRole();
@@ -586,7 +545,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/waterzone", config)
+        .get(
+          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataWaterZones = data.result;
@@ -605,7 +567,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/building", config)
+        .get(
+          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataBuilding = data.result;
@@ -624,7 +589,10 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/building/data/room", config)
+        .get(
+          apiUrl + "/v1/building/data/room" + "?id=" + this.buildingIds,
+          config
+        )
         .then((response) => {
           let data = response.data;
           const dataRoom = data.result;
@@ -873,6 +841,7 @@ export default {
     },
     close() {
       this.dialog = false;
+      this.$refs.formAdduser.reset()
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;

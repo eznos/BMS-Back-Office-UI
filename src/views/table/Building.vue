@@ -44,21 +44,6 @@
                     class="filter"
                   ></v-text-field>
                 </v-col>
-                <!-- search -->
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-                  <v-autocomplete
-                    item-text="name"
-                    item-value="name"
-                    v-model="waterGroupFilterValue"
-                    prepend-icon="mdi-water-circle"
-                    type="text"
-                    label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
-                    clearable
-                    class="filter"
-                    :items="waterZonesData"
-                  >
-                  </v-autocomplete>
-                </v-col>
                 <!-- Filter for  zone-->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-autocomplete
@@ -71,6 +56,21 @@
                     item-text="name"
                     item-value="name"
                     :items="zonesData"
+                  >
+                  </v-autocomplete>
+                </v-col>
+                <!-- water zone filter -->
+                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
+                  <v-autocomplete
+                    item-text="name"
+                    item-value="name"
+                    v-model="waterGroupFilterValue"
+                    prepend-icon="mdi-water-circle"
+                    type="text"
+                    label="ค้นหาด้วยสายมิเตอร์น้ำประปา"
+                    clearable
+                    class="filter"
+                    :items="waterZonesData"
                   >
                   </v-autocomplete>
                 </v-col>
@@ -294,9 +294,7 @@
                   </v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>
-                    <span>{{ formTitle }}</span>
-                  </v-card-title>
+                  <v-card-title> เพิ่มอาคาร </v-card-title>
                   <v-card-text>
                     <v-container>
                       <v-form ref="addBuilding" v-model="valid" lazy-validation>
@@ -310,8 +308,7 @@
                               :items="zonesData"
                               label="เขตพื้นที่"
                               required
-                              @click="getWaterZoneIdForcreateBuilding()"
-                              v-case
+                              :search-input.sync="search1"
                             >
                             </v-autocomplete>
                           </v-col>
@@ -336,28 +333,6 @@
                               required
                             ></v-text-field>
                           </v-col>
-                          <!-- lat -->
-                          <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="lat"
-                              label="ละติจูด"
-                              @keypress="isNumber($event)"
-                              clearable
-                              required
-                              :rules="[rules.latitudeRules.regex]"
-                            ></v-text-field>
-                          </v-col>
-                          <!-- lng -->
-                          <v-col cols="12" sm="6" md="4">
-                            <v-text-field
-                              v-model="lng"
-                              label="ลองจิจูด"
-                              @keypress="isNumber($event)"
-                              clearable
-                              :rules="[rules.longitudeRules.regex]"
-                              required
-                            ></v-text-field>
-                          </v-col>
                         </v-row>
                       </v-form>
                     </v-container>
@@ -365,12 +340,7 @@
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-form ref="form" v-model="valid" lazy-validation>
-                      <v-btn
-                        large
-                        color="error"
-                        text
-                        @click="dialogAddbuilding = false"
-                      >
+                      <v-btn large color="error" text @click="close">
                         ยกเลิก
                       </v-btn>
                       <v-btn
@@ -418,14 +388,14 @@
                               required
                               clearable
                               autofocus
+                              :search-input.sync="search2"
                               :rules="rules.zonesBuildingsRoom"
-                              @click="getwaterDataAutofill()"
                             >
                             </v-autocomplete>
                           </v-col>
                           <!-- water group -->
                           <v-col cols="12" sm="6" md="4">
-                            <v-select
+                            <v-autocomplete
                               v-model="editedItem.waterZone"
                               item-text="name"
                               item-value="id"
@@ -434,9 +404,9 @@
                               required
                               clearable
                               :rules="rules.zonesBuildingsRoom"
-                              @click="getBuildingIdForCreateRoom()"
+                              :search-input.sync="search3"
                             >
-                            </v-select>
+                            </v-autocomplete>
                           </v-col>
                           <!-- building -->
                           <v-col cols="12" sm="6" md="4">
@@ -666,6 +636,10 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    search1: "",
+    search2: "",
+    search3: "",
+    buildingIDs: "",
     waterZoneIds: "",
     zoneIds: "",
     waterIds: "",
@@ -857,6 +831,18 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete();
     },
+    search1: function () {
+      this.zoneIds = this.addZoneInBuilding;
+      this.getWaterZonesdata();
+    },
+    search2: function () {
+      this.zoneIds = this.editedItem.zone;
+      this.getWaterZonesdata();
+    },
+    search3: function () {
+      this.waterZoneIds = this.editedItem.waterZone;
+      this.getBuildingsdatas();
+    },
   },
   created() {
     this.getRole();
@@ -948,8 +934,6 @@ export default {
         zoneId: this.addZoneInBuilding,
         waterZoneId: this.waterZonesDatas,
         name: this.addBuilding,
-        lat: this.lat,
-        lng: this.lng,
       });
       const config = {
         method: "post",
@@ -969,8 +953,6 @@ export default {
           this.snackbar = true;
           this.getBuildingsdatas();
           this.addBuilding = null;
-          this.lat = null;
-          this.lng = null;
         })
         .catch((error) => {
           console.log(error);
@@ -979,26 +961,7 @@ export default {
           this.snackbar = true;
           this.dialogAddbuilding = false;
           this.addBuilding = null;
-          this.lat = null;
-          this.lng = null;
         });
-    },
-    getWaterZoneIdForcreateBuilding() {
-      this.zoneIds = "";
-      this.zoneIds = this.addZoneInBuilding;
-      this.getWaterZonesdata();
-    },
-    getBuildingIdForCreateRoom() {
-      this.waterZoneIds = "";
-      this.waterZoneIds = this.editedItem.waterZone;
-      this.getBuildingsdatas();
-    },
-    getwaterDataAutofill() {
-      if (this.editedItem.zone != null) {
-        this.zoneIds = "";
-        this.zoneIds = this.editedItem.zone;
-        this.getWaterZonesdata();
-      }
     },
     // get zone data for select
     getZonesdata() {
@@ -1337,6 +1300,8 @@ export default {
       this.closeDelete();
     },
     close() {
+      this.dialogAddbuilding = false;
+      this.$refs.addBuilding.reset();
       this.dialog = false;
       this.$refs.formNewdata.resetValidation();
       this.$nextTick(() => {
