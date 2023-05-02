@@ -337,10 +337,10 @@ export default {
       const data = {
         rank: this.rank,
         affiliation: this.affiliation,
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email,
-        phoneNumber: this.phoneNumber,
+        firstName: this.firstName.trim(),
+        lastName: this.lastName.trim(),
+        email: this.email.trim(),
+        phoneNumber: this.phoneNumber.trim(),
         gender: this.defaultGender,
         profileUrl: this.imageURL,
       };

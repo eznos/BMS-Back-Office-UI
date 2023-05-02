@@ -121,8 +121,7 @@ export default {
         },
       };
       axios(config)
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           localStorage.setItem("userEmail", this.email);
           this.$router.push({
             name: "ForgetpasswordRecoverycode",

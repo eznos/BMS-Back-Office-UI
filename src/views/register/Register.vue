@@ -311,21 +311,20 @@ export default {
     },
     async callAPIRegister() {
       const datas = {
-        username: this.username,
-        password: this.password,
-        rank: this.rank,
-        affiliation: this.affiliation,
-        first_name: this.firstName,
-        last_name: this.lastName,
-        gender: this.gender,
-        email: this.email,
-        phone_number: this.phoneNumber,
+        username: this.username.trim(),
+        password: this.password.trim(),
+        rank: this.rank.trim(),
+        affiliation: this.affiliation.trim(),
+        first_name: this.firstName.trim(),
+        last_name: this.lastName.trim(),
+        gender: this.gender.trim(),
+        email: this.email.trim(),
+        phone_number: this.phoneNumber.trim(),
         profile_url: this.imageURL,
       };
       const config = {
         headers: {
           "x-api-key": process.env.apiKey,
-          "Content-Type": "application/json",
         },
       };
       axios

@@ -57,7 +57,6 @@
                     item-text="name"
                     item-value="name"
                     clearable
-
                   >
                   </v-autocomplete>
                 </v-col>
@@ -224,7 +223,7 @@
               >
               <v-card-text>
                 <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
-                <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
+                <v-form ref="formOldBill" v-model="valid" lazy-validation>
                   <v-row>
                     <!-- rank -->
                     <v-col cols="12" sm="6" md="4">
@@ -476,9 +475,24 @@
                 <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
                 <v-form ref="formDiffPrice" v-model="valid" lazy-validation>
                   <v-row>
+                    <!-- zone  -->
+                    <v-col cols="6">
+                      <v-autocomplete
+                        v-model="zoneCalculate"
+                        label="เขตพื้นที่"
+                        prepend-icon="mdi-home-city-outline"
+                        required
+                        :items="zonesData"
+                        :rules="rules.buildingRoom"
+                        item-text="name"
+                        item-value="id"
+                        :search-input.sync="search4"
+                      >
+                      </v-autocomplete>
+                    </v-col>
                     <!-- meter group -->
                     <v-col cols="6">
-                      <v-select
+                      <v-autocomplete
                         v-model="waterGroupCalculate"
                         label="สายมิเตอร์น้ำ"
                         prepend-icon="mdi-home-group"
@@ -487,9 +501,8 @@
                         :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="id"
-                        ref="input"
                       >
-                      </v-select>
+                      </v-autocomplete>
                     </v-col>
                     <!-- meter zone -->
                     <v-col cols="6">
@@ -763,12 +776,14 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    zoneCalculate: "",
     waterZoneIds: "",
     buildingIds: "",
     search1: "",
     search2: "",
     search3: "",
     search4: "",
+    search5: "",
     dateFilter: false,
     dateFilterValue: new Date().toISOString().substr(0, 7),
     GGG: false,
@@ -1003,6 +1018,7 @@ export default {
     dialog(val) {
       val || this.close();
     },
+
     search1: function () {
       this.zoneIds = this.zoneOldbill;
       this.getWaterZonesdata();
@@ -1013,7 +1029,11 @@ export default {
     },
     search3: function () {
       this.buildingIds = this.buildingOldbill;
-      this.getRoomsdatas();
+      this.getNotEmptyRoomsdatas();
+    },
+    search4: function () {
+      this.zoneIds = this.zoneCalculate;
+      this.getWaterZonesdata();
     },
   },
 
@@ -1021,6 +1041,7 @@ export default {
     this.gettoken();
     this.getRole();
     this.getNameForCreateOldBill();
+    console.log(this.waterZonesData);
   },
 
   beforeMount() {
@@ -1170,6 +1191,27 @@ export default {
       return axios
         .get(
           apiUrl + "/v1/building/data/room" + "?id=" + this.buildingIds,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          const dataRoom = data.result;
+          this.roomsData = dataRoom;
+          return this.roomsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getNotEmptyRoomsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/building/data/empty-room" + "?id=" + this.buildingIds,
           config
         )
         .then((response) => {
@@ -1373,8 +1415,8 @@ export default {
     editWaterBilling(unit, billing_cycle) {
       let idwater = "?id=" + this.WaterBillingID;
       const payload = {
-        unit: unit,
-        unitPrice: this.pricePerUnit,
+        unit: unit.trim(),
+        unitPrice: this.pricePerUnit.trim(),
         billing_cycle: billing_cycle,
       };
       var config = {
@@ -1455,6 +1497,7 @@ export default {
     close() {
       this.dialog = false;
       this.differencePriceCalculate = false;
+      this.$refs.formOldBill.resetValidation();
       this.$refs.formDiffPrice.resetValidation();
       this.$refs.formButton.resetValidation();
       this.$refs.formEditwater.resetValidation();

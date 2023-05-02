@@ -1064,11 +1064,11 @@ export default {
         for (var i = 0; i < this.selected.length; i++) {
           roomsIDs.push(this.selected[i].id);
         }
-        if (this.exportExcelBuliding == true) {
+        if (this.exportExcelBuliding === true) {
           this.loader;
           this.exportBuliding(roomsIDs);
         }
-        if (this.exportExcelBuliding == false) {
+        if (this.exportExcelBuliding === false) {
           this.deleteItemSelected(roomsIDs);
         }
       }
@@ -1107,7 +1107,7 @@ export default {
             this.snackbar = true;
             this.exportExcelBuliding = false;
           } else {
-            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.exportExcelBuliding = false;
@@ -1116,9 +1116,7 @@ export default {
     },
     // delete buildibg
     deleteRoom(roomsIDs) {
-      var data = {
-        id: roomsIDs,
-      };
+      var data = { id: roomsIDs };
       var config = {
         method: "delete",
         headers: {
@@ -1133,7 +1131,7 @@ export default {
         .then(() => {
           if (confirm) {
             this.statusAction =
-              "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
+              "ลบข้อมูลห้องพักจำนวน " + this.selected.length + "ห้อง สำเร็จ";
             this.colorSnackbar = "agree";
             this.snackbar = true;
             this.selected = [];
@@ -1146,7 +1144,7 @@ export default {
             this.colorSnackbar = "error";
             this.snackbar = true;
           } else {
-            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             this.snackbar = true;
           }
@@ -1167,9 +1165,9 @@ export default {
         waterZoneId: waterZone,
         zoneId: zone,
         buildingId: building,
-        roomNo: roomNo,
-        waterNo: waterNo,
-        waterMeterNo: waterMeterNo,
+        roomNo: roomNo.trim(),
+        waterNo: waterNo.trim(),
+        waterMeterNo: waterMeterNo.trim(),
         roomType: roomType,
         status: status,
       };
@@ -1204,9 +1202,9 @@ export default {
         waterZoneId: this.editedItem.waterZone.id,
         zoneId: this.editedItem.zone.id,
         buildingId: this.editedItem.building.id,
-        roomNo: this.editedItem.roomNo,
-        waterNo: this.editedItem.waterNo,
-        waterMeterNo: this.editedItem.waterMeterNo,
+        roomNo: this.editedItem.roomNo.trim(),
+        waterNo: this.editedItem.waterNo.trim(),
+        waterMeterNo: this.editedItem.waterMeterNo.trim(),
         roomType: this.editedItem.roomType,
         status: this.editedItem.status,
       };
@@ -1227,12 +1225,12 @@ export default {
         .catch((error) => {
           console.log(error);
           if (error.response.data.status === "unauthorized") {
-            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "error";
             this.snackbar = true;
             this.differencePriceCalculate = false;
           } else {
-            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.differencePriceCalculate = false;
@@ -1301,7 +1299,6 @@ export default {
     },
     close() {
       this.dialogAddbuilding = false;
-      this.$refs.addBuilding.reset();
       this.dialog = false;
       this.$refs.formNewdata.resetValidation();
       this.$nextTick(() => {

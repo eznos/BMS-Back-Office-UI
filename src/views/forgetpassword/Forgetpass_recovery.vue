@@ -198,7 +198,7 @@ export default {
       let payload = {
         type: "RESET",
         recovery_code: this.recoveryCode,
-        password: this.repeatpassword,
+        password: this.repeatpassword.trim(),
       };
       let headerAPI = {
         headers: {

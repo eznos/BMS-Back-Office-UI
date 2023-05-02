@@ -368,6 +368,7 @@ export default {
     rank: "",
     ranks: ranks,
     date: "",
+    residentID: "",
     residentTable: [],
     editedIndex: -1,
     start: 0,
@@ -625,6 +626,7 @@ export default {
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
+            console.log(data);
             this.residentTable = data.result;
             this.loadTable = false;
           }
@@ -638,12 +640,13 @@ export default {
       if (this.selectItems == true) {
         let residentsIDs = [];
         for (var i = 0; i < this.selected.length; i++) {
-          residentsIDs.push(this.selected[i].id);
+          residentsIDs.push(String(this.selected[i].id));
         }
-        if (this.exportExcelResident == true) {
+        console.log(residentsIDs);
+        if (this.exportExcelResident === true) {
           this.exportResident(residentsIDs);
         }
-        if (this.exportExcelResident == false) {
+        if (this.exportExcelResident === false) {
           this.deleteItemSelected(residentsIDs);
         }
       }
@@ -657,7 +660,7 @@ export default {
         waterZoneId: water_zone,
         zoneId: zone,
         buildingId: building,
-        roomNo: roomNo,
+        roomNo: roomNo.trim(),
       };
       let headerAPI = {
         headers: {
@@ -707,7 +710,7 @@ export default {
         waterZoneId: water_zone,
         zoneId: zone,
         buildingId: building,
-        roomNo: roomNo,
+        roomNo: roomNo.trim(),
       };
       var config = {
         headers: {
@@ -779,26 +782,23 @@ export default {
     },
     // delete with api
     deleteResident(residentsIDs) {
+      const data = { id: residentsIDs };
       var config = {
         headers: {
           "x-api-key": process.env.apiKey,
           "x-refresh-token": this.token,
+          "Content-Type": "application/json",
         },
+        data: data,
       };
-      const resident_id = { residents_id: residentsIDs };
-      const residents_id = "?id=" + resident_id;
       return axios
-        .delete(apiUrl + "/v1/delete/resident/" + residents_id, config)
-        .then((response) => {
-          let data = response.data;
-          if (data.status == "success") {
-            this.exportExcelResident = false;
-            this.statusAction =
-              "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
-            this.colorSnackbar = "agree";
-            this.snackbar = true;
-            this.selected = [];
-          }
+        .delete(apiUrl + "/v1/resident/delete", config)
+        .then(() => {
+          this.statusAction =
+            "ลบข้อมูลผู้อยู่อาศัยจำนวน " + this.selected.length + "คน สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+          this.selected = [];
         })
         .catch((error) => {
           console.log(error);
@@ -806,7 +806,10 @@ export default {
             this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
             this.colorSnackbar = "warning";
             this.snackbar = true;
-            this.exportExcelResident = false;
+          } else {
+            this.statusAction = "ลบข้อมูลไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
           }
         });
     },
@@ -841,7 +844,7 @@ export default {
     },
     close() {
       this.dialog = false;
-      this.$refs.formAdduser.reset()
+      this.$refs.formAdduser.reset();
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
@@ -936,7 +939,9 @@ export default {
           const index = this.residentTable.indexOf(this.selected[i]);
           this.residentTable.splice(index, 1);
         }
+        this.residentTable.indexOf(this.selected[0]);
         this.selectItems = false;
+        this.residentID = this.selected.id;
         this.deleteResident(residentsIDs);
       }
     },

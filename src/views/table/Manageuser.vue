@@ -432,7 +432,7 @@ export default {
     editUser(email) {
       let user_ID = "?id=" + this.userID;
       let payload = {
-        email: email,
+        email: email.trim(),
       };
       var config = {
         headers: {
