@@ -35,42 +35,46 @@
             <v-col cols="12" xs="12" sm="12" md="4" lg="4">
               <v-autocomplete
                 v-model="rank"
-                prepend-icon="mdi-map-legend"
                 label="ยศ"
                 class="filter"
                 :items="ranks"
                 clearable
                 item-text="name"
-                item-value="value"
                 :rules="rules.autocomplete"
                 name="rank"
                 autofocus
+                :search-input.sync="findFirstName"
               >
               </v-autocomplete>
             </v-col>
             <!--frist name-->
             <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-              <v-text-field
+              <v-autocomplete
                 v-model="firstName"
+                :items="firstNameList"
                 label="ชื่อ"
                 class="filter"
                 clearable
                 :rules="rules.name"
                 name="firstName"
-                v-on:keyup="checkEnterPressedToSubmit"
-              ></v-text-field>
+                item-text="firstName"
+                item-value="id"
+                :search-input.sync="findLastName"
+              ></v-autocomplete>
             </v-col>
             <!-- last name -->
             <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-              <v-text-field
+              <v-autocomplete
                 v-model="lastName"
                 label="นามสกุล"
                 class="filter"
+                :items="lastNameList"
                 clearable
+                item-text="lastName"
+                item-value="id"
                 name="lastName"
                 :rules="rules.name"
-                v-on:keyup="checkEnterPressedToSubmit"
-              ></v-text-field>
+              ></v-autocomplete>
             </v-col>
             <v-row> </v-row>
             <!-- btn search -->
@@ -185,6 +189,10 @@ import { apiUrl } from "../../utils/url";
 import FileDownload from "js-file-download";
 export default {
   data: () => ({
+    firstNameList: [],
+    lastNameList: [],
+    findFirstName: "",
+    findLastName: "",
     datenow: new Date().toISOString().substr(0, 4),
     firstName: "",
     lastName: "",
@@ -192,10 +200,10 @@ export default {
     snackbar: false,
     statusAction: "",
     colorSnackbar: "",
-    timeout: 2000,
+    timeout: 3500,
     valid: true,
-    loadTable: true,
-    sortBy: "first_name",
+    loadTable: false,
+    sortBy: "created_at",
     sortDesc: false,
     modalAddDate: false,
     modalfilter: false,
@@ -225,23 +233,6 @@ export default {
     },
   }),
   computed: {
-    // headersElectric() {
-    //   return [
-    //     {
-    //       text: "เดือน",
-    //       align: "left",
-    //       value: "created_at",
-    //     },
-    //     {
-    //       text: "จำนวนหน่วย",
-    //       value: "unit",
-    //     },
-    //     {
-    //       text: "ค่าใช้จ่าย",
-    //       value: "total_pay",
-    //     },
-    //   ];
-    // },
     headersWater() {
       return [
         {
@@ -272,10 +263,53 @@ export default {
       ];
     },
   },
-  watch: {},
+  watch: {
+    findFirstName: function () {
+      console.log(this.rank);
+      this.getNameForCreateOldBill();
+    },
+    findLastName: function () {
+      this.getLastNameForCreateOldBill();
+    },
+  },
   created() {},
   mounted() {},
   methods: {
+    getNameForCreateOldBill() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/resident/name" + "?rank=" + this.rank, config)
+        .then((response) => {
+          let data = response.data;
+          this.firstNameList = data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getLastNameForCreateOldBill() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/resident/last-name" + "?id=" + this.firstName,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          this.lastNameList = data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
     async checkEnterPressedToSubmit(e) {
       if (e.keyCode === 13) this.submit();
     },
@@ -298,29 +332,20 @@ export default {
             config
           )
           .then((response) => {
+            console.log(response);
             let data = response.data;
-            if (data.status == "success") {
-              // this.electricHistoryTable =
-              //   data.result.electric.accommodations[0].billings;
-              this.waterHistoryTable =
-                data.result.water.accommodations[0].billings;
-              this.loadTable = false;
-              this.snackbar = true;
-              this.statusAction = "ค้นหาเรียบร้อย";
-              this.colorSnackbar = "agree";
-            }
-            if (data.status == "success no data") {
-              this.loadTable = false;
-              this.snackbar = true;
-              this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
-              this.colorSnackbar = "warning";
-            }
+            this.waterHistoryTable =
+              data.result.water.accommodations[0].billings;
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ค้นหาสำเร็จ";
+            this.colorSnackbar = "agree";
           })
           .catch((error) => {
             this.loadTable = false;
             this.snackbar = true;
-            this.statusAction = "ค้นหาไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
-            this.colorSnackbar = "warning";
+            this.statusAction = "ค้นหาไม่สำเร็จ กรุณากรอกข้อมูลให้ถูกต้อง";
+            this.colorSnackbar = "red";
             console.log(error);
           });
       } catch (error) {

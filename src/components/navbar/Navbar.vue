@@ -49,6 +49,7 @@
               to="/edit"
               tile
               block
+              dark
               color="agree"
             >
               แก้ไขข้อมูลส่วนตัว <v-icon right>mdi-account-edit</v-icon>
@@ -249,11 +250,6 @@ export default {
         icon: "mdi-clipboard-text-clock",
         text: "ภาพรวมการใช้น้ำประปา",
         route: "/history",
-      },
-      {
-        icon: "mdi-history",
-        text: "ประวัติค่าใช้จ่าย",
-        route: "/historyUser",
       },
     ],
     items: [

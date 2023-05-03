@@ -186,7 +186,6 @@
             ></v-text-field>
           </v-responsive>
         </v-form>
-
         <v-btn
           color="green"
           v-if="this.GGG == false"
@@ -219,7 +218,7 @@
             <v-card>
               <v-card-title>
                 <v-icon> mdi-newspaper-plus </v-icon> &nbsp;
-                สร้างบิลของเดือนเก่า</v-card-title
+                สร้างบิลย้อนหลัง</v-card-title
               >
               <v-card-text>
                 <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
@@ -237,6 +236,7 @@
                         :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="name"
+                        :search-input.sync="findFirstName"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -250,7 +250,8 @@
                         clearable
                         :rules="rules.name"
                         item-text="firstName"
-                        item-value="firstName"
+                        item-value="id"
+                        :search-input.sync="findLastName"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -265,66 +266,6 @@
                         :rules="rules.name"
                         item-text="lastName"
                         item-value="lastName"
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <!-- zone -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="zoneOldbill"
-                        label="เขตพื้นที่"
-                        required
-                        :items="zonesData"
-                        :rules="rules.zonesBuildingsRoom"
-                        clearable
-                        item-value="id"
-                        item-text="name"
-                        :search-input.sync="search1"
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <!-- water zone -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="waterZoneOldbill"
-                        required
-                        :items="waterZonesData"
-                        label="สายมิเตอร์น้ำ"
-                        :rules="rules.zonesBuildingsRoom"
-                        clearable
-                        item-text="name"
-                        item-value="id"
-                        :search-input.sync="search2"
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <!-- building -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="buildingOldbill"
-                        label="อาคาร"
-                        required
-                        :items="buildingsData"
-                        item-text="name"
-                        item-value="id"
-                        :rules="rules.zonesBuildingsRoom"
-                        clearable
-                        :search-input.sync="search3"
-                      >
-                      </v-autocomplete>
-                    </v-col>
-                    <!-- room number -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-autocomplete
-                        v-model="roomNoOldbill"
-                        label="เลขห้องพัก"
-                        required
-                        @keypress="isNumber($event)"
-                        :items="roomsData"
-                        :rules="rules.zonesBuildingsRoom"
-                        item-text="roomNo"
-                        item-value="roomNo"
-                        clearable
                       >
                       </v-autocomplete>
                     </v-col>
@@ -436,7 +377,7 @@
               </v-btn>
             </template>
             <v-card>
-              <v-card-title> เพิ่มบิลค่าน้ำในเดือนนี้ </v-card-title>
+              <v-card-title> สร้างบิลเดือนปัจจุบัน </v-card-title>
               <v-card-text></v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -486,7 +427,6 @@
                         :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="id"
-                        :search-input.sync="search4"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -776,14 +716,9 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    findFirstName: "",
+    findLastName: "",
     zoneCalculate: "",
-    waterZoneIds: "",
-    buildingIds: "",
-    search1: "",
-    search2: "",
-    search3: "",
-    search4: "",
-    search5: "",
     dateFilter: false,
     dateFilterValue: new Date().toISOString().substr(0, 7),
     GGG: false,
@@ -992,64 +927,29 @@ export default {
         },
       ];
     },
-    // differencePriceCalculate
-    difference: function () {
-      const sum = this.meterSum;
-      const zone = this.meterZone;
-      const room = this.numberOfroom;
-      if (sum && zone && room) {
-        return ((parseInt(sum) - parseInt(zone)) / parseInt(room)).toFixed(2);
-      } else {
-        return "0.00";
-      }
-    },
-    dessertsLimited() {
-      return this.waterTables.slice(this.start, this.perPage + this.start);
-    },
-    startHeight() {
-      return this.start * this.rowHeight - 32;
-    },
-    endHeight() {
-      return this.rowHeight * (this.waterTables.length - this.start);
-    },
   },
 
   watch: {
     dialog(val) {
       val || this.close();
     },
-
-    search1: function () {
-      this.zoneIds = this.zoneOldbill;
-      this.getWaterZonesdata();
+    findFirstName: function () {
+      console.log(this.rankOldBill);
+      this.getNameForCreateOldBill();
     },
-    search2: function () {
-      this.waterZoneIds = this.waterZoneOldbill;
-      this.getBuildingsdatas();
-    },
-    search3: function () {
-      this.buildingIds = this.buildingOldbill;
-      this.getNotEmptyRoomsdatas();
-    },
-    search4: function () {
-      this.zoneIds = this.zoneCalculate;
-      this.getWaterZonesdata();
+    findLastName: function () {
+      console.log(this.firstNameOldBill);
+      this.getLastNameForCreateOldBill();
     },
   },
 
   created() {
     this.gettoken();
     this.getRole();
-    this.getNameForCreateOldBill();
-    console.log(this.waterZonesData);
   },
 
   beforeMount() {
     this.getWaterData();
-    this.getZonesdata();
-    this.getWaterZonesdata();
-    this.getBuildingsdatas();
-    this.getRoomsdatas();
   },
 
   methods: {
@@ -1069,11 +969,31 @@ export default {
         },
       };
       return axios
-        .get(apiUrl + "/v1/resident/name", config)
+        .get(apiUrl + "/v1/resident/name" + "?rank=" + this.rankOldBill, config)
         .then((response) => {
+          console.log(response);
           let data = response.data;
-          this.firstNameOldBillData = data.result.firstName;
-          this.lastNameOldBillData = data.result.lastName;
+          this.firstNameOldBillData = data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getLastNameForCreateOldBill() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/resident/last-name" + "?id=" + this.firstNameOldBill,
+          config
+        )
+        .then((response) => {
+          console.log(response);
+          let data = response.data;
+          this.lastNameOldBillData = data.result;
         })
         .catch((error) => {
           console.log(error);
@@ -1085,10 +1005,6 @@ export default {
         rank: this.rankOldBill,
         firstName: this.firstNameOldBill,
         lastName: this.lastNameOldBill,
-        zone: this.zoneOldbill,
-        waterZone: this.waterZoneOldbill,
-        building: this.buildingOldbill,
-        roomNo: this.roomNoOldbill,
         date: this.billCycleOldbill,
         unit: this.unitOldbill,
         price: this.priceOldbill,
@@ -1118,112 +1034,6 @@ export default {
         });
     },
     // data for select
-    // get zone data for select
-    getZonesdata() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(apiUrl + "/v1/building/data/zones", config)
-        .then((response) => {
-          let data = response.data;
-          const dataZones = data.result;
-          this.zonesData = dataZones;
-          return this.zonesData;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    // water zone data for select
-    getWaterZonesdata() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(
-          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneIds,
-          config
-        )
-        .then((response) => {
-          let data = response.data;
-          const dataWaterZones = data.result;
-          this.waterZonesData = dataWaterZones;
-          return this.waterZonesData;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    // buildings data for select
-    getBuildingsdatas() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(
-          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
-          config
-        )
-        .then((response) => {
-          let data = response.data;
-          const dataBuilding = data.result;
-          this.buildingsData = dataBuilding;
-          return this.buildingsData;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    // rooms data for select
-    getRoomsdatas() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(
-          apiUrl + "/v1/building/data/room" + "?id=" + this.buildingIds,
-          config
-        )
-        .then((response) => {
-          let data = response.data;
-          const dataRoom = data.result;
-          this.roomsData = dataRoom;
-          return this.roomsData;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
-    getNotEmptyRoomsdatas() {
-      var config = {
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      return axios
-        .get(
-          apiUrl + "/v1/building/data/empty-room" + "?id=" + this.buildingIds,
-          config
-        )
-        .then((response) => {
-          let data = response.data;
-          const dataRoom = data.result;
-          this.roomsData = dataRoom;
-          return this.roomsData;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
     // end of data for select
     // get role
     getRole() {

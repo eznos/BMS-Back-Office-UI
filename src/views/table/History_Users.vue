@@ -30,37 +30,6 @@
       </v-card-title>
       <v-card-text>
         <v-row>
-          <!-- electric -->
-          <!-- <v-col cols="6">
-              <v-data-table
-                v-model="selected"
-                :headers="headersElectric"
-                :items="electricHistoryTable"
-                item-key="first_name"
-                :items-per-page="itemsPerPage"
-                class="elevation-1 pa-6"
-                :loading="loadTable"
-                loading-text="กำลังโหลด... โปรดรอสักครู่"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                @input="enterSelect($event)"
-              >
-                <template v-slot:top>
-                  <h3>ตารางประวัติค่าไฟฟ้า</h3>
-                </template>
-                <template v-slot:item.created_at="{ item }">
-                  <span>{{
-                    new Date(item.created_at).toISOString().substr(0, 7)
-                  }}</span>
-                </template>
-                <template v-slot:[`item.price`]="{ item }">
-                  <v-chip :color="getColor(item.price)">
-                    {{ item.price }}
-                  </v-chip>
-                </template>
-              </v-data-table>
-            </v-col> -->
-          <!-- water -->
           <v-col cols="12">
             <v-data-table
               v-model="selected"
@@ -150,23 +119,6 @@ export default {
     },
   }),
   computed: {
-    // headersElectric() {
-    //   return [
-    //     {
-    //       text: "เดือน",
-    //       align: "left",
-    //       value: "created_at",
-    //     },
-    //     {
-    //       text: "จำนวยหน่วย",
-    //       value: "unit",
-    //     },
-    //     {
-    //       text: "ค่าใช้จ่าย",
-    //       value: "total_pay",
-    //     },
-    //   ];
-    // },
     headersWater() {
       return [
         {
@@ -263,7 +215,7 @@ export default {
           } else {
             this.loadTable = false;
             this.snackbar = true;
-            this.statusAction = "ค้นหาไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "ค้นหาไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             console.log(error);
           }
