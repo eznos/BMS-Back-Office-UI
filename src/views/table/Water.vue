@@ -149,7 +149,7 @@
         </v-expansion-panels>
       </v-card>
     </div>
-    <!-- button and data table --> 
+    <!-- button and data table -->
     <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <!-- title and button -->
       <v-card-title>
@@ -171,7 +171,7 @@
             ></v-text-field>
           </v-responsive>
         </v-form>
-        <v-btn  
+        <v-btn
           color="green"
           v-if="this.GGG == false"
           outlined
@@ -925,14 +925,6 @@ export default {
           value: "accommodations[0].room.roomNo",
         },
         {
-          text: "เลขผู้ใช้น้ำ",
-          value: "accommodations[0].room.waterNo",
-        },
-        {
-          text: "เลขมิเตอร์น้ำ",
-          value: "accommodations[0].room.waterMeterNo",
-        },
-        {
           text: "หน่วยเก่า",
           value: "accommodations[0].billings[0].beforeUnit",
         },
@@ -1014,20 +1006,24 @@ export default {
         data: data,
       };
       axios(config)
-        .then((response) => {
-          console.log(response);
-          this.dialogCreateOldBill = false;
+        .then(() => {
+          this.statusChenge = false;
+          this.statusChanger = ""
+          this.selected = [];
+          this.getWaterData();
           this.snackbar = true;
           this.statusAction = "สร้างบิลค่าน้ำสำเร็จ";
           this.colorSnackbar = "agree";
         })
         .catch((error) => {
-          this.dialogCreateOldBill = false;
+          this.statusChenge = false;
+          this.statusChanger = ""
+          this.selected = [];
           this.snackbar = true;
           this.statusAction = "สร้างบิลค่าน้ำไม่สำเร็จ";
           this.colorSnackbar = "warning";
           console.log(error);
-          this.dialogCreateOldBill = false;
+
         });
     },
     setPrice() {

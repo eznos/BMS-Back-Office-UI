@@ -263,7 +263,6 @@ export default {
   },
   watch: {
     findFirstName: function () {
-      console.log(this.rank);
       this.getNameForCreateOldBill();
     },
     findLastName: function () {
@@ -326,13 +325,21 @@ export default {
           config
         )
         .then((response) => {
-          console.log(response);
           let data = response.data;
-          this.waterHistoryTable = data.result.water.accommodations[0].billings;
-          this.loadTable = false;
-          this.snackbar = true;
-          this.statusAction = "ค้นหาสำเร็จ";
-          this.colorSnackbar = "agree";
+          if (data.result.water == null) {
+            this.waterHistoryTable = [];
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ไม่พบค่าน้ำ";
+            this.colorSnackbar = "warning";
+          } else {
+            this.waterHistoryTable =
+              data.result.water.accommodations[0].billings;
+            this.loadTable = false;
+            this.snackbar = true;
+            this.statusAction = "ค้นหาสำเร็จ";
+            this.colorSnackbar = "agree";
+          }
         })
         .catch((error) => {
           this.loadTable = false;
@@ -341,16 +348,6 @@ export default {
           this.colorSnackbar = "red";
           console.log(error);
         });
-    },
-    // get selected id
-    getbillingsID() {
-      if (this.selectItems == true) {
-        let billingsIDs = [];
-        for (var i = 0; i < this.selected.length; i++) {
-          billingsIDs.push(this.selected[i].id);
-        }
-        this.exportElectric(billingsIDs);
-      }
     },
     // export with api
     exportHistory() {
