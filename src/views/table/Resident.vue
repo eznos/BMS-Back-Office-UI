@@ -697,8 +697,8 @@ export default {
       rank,
       firstName,
       lastName,
-      water_zone,
       zone,
+      water_zone,
       building,
       roomNo
     ) {
@@ -707,8 +707,8 @@ export default {
         rank: rank,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        waterZoneId: water_zone,
         zoneId: zone,
+        waterZoneId: water_zone,
         buildingId: building,
         roomNo: roomNo.trim(),
       };

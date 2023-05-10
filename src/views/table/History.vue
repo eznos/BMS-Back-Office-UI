@@ -56,7 +56,6 @@
                 class="filter"
                 clearable
                 :rules="rules.name"
-                name="firstName"
                 item-text="firstName"
                 item-value="id"
                 :search-input.sync="findLastName"
@@ -72,7 +71,6 @@
                 clearable
                 item-text="lastName"
                 item-value="id"
-                name="lastName"
                 :rules="rules.name"
               ></v-autocomplete>
             </v-col>
@@ -310,47 +308,39 @@ export default {
           console.log(error);
         });
     },
-    async checkEnterPressedToSubmit(e) {
-      if (e.keyCode === 13) this.submit();
-    },
     submit() {
       if (this.$refs.history.validate()) {
         this.getUserHistory();
       }
     },
     // get electric
-    async getUserHistory() {
-      try {
-        let config = {
-          headers: {
-            "x-api-key": process.env.apiKey,
-          },
-        };
-        return axios
-          .get(
-            `${apiUrl}/v1/billings/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
-            config
-          )
-          .then((response) => {
-            console.log(response);
-            let data = response.data;
-            this.waterHistoryTable =
-              data.result.water.accommodations[0].billings;
-            this.loadTable = false;
-            this.snackbar = true;
-            this.statusAction = "ค้นหาสำเร็จ";
-            this.colorSnackbar = "agree";
-          })
-          .catch((error) => {
-            this.loadTable = false;
-            this.snackbar = true;
-            this.statusAction = "ค้นหาไม่สำเร็จ กรุณากรอกข้อมูลให้ถูกต้อง";
-            this.colorSnackbar = "red";
-            console.log(error);
-          });
-      } catch (error) {
-        console.log(error);
-      }
+    getUserHistory() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/billings/history/admin" + "?id=" + this.firstName,
+          config
+        )
+        .then((response) => {
+          console.log(response);
+          let data = response.data;
+          this.waterHistoryTable = data.result.water.accommodations[0].billings;
+          this.loadTable = false;
+          this.snackbar = true;
+          this.statusAction = "ค้นหาสำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch((error) => {
+          this.loadTable = false;
+          this.snackbar = true;
+          this.statusAction = "ค้นหาไม่สำเร็จ กรุณากรอกข้อมูลให้ถูกต้อง";
+          this.colorSnackbar = "red";
+          console.log(error);
+        });
     },
     // get selected id
     getbillingsID() {

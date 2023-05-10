@@ -74,21 +74,6 @@
                   >
                   </v-autocomplete>
                 </v-col>
-                <!-- Filter for  building-->
-                <v-col cols="12" xs="12" sm="12" md="4" lg="4">
-                  <v-autocomplete
-                    v-model="buildingFilterValue"
-                    prepend-icon="mdi-office-building"
-                    label="อาคาร"
-                    class="filter"
-                    :items="buildingsData"
-                    item-text="name"
-                    item-value="name"
-                    clearable
-                  >
-                  </v-autocomplete>
-                </v-col>
-                <!-- filter by date -->
                 <v-col cols="12" xs="12" sm="12" md="4" lg="4">
                   <v-dialog
                     ref="dialog"
@@ -164,7 +149,7 @@
         </v-expansion-panels>
       </v-card>
     </div>
-    <!-- button and data table -->
+    <!-- button and data table --> 
     <v-card class="card-filter px-6 py-6" v-if="role == 'admin'">
       <!-- title and button -->
       <v-card-title>
@@ -186,7 +171,7 @@
             ></v-text-field>
           </v-responsive>
         </v-form>
-        <v-btn
+        <v-btn  
           color="green"
           v-if="this.GGG == false"
           outlined
@@ -221,7 +206,6 @@
                 สร้างบิลย้อนหลัง</v-card-title
               >
               <v-card-text>
-                <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
                 <v-form ref="formOldBill" v-model="valid" lazy-validation>
                   <v-row>
                     <!-- rank -->
@@ -273,7 +257,7 @@
                     <v-col cols="12" sm="6" md="4">
                       <v-dialog
                         ref="dialog"
-                        v-model="modal"
+                        v-model="modal1"
                         persistent
                         width="290px"
                       >
@@ -291,9 +275,10 @@
                           v-model="billCycleOldbill"
                           type="month"
                           locale="th-TH"
+                          :max="new Date().toISOString()"
                         >
                           <v-spacer></v-spacer>
-                          <v-btn text color="warning" @click="modal = false">
+                          <v-btn text color="warning" @click="modal1 = false">
                             ยกเลิก
                           </v-btn>
                           <v-btn
@@ -305,6 +290,28 @@
                           </v-btn>
                         </v-date-picker>
                       </v-dialog>
+                    </v-col>
+                    <!-- before unit -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="beforeUnit"
+                        label="หน่วยเดิม"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
+                    </v-col>
+                    <!-- after unit -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="afterUnit"
+                        label="หน่วยใหม่"
+                        clearable
+                        required
+                        :rules="rules.buildingRoom"
+                        @keypress="isNumber($event)"
+                      ></v-text-field>
                     </v-col>
                     <!-- unit -->
                     <v-col cols="12" sm="6" md="4">
@@ -372,7 +379,13 @@
           <!-- add bills in this month -->
           <v-dialog v-model="dialogAddWater" persistent max-width="25%">
             <template v-slot:activator="{ on, attrs }">
-              <v-btn color="agree" dark v-bind="attrs" v-on="on">
+              <v-btn
+                class="button-filter pt-5 pb-5"
+                color="agree"
+                dark
+                v-bind="attrs"
+                v-on="on"
+              >
                 สร้างบิลเดือนปัจจุบัน
               </v-btn>
             </template>
@@ -404,13 +417,13 @@
                 v-on="{ ...attrs }"
               >
                 <v-icon> mdi-calculator </v-icon>
-                &nbsp; คำนวนค่าน้ำส่วนต่าง
+                &nbsp; คำนวณค่าน้ำส่วนต่าง
               </v-btn>
             </template>
             <v-card>
               <v-card-title>
                 <v-icon> mdi-calculator </v-icon> &nbsp;
-                คำนวนค่าน้ำส่วนต่าง</v-card-title
+                คำนวณค่าน้ำส่วนต่าง</v-card-title
               >
               <v-card-text>
                 <!-- new changed  version ╰(▔∀▔)╯  ╰(▔∀▔)╯ -->
@@ -427,6 +440,7 @@
                         :rules="rules.buildingRoom"
                         item-text="name"
                         item-value="id"
+                        :search-input.sync="search1"
                       >
                       </v-autocomplete>
                     </v-col>
@@ -520,56 +534,42 @@
                           disabled
                         ></v-text-field>
                       </v-col>
-                      <!-- water unit -->
+                      <!-- old unit -->
                       <v-col cols="12" sm="6" md="4">
                         <v-text-field
                           autofocus
-                          v-model="editedItem.unit"
-                          label="หน่วยน้ำ"
+                          v-model="oldUnit"
+                          label="หน่วยน้ำเดือนก่อน"
+                          @keypress="isNumber($event)"
+                          required
+                          suffix="หน่วย"
+                          :rules="rules.buildingRoom"
+                          disabled
+                        ></v-text-field>
+                      </v-col>
+                      <!-- new unit -->
+                      <v-col cols="12" sm="6" md="4">
+                        <v-text-field
+                          autofocus
+                          v-model="editedItem.newUnit"
+                          label="หน่วยน้ำเดือนปัจจุบัน"
                           @keypress="isNumber($event)"
                           required
                           suffix="หน่วย"
                           :rules="rules.buildingRoom"
                         ></v-text-field>
                       </v-col>
-                      <!-- bill pay -->
+                      <!-- water unit -->
                       <v-col cols="12" sm="6" md="4">
-                        <v-dialog
-                          ref="dialog"
-                          v-model="modal"
-                          persistent
-                          width="290px"
+                        <v-autocomplete
+                          v-model="editedItem.status"
+                          label="สถานะ"
+                          required
+                          :items="statuses"
+                          item-text="name"
+                          item-value="value"
                         >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-text-field
-                              v-model="editedItem.billing_cycle"
-                              label="รอบบิล"
-                              prepend-icon="mdi-calendar"
-                              readonly
-                              v-bind="attrs"
-                              v-on="on"
-                            ></v-text-field>
-                          </template>
-                          <v-date-picker
-                            v-model="editedItem.billing_cycle"
-                            type="month"
-                            locale="th-TH"
-                          >
-                            <v-spacer></v-spacer>
-                            <v-btn text color="warning" @click="modal = false">
-                              ยกเลิก
-                            </v-btn>
-                            <v-btn
-                              text
-                              color="agree"
-                              @click="
-                                $refs.dialog.save(editedItem.billing_cycle)
-                              "
-                            >
-                              ยืนยัน
-                            </v-btn>
-                          </v-date-picker>
-                        </v-dialog>
+                        </v-autocomplete>
                       </v-col>
                     </v-row>
                   </v-form>
@@ -593,6 +593,42 @@
                     ยืนยัน
                   </v-btn>
                 </v-form>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <!-- status chenge -->
+          <v-dialog v-model="statusChenge" persistent width="25%">
+            <template v-slot:activator="{ on: attrs }">
+              <v-btn
+                class="button-filter pt-5 pb-5"
+                color="#FB929E"
+                v-on="{ ...attrs }"
+                :disabled="!selectItems"
+              >
+                เปลี่ยนสถานะ
+              </v-btn>
+            </template>
+            <v-card>
+              <v-card-title class="text-h5"> เปลี่ยนสถานะ </v-card-title>
+              <v-card-text>
+                <v-autocomplete
+                  v-model="statusChanger"
+                  label="สถานะ"
+                  :items="statuses"
+                  item-text="name"
+                  item-value="value"
+                  autofocus
+                  required
+                  :rules="rules.buildingRoom"
+                >
+                </v-autocomplete>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="error" text @click="statusChenge = false">
+                  ยกเลิก
+                </v-btn>
+                <v-btn color="agree" text @click="getID()"> ตกลง </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -645,6 +681,9 @@
           id="virtual-scroll-table"
           v-scroll:#virtual-scroll-table="onScroll"
         >
+          <template #item.full_name="{ item }"
+            >{{ item.rank }} {{ item.firstName }} {{ item.lastName }}</template
+          >
           <!-- price color -->
           <template
             v-slot:[`item.accommodations[0].billings[0].total_pay`]="{ item }"
@@ -669,21 +708,24 @@
           <template
             v-slot:[`item.accommodations[0].billings[0].status`]="{ item }"
           >
-            <td v-if="item.accommodations[0].billings[0].status === 'draft'">
-              {{ "ร่าง" }}
+            <td v-if="item.accommodations[0].billings[0].status === 'un_paid'">
+              <v-chip
+                :color="
+                  getColorStatus(item.accommodations[0].billings[0].status)
+                "
+              >
+                {{ "ยังไม่จ่าย" }}
+              </v-chip>
             </td>
-            <td
-              v-if="item.accommodations[0].billings[0].status === 'in_progress'"
-            >
-              {{ "กำลังดำเนินการ" }}
-            </td>
-            <td
-              v-if="item.accommodations[0].billings[0].status === 'calculated'"
-            >
-              {{ "คำนวนแล้ว" }}
-            </td>
-            <td v-if="item.accommodations[0].billings[0].status === 'exported'">
-              {{ "Export แล้ว" }}
+            <td v-if="item.accommodations[0].billings[0].status === 'paid'">
+              <v-chip
+                dark
+                :color="
+                  getColorStatus(item.accommodations[0].billings[0].status)
+                "
+              >
+                {{ "จ่ายแล้ว" }}
+              </v-chip>
             </td>
           </template>
           <!-- editor -->
@@ -716,6 +758,12 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    statusChanger: "",
+    statusChenge: false,
+    beforeUnit: "",
+    afterUnit: "",
+    modal1: "",
+    search1: "",
     findFirstName: "",
     findLastName: "",
     zoneCalculate: "",
@@ -756,7 +804,7 @@ export default {
     sortBy: "first_name",
     menuDatefilter: false,
     sortDesc: false,
-    oldUnit: null,
+    oldUnit: "",
     currentUnit: null,
     selected: [],
     attrs: {},
@@ -797,6 +845,8 @@ export default {
     start: 0,
     rowHeight: 24,
     perPage: 25,
+    zoneIds: "",
+    selectedHeaders: [],
     editedItem: {
       first_name: "",
       zone: "",
@@ -854,19 +904,7 @@ export default {
     // header table
     headers() {
       return [
-        {
-          text: "ยศ",
-          align: "left",
-          value: "rank",
-        },
-        {
-          text: "ชื่อ",
-          value: "firstName",
-        },
-        {
-          text: "นามสกุล",
-          value: "lastName",
-        },
+        { text: "ชื่อ", value: "full_name" },
         {
           text: "เขตพื้นที่",
           value: "accommodations[0].room.zone.name",
@@ -895,8 +933,12 @@ export default {
           value: "accommodations[0].room.waterMeterNo",
         },
         {
-          text: "รอบบิล",
-          value: "accommodations[0].billings[0].created_at",
+          text: "หน่วยเก่า",
+          value: "accommodations[0].billings[0].beforeUnit",
+        },
+        {
+          text: "หน่วยปัจจุบัน",
+          value: "accommodations[0].billings[0].afterUnit",
         },
         {
           text: "จำนวนหน่วย",
@@ -907,7 +949,7 @@ export default {
           value: "accommodations[0].billings[0].price",
         },
         {
-          text: "ค่าน้ำส่วนต่าง",
+          text: "ส่วนต่าง",
           value: "accommodations[0].billings[0].price_diff",
         },
         {
@@ -933,12 +975,14 @@ export default {
     dialog(val) {
       val || this.close();
     },
+    search1: function () {
+      this.zoneIds = this.zoneCalculate;
+      this.getWaterZonesdata();
+    },
     findFirstName: function () {
-      console.log(this.rankOldBill);
       this.getNameForCreateOldBill();
     },
     findLastName: function () {
-      console.log(this.firstNameOldBill);
       this.getLastNameForCreateOldBill();
     },
   },
@@ -946,6 +990,8 @@ export default {
   created() {
     this.gettoken();
     this.getRole();
+    this.getZonesdata();
+    this.getWaterZonesdata();
   },
 
   beforeMount() {
@@ -953,6 +999,37 @@ export default {
   },
 
   methods: {
+    statusesChenge(billingIDs) {
+      var data = {
+        id: billingIDs,
+        status: this.statusChanger,
+      };
+      var config = {
+        method: "post",
+        url: apiUrl + "/v1/billings/water/status-change",
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "x-refresh-token": this.token,
+        },
+        data: data,
+      };
+      axios(config)
+        .then((response) => {
+          console.log(response);
+          this.dialogCreateOldBill = false;
+          this.snackbar = true;
+          this.statusAction = "สร้างบิลค่าน้ำสำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch((error) => {
+          this.dialogCreateOldBill = false;
+          this.snackbar = true;
+          this.statusAction = "สร้างบิลค่าน้ำไม่สำเร็จ";
+          this.colorSnackbar = "warning";
+          console.log(error);
+          this.dialogCreateOldBill = false;
+        });
+    },
     setPrice() {
       this.pricePerUnit = this.defineUnitPrice;
       this.GGG = true;
@@ -961,6 +1038,69 @@ export default {
       this.defineUnitPrice = null;
       this.GGG = false;
       this.$refs.isFormValid.reset();
+    },
+    // get zone data for select
+    getZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/zones", config)
+        .then((response) => {
+          let data = response.data;
+          const dataZones = data.result;
+          this.zonesData = dataZones;
+          return this.zonesData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // water zone data for select
+    getWaterZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneIds,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          const dataWaterZones = data.result;
+          this.waterZonesData = dataWaterZones;
+          return this.waterZonesData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // buildings data for select
+    getBuildingsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          const dataBuilding = data.result;
+          this.buildinsData = dataBuilding;
+          return this.buildinsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     getNameForCreateOldBill() {
       var config = {
@@ -971,7 +1111,6 @@ export default {
       return axios
         .get(apiUrl + "/v1/resident/name" + "?rank=" + this.rankOldBill, config)
         .then((response) => {
-          console.log(response);
           let data = response.data;
           this.firstNameOldBillData = data.result;
         })
@@ -991,7 +1130,6 @@ export default {
           config
         )
         .then((response) => {
-          console.log(response);
           let data = response.data;
           this.lastNameOldBillData = data.result;
         })
@@ -1006,6 +1144,8 @@ export default {
         firstName: this.firstNameOldBill,
         lastName: this.lastNameOldBill,
         date: this.billCycleOldbill,
+        beforeUnit: this.beforeUnit,
+        afterUnit: this.afterUnit,
         unit: this.unitOldbill,
         price: this.priceOldbill,
         priceDiff: this.priceDiffOldBill,
@@ -1024,18 +1164,18 @@ export default {
         .then(() => {
           this.dialogCreateOldBill = false;
           this.snackbar = true;
-          this.statusAction =
-            "สร้างบิลค่าน้ำของเดือน" + this.billCycleOldbill + "สำเร็จ";
+          this.statusAction = "สร้างบิลค่าน้ำสำเร็จ";
           this.colorSnackbar = "agree";
         })
         .catch((error) => {
+          this.dialogCreateOldBill = false;
+          this.snackbar = true;
+          this.statusAction = "สร้างบิลค่าน้ำไม่สำเร็จ";
+          this.colorSnackbar = "warning";
           console.log(error);
           this.dialogCreateOldBill = false;
         });
     },
-    // data for select
-    // end of data for select
-    // get role
     getRole() {
       var role = localStorage.getItem("role");
       this.role = role;
@@ -1057,6 +1197,7 @@ export default {
         .get(apiUrl + "/v1/billings/water" + date, config)
         .then((response) => {
           let data = response.data;
+          console.log(data);
           if (data.status == "success") {
             this.waterTables = [];
             this.loadTable = false;
@@ -1095,20 +1236,24 @@ export default {
           this.snackbar = true;
         })
         .catch((error) => {
-          this.statusAction =
-            "เพิ่มบิลค่าน้ำประปาของรอบ " + this.date_now + " ไม่สำเร็จ";
-          this.colorSnackbar = "warning";
-          this.snackbar = true;
-          this.dialogAddWater = false;
-          console.log(error);
+          if (error.response.data.error_message == "unprocessable_entity") {
+            this.statusAction = "เพิ่มบิลค่าน้ำเดือนนี้ไปแล้ว ";
+            this.colorSnackbar = "warning";
+            this.snackbar = true;
+            this.dialogAddWater = false;
+          } else {
+            this.statusAction =
+              "เพิ่มบิลค่าน้ำประปาของรอบ " + this.date_now + " ไม่สำเร็จ";
+            this.colorSnackbar = "error";
+            this.snackbar = true;
+            this.dialogAddWater = false;
+          }
         });
     },
     // color for status
-    getColorForStatus(status) {
-      if (status === "draft") return "yellow";
-      if (status === "in_progress") return "red";
-      if (status === "calculated") return "gray";
-      else return "green";
+    getColorStatus(status) {
+      if (status == "un_paid") return "error";
+      else return "agree";
     },
     // show delete as selected button
     enterSelect(values) {
@@ -1141,9 +1286,8 @@ export default {
       const zoneID = "?id=" + this.waterGroupCalculate;
       return axios
         .post(apiUrl + "/v1/billings/water/diff" + zoneID, price, config)
-
         .then(() => {
-          this.statusAction = "คำนวนค่าน้ำส่วนต่าง" + "สำเร็จ";
+          this.statusAction = "คำนวณค่าน้ำส่วนต่าง" + "สำเร็จ";
           this.waterGroupCalculate = "";
           this.meterZone = "";
           this.differencePriceCalculate = false;
@@ -1162,7 +1306,7 @@ export default {
           }
           if (error.response.data.status === "unprocessable_entity") {
             this.statusAction =
-              "คำวนวนค่าน้ำส่วนต่าง ไม่สำเร็จ กรุณาเลือกสายมิเตอร์ที่ยังไม่คำนวน";
+              "คำวนวนค่าน้ำส่วนต่าง ไม่สำเร็จ กรุณาเลือกสายมิเตอร์ที่ยังไม่คำนวณ";
             this.colorSnackbar = "warning";
             this.snackbar = true;
           }
@@ -1177,6 +1321,16 @@ export default {
           billingsIDs.push(this.selected[i].id);
         }
         this.exportWater(billingsIDs);
+      }
+    },
+    getID() {
+      if (this.selectItems == true) {
+        const billingIDs = [];
+        for (let i = 0; i < this.selected.length; i++) {
+          billingIDs.push(this.selected[i].accommodations[0].billings[0].id);
+        }
+        console.log(billingIDs);
+        this.statusesChenge(billingIDs);
       }
     },
     // export with api
@@ -1222,12 +1376,13 @@ export default {
         });
     },
     // edit billing via API
-    editWaterBilling(unit, billing_cycle) {
+    editWaterBilling() {
       let idwater = "?id=" + this.WaterBillingID;
       const payload = {
-        unit: unit.trim(),
+        oldUnit: this.oldUnit,
+        newUnit: this.editedItem.newUnit,
         unitPrice: this.pricePerUnit.trim(),
-        billing_cycle: billing_cycle,
+        status: this.editedItem.status,
       };
       var config = {
         headers: {
@@ -1299,6 +1454,7 @@ export default {
       return value === this.stateFilterValue;
     },
     editItem(item) {
+      this.oldUnit = item.accommodations[0].billings[0].beforeUnit;
       this.editedIndex = this.waterTables.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
@@ -1320,7 +1476,8 @@ export default {
       if (this.editedIndex > -1) {
         Object.assign(this.waterTables[this.editedIndex], this.editedItem);
         this.editWaterBilling(
-          this.editedItem.unit,
+          this.editedItem.newUnit,
+          this.oldUnit,
           this.editedItem.price,
           this.editedItem.status,
           this.editedItem.billing_cycle

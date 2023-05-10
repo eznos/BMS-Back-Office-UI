@@ -47,9 +47,9 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าน้ำประปา</h3>
               </template>
-              <template v-slot:item.updated_at="{ item }">
+              <template v-slot:item.created_at="{ item }">
                 <span>{{
-                  new Date(item.updated_at).toISOString().substr(0, 7)
+                  new Date(item.created_at).toISOString().substr(0, 7)
                 }}</span>
               </template>
               <!-- color of price on datatable  -->
@@ -81,6 +81,7 @@ import { apiUrl } from "../../utils/url";
 import FileDownload from "js-file-download";
 export default {
   data: () => ({
+    id: "",
     datenow: new Date().toISOString().substr(0, 4),
     firstName: "",
     lastName: "",
@@ -124,7 +125,7 @@ export default {
         {
           text: "เดือน",
           align: "left",
-          value: "updated_at",
+          value: "created_at",
         },
         {
           text: "หน่วย",
@@ -157,9 +158,11 @@ export default {
   mounted() {},
   methods: {
     getUserData() {
+      const id = localStorage.getItem("id");
       var rank = localStorage.getItem("rank");
       var firstName = localStorage.getItem("first_name");
       var lastName = localStorage.getItem("last_name");
+      this.id = id;
       this.rank = rank;
       this.firstName = firstName;
       this.lastName = lastName;
@@ -180,10 +183,7 @@ export default {
         },
       };
       return axios
-        .get(
-          `${apiUrl}/v1/billings/history?&firstName=${this.firstName}&lastName=${this.lastName}&rank=${this.rank}`,
-          config
-        )
+        .get(`${apiUrl}/v1/billings/history?&id=${this.id}`, config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {

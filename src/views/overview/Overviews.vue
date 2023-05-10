@@ -45,20 +45,27 @@
       <!-- info card -->
       <div class="space">
         <v-row>
-          <!-- resident number -->
-          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+          <!-- zone -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="4">
             <v-card elevation="6" class="rounded-lg">
               <v-list-item>
-                <v-list-item-avatar>
-                  <v-sheet>
-                    <v-icon color="#3EDBF0" large>mdi-face-man-shimmer</v-icon>
-                  </v-sheet>
-                </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="text-right mb-3">จำนวนผู้อยู่อาศัยรวม</div>
                   <v-list-item-title class="headline mb-3 text-right">
-                    <div class="font">{{ this.total }} คน</div>
+                    <v-autocomplete
+                      v-model="zoneId"
+                      label="พื้นที่"
+                      :items="zones"
+                      item-text="name"
+                      item-value="id"
+                      :search-input.sync="zone"
+                    ></v-autocomplete>
                   </v-list-item-title>
+                  <div class="font" v-if="this.sumOfZones === null">
+                    {{ 0 }} บาท
+                  </div>
+                  <div class="font" v-if="this.sumOfZones != null">
+                    {{ this.sumOfZones }} บาท
+                  </div>
                   <div>
                     <v-divider></v-divider>
                   </div>
@@ -66,20 +73,27 @@
               </v-list-item>
             </v-card>
           </v-col>
-          <!-- empty room -->
-          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+          <!-- water zone -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="4">
             <v-card elevation="6" class="rounded-lg">
               <v-list-item>
-                <v-list-item-avatar>
-                  <v-sheet>
-                    <v-icon color="#04009A" large>mdi-room-service</v-icon>
-                  </v-sheet>
-                </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="text-right mb-3">จำนวนห้องว่าง</div>
                   <v-list-item-title class="headline mb-3 text-right">
-                    <div class="font">{{ this.empty }} ห้อง</div>
+                    <v-autocomplete
+                      v-model="waterZoneIds"
+                      label="สายมิเตอร์"
+                      :items="waterZonesData"
+                      item-text="name"
+                      item-value="id"
+                      :search-input.sync="waterZone"
+                    ></v-autocomplete>
                   </v-list-item-title>
+                  <div class="font" v-if="this.sumOfwaterZone === null">
+                    {{ 0 }} บาท
+                  </div>
+                  <div class="font" v-if="this.sumOfwaterZone != null">
+                    {{ this.sumOfwaterZone }} บาท
+                  </div>
                   <div>
                     <v-divider></v-divider>
                   </div>
@@ -87,43 +101,27 @@
               </v-list-item>
             </v-card>
           </v-col>
-          <!-- resodent enter in month -->
-          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
+          <!-- building -->
+          <v-col cols="12" xs="12" sm="6" md="6" lg="4">
             <v-card elevation="6" class="rounded-lg">
               <v-list-item>
-                <v-list-item-avatar>
-                  <v-sheet>
-                    <v-icon color="green" large>mdi-location-enter</v-icon>
-                  </v-sheet>
-                </v-list-item-avatar>
                 <v-list-item-content>
-                  <div class="text-right mb-3">
-                    จำนวนผู้เข้าพักอาศัยเดือนนี้
-                  </div>
                   <v-list-item-title class="headline mb-3 text-right">
-                    <div class="font">{{ move_in }} คน</div>
+                    <v-autocomplete
+                      v-model="buildingId"
+                      label="อาคาร"
+                      :items="buildinsData"
+                      item-text="name"
+                      item-value="id"
+                      :search-input.sync="building"
+                    ></v-autocomplete>
                   </v-list-item-title>
-                  <div>
-                    <v-divider></v-divider>
+                  <div class="font" v-if="this.sumOfBuilding === null">
+                    {{ 0 }} บาท
                   </div>
-                </v-list-item-content>
-              </v-list-item>
-            </v-card>
-          </v-col>
-          <!-- resident exit -->
-          <v-col cols="12" xs="12" sm="6" md="6" lg="3">
-            <v-card elevation="6" class="rounded-lg">
-              <v-list-item>
-                <v-list-item-avatar>
-                  <v-sheet>
-                    <v-icon color="red" large>mdi mdi-exit-run</v-icon>
-                  </v-sheet>
-                </v-list-item-avatar>
-                <v-list-item-content>
-                  <div class="text-right mb-3">จำนวนผู้ย้ายออกเดือนนี้</div>
-                  <v-list-item-title class="headline mb-3 text-right">
-                    <div class="font">{{ move_out }} คน</div>
-                  </v-list-item-title>
+                  <div class="font" v-if="this.sumOfBuilding != null">
+                    {{ this.sumOfBuilding }} บาท
+                  </div>
                   <div>
                     <v-divider></v-divider>
                   </div>
@@ -155,26 +153,6 @@
             </v-card>
           </div>
         </v-col>
-        <!-- <v-col cols="12" xs="12" sm="12" md="6" lg="6">
-          <div> -->
-        <!-- electric -->
-        <!-- <v-card elevation="6" class="card-chart rounded-lg">
-              <v-card-title>
-                <div class="mx-auto">
-                  <v-icon size="35px" color="#FDFC15"
-                    >mdi-lightning-bolt-circle</v-icon
-                  >
-                  ค่าไฟฟ้า
-                </div>
-              </v-card-title>
-              <v-card-actions>
-                <div class="chart-responsive" :style="{ padding: 10 }">
-                  <canvas id="electric" width="900" height="350"></canvas>
-                </div>
-              </v-card-actions>
-            </v-card> -->
-        <!-- </div>
-        </v-col> -->
       </v-row>
     </div>
     <v-snackbar v-model="snackbar" :timeout="timeout" :color="colorSnackbar">
@@ -195,15 +173,25 @@ export default {
   mounted() {
     // this.chartElectric();
     this.chartWater();
-    this.getInfoDataCard();
   },
   data() {
     return {
-      // myApiKey:process.env.API_KEY,
+      sumOfZones: "",
+      sumOfwaterZone: "",
+      sumOfBuilding: "",
+      zoneId: "",
+      waterZoneIds: "",
+      buildingId: "",
+      zone: "",
+      waterZone: "",
+      building: "",
+      zones: [],
+      waterZonesData: [],
+      buildinsData: [],
       snackbar: false,
       statusAction: "",
       colorSnackbar: "",
-      timeout: 2000,
+      timeout: 2500,
       role: "",
       infoCardSelect: [],
       infoCardSelects: infoCardSelects,
@@ -219,29 +207,91 @@ export default {
       },
     };
   },
+  watch: {
+    zone: function () {
+      this.getSumZone();
+      this.getWaterZonesdata();
+    },
+    waterZone: function () {
+      this.getSumWaterZone();
+      this.getBuildingsdatas();
+    },
+    building: function () {
+      this.getSumBuilding();
+    },
+  },
   created() {
+    this.getZonesdata();
     this.getRole();
   },
   methods: {
-    getInfoDataCard() {
+    getSumZone() {
       var config = {
+        method: "get",
+        url: apiUrl + "/v1/overviews/sum-zone" + "?id=" + this.zoneId,
         headers: {
           "x-api-key": process.env.apiKey,
         },
       };
-      axios
-        .get(apiUrl + "/v1/overviews/overviews", config)
+      axios(config)
         .then((response) => {
-          let data = response.data;
-          if (data.status === "success") {
-            this.total = data.result.billings.info.numberOfResident;
-            this.empty = data.result.billings.info.numberOfRoom;
-            this.move_out = data.result.billings.info.numberOfExitInMount;
-            this.move_in = data.result.billings.info.numberOfComeInMonth;
-          }
+          console.log(response);
+          this.sumOfZones = response.data.result.sum;
+          this.snackbar = true;
+          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
+          this.colorSnackbar = "agree";
         })
-        .catch((error) => {
+        .catch(function (error) {
           console.log(error);
+          this.snackbar = true;
+          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
+          this.colorSnackbar = "red";
+        });
+    },
+    // sumOfBuilding
+    getSumWaterZone() {
+      var config = {
+        method: "get",
+        url:
+          apiUrl + "/v1/overviews/sum-water-zone" + "?id=" + this.waterZoneIds,
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      axios(config)
+        .then((response) => {
+          this.sumOfwaterZone = response.data.result.sum;
+          this.snackbar = true;
+          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch(function (error) {
+          console.log(error);
+          this.snackbar = true;
+          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
+          this.colorSnackbar = "red";
+        });
+    },
+    getSumBuilding() {
+      var config = {
+        method: "get",
+        url: apiUrl + "/v1/overviews/sum-building" + "?id=" + this.buildingId,
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      axios(config)
+        .then((response) => {
+          this.sumOfBuilding = response.data.result.sum;
+          this.snackbar = true;
+          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
+          this.colorSnackbar = "agree";
+        })
+        .catch(function (error) {
+          console.log(error);
+          this.snackbar = true;
+          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
+          this.colorSnackbar = "red";
         });
     },
     chartWater() {
@@ -256,7 +306,6 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             return new Chart(water, {
-              type: "bar",
               data: {
                 labels: [
                   "มกราคม",
@@ -274,6 +323,7 @@ export default {
                 ],
                 datasets: [
                   {
+                    type: "bar",
                     label: "ส่วนกลาง",
                     data: [
                       data.result.billings.zone.Center.jan,
@@ -290,9 +340,9 @@ export default {
                       data.result.billings.zone.Center.dec,
                     ],
                     backgroundColor: "#8CFFD5",
-                    borderWidth: 1,
                   },
                   {
+                    type: "bar",
                     label: "สุรนารายณ์",
                     data: [
                       data.result.billings.zone.Suranarai.jan,
@@ -311,6 +361,7 @@ export default {
                     backgroundColor: "#F86D6D",
                   },
                   {
+                    type: "bar",
                     label: "อัษฎางค์",
                     data: [
                       data.result.billings.zone.Asadang.jan,
@@ -330,6 +381,7 @@ export default {
                   },
                 ],
               },
+
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -368,157 +420,6 @@ export default {
           console.log(error);
         });
     },
-    // chartElectric() {
-    //   var config = {
-    //     headers: {
-    //       "x-api-key": "xxx-api-key",
-    //       "x-refresh-token": "xxx-refresh-token",
-    //     },
-    //   };
-    //   axios
-    //     .get(apiUrl + "/v1/overviews", config)
-    //     .then((response) => {
-    //       let data = response.data;
-    //       if (data.status == "success") {
-    //         var electric = document.getElementById("electric");
-    //         return new Chart(electric, {
-    //           type: "bar",
-    //           data: {
-    //             labels: [
-    //               "มกราคม",
-    //               "กุมภาพันธ์",
-    //               "มีนาคม",
-    //               "เมษายน",
-    //               "พฤษภาคม ",
-    //               "มิถุนายน ",
-    //               "กรกฎาคม",
-    //               "สิงหาคม",
-    //               "กันยายน",
-    //               "ตุลาคม",
-    //               "พฤศจิกายน",
-    //               "ธันวาคม",
-    //             ],
-    //             datasets: [
-    //               {
-    //                 label: "ส่วนกลาง",
-    //                 data: [
-    //                   data.result.summary.billings.electricity.zones.center.jan,
-    //                   data.result.summary.billings.electricity.zones.center.feb,
-    //                   data.result.summary.billings.electricity.zones.center.mar,
-    //                   data.result.summary.billings.electricity.zones.center.apr,
-    //                   data.result.summary.billings.electricity.zones.center.may,
-    //                   data.result.summary.billings.electricity.zones.center.jun,
-    //                   data.result.summary.billings.electricity.zones.center.jul,
-    //                   data.result.summary.billings.electricity.zones.center.aug,
-    //                   data.result.summary.billings.electricity.zones.center.sep,
-    //                   data.result.summary.billings.electricity.zones.center.oct,
-    //                   data.result.summary.billings.electricity.zones.center.nov,
-    //                   data.result.summary.billings.electricity.zones.center.dec,
-    //                 ],
-    //                 backgroundColor: "#8CFFD5",
-    //                 borderWidth: 1,
-    //               },
-    //               {
-    //                 label: "มหาชัย",
-    //                 data: [
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .jan,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .feb,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .mar,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .apr,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .may,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .jun,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .jul,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .aug,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .sep,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .oct,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .nov,
-    //                   data.result.summary.billings.electricity.zones.suranarai
-    //                     .dec,
-    //                 ],
-    //                 backgroundColor: "#F86D6D",
-    //               },
-    //               {
-    //                 label: "อัษฎางค์",
-    //                 data: [
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .jan,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .feb,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .mar,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .apr,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .may,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .jun,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .jul,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .aug,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .sep,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .oct,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .nov,
-    //                   data.result.summary.billings.electricity.zones.angtadang
-    //                     .dec,
-    //                 ],
-    //                 backgroundColor: "#2E36F0",
-    //               },
-    //             ],
-    //           },
-    //           options: {
-    //             responsive: true,
-    //             maintainAspectRatio: false,
-    //             locale: "th-TH",
-    //             layout: {
-    //               padding: 15,
-    //             },
-    //             legend: {
-    //               position: "top", // place legend on the right side of chart
-    //               plugins: {
-    //                 labels: {
-    //                   font: {
-    //                     size: 20,
-    //                     family: "Sarabun",
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //             scales: {
-    //               xAxes: [
-    //                 {
-    //                   stacked: true, // this should be set to make the bars stacked
-    //                 },
-    //               ],
-    //               yAxes: [
-    //                 {
-    //                   stacked: true, // this also..
-    //                 },
-    //               ],
-    //             },
-    //           },
-    //         });
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       console.log(error);
-    //     });
-    // },
-
     // export with api
     exportOverview() {
       var config = {
@@ -548,6 +449,69 @@ export default {
     getRole() {
       var role = localStorage.getItem("role");
       this.role = role;
+    },
+    // get zone data for select
+    getZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/zones", config)
+        .then((response) => {
+          let data = response.data;
+          const dataZones = data.result;
+          this.zones = dataZones;
+          return this.zones;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // water zone data for select
+    getWaterZonesdata() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/building/data/waterzone" + "?id=" + this.zoneId,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          const dataWaterZones = data.result;
+          this.waterZonesData = dataWaterZones;
+          return this.waterZonesData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    // buildings data for select
+    getBuildingsdatas() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl + "/v1/building/data/building" + "?id=" + this.waterZoneIds,
+          config
+        )
+        .then((response) => {
+          let data = response.data;
+          const dataBuilding = data.result;
+          this.buildinsData = dataBuilding;
+          return this.buildinsData;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
   },
 };
