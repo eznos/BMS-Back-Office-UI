@@ -503,6 +503,7 @@ export default {
     },
     search3: function () {
       this.buildingIds = this.editedItem.building;
+      this.checkEmptyRooms();
       this.getRoomsdatas();
     },
   },
@@ -518,6 +519,36 @@ export default {
     this.getRoomsdatas();
   },
   methods: {
+    checkEmptyRooms() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(
+          apiUrl +
+            "/v1/building/data/check-empty-room" +
+            "?id=" +
+            this.buildingIds,
+          config
+        )
+        .then(async () => {})
+        .catch((error) => {
+          console.log(error.response.data.error_message);
+          if (error.response.data.error_message == "no room available") {
+            this.statusAction = "ไม่มีห้องพัก";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          } else {
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
+            this.colorSnackbar = "red";
+            this.snackbar = true;
+            this.differencePriceCalculate = false;
+          }
+        });
+    },
     // data for select
     // get zone data for select
     getZonesdata() {
@@ -686,7 +717,7 @@ export default {
             this.isLogin = false;
             console.log(error.response.data.error_message);
           } else {
-            this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ ผู้จัดทำ";
+            this.loginFail = "มีบางอย่างผิดพลาด กรุณาติดต่อ เจ้าหน้าที่";
             this.isLogin = false;
             console.log(error.response.data.error_message);
           }
@@ -727,12 +758,12 @@ export default {
           console.log(error);
           if (error.response.data.status === "unauthorized") {
             this.getResidentData();
-            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "warning";
             this.snackbar = true;
             this.differencePriceCalculate = false;
           } else {
-            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "แก้ไขข้อมูล ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.differencePriceCalculate = false;
@@ -773,7 +804,7 @@ export default {
             this.snackbar = true;
             this.exportExcelResident = false;
           } else {
-            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
+            this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
             this.colorSnackbar = "red";
             this.snackbar = true;
             this.exportExcelResident = false;

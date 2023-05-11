@@ -4,11 +4,6 @@
       <!-- title and export button -->
       <v-row justify="space-between" class="px-3">
         <div class="mb-4">
-          <!-- <v-row style="align-items: center">
-            <div class="ml-3 mt-2">
-              <h2>ภาพรวม</h2>
-            </div>
-          </v-row> -->
         </div>
         <!-- export data -->
         <div v-if="role === 'admin'">
@@ -215,6 +210,7 @@ export default {
     waterZone: function () {
       this.getSumWaterZone();
       this.getBuildingsdatas();
+      this.chartWaterZoneChart();
     },
     building: function () {
       this.getSumBuilding();
@@ -248,7 +244,6 @@ export default {
           this.colorSnackbar = "red";
         });
     },
-    // sumOfBuilding
     getSumWaterZone() {
       var config = {
         method: "get",
@@ -420,6 +415,7 @@ export default {
           console.log(error);
         });
     },
+
     // export with api
     exportOverview() {
       var config = {

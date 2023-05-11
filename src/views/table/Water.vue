@@ -1008,22 +1008,22 @@ export default {
       axios(config)
         .then(() => {
           this.statusChenge = false;
-          this.statusChanger = ""
+          this.statusChanger = "";
           this.selected = [];
           this.getWaterData();
           this.snackbar = true;
-          this.statusAction = "สร้างบิลค่าน้ำสำเร็จ";
+          this.statusAction = "แก้ไขสถานะบิลสำเร็จ";
           this.colorSnackbar = "agree";
         })
         .catch((error) => {
           this.statusChenge = false;
-          this.statusChanger = ""
+          this.statusChanger = "";
           this.selected = [];
+          this.getWaterData();
           this.snackbar = true;
-          this.statusAction = "สร้างบิลค่าน้ำไม่สำเร็จ";
+          this.statusAction = "แก้ไขสถานะบิลไม่สำเร็จ";
           this.colorSnackbar = "warning";
           console.log(error);
-
         });
     },
     setPrice() {
