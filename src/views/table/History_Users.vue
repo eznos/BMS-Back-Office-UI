@@ -183,7 +183,7 @@ export default {
         },
       };
       return axios
-        .get(`${apiUrl}/v1/billings/history?&id=${this.id}`, config)
+        .get(`${apiUrl}/v1/billings/history?id=${this.id}`, config)
         .then((response) => {
           let data = response.data;
           if (data.status == "success") {
