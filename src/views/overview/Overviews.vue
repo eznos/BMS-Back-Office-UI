@@ -3,8 +3,7 @@
     <div class="pa-3 content background-main">
       <!-- title and export button -->
       <v-row justify="space-between" class="px-3">
-        <div class="mb-4">
-        </div>
+        <div class="mb-4"></div>
         <!-- export data -->
         <div v-if="role === 'admin'">
           <v-dialog
@@ -147,7 +146,7 @@ export default {
   },
   created() {
     this.getZonesdata();
-    this. chartWaterUnit();
+    this.chartWaterUnit();
     this.getRole();
   },
   methods: {
@@ -231,7 +230,7 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             return new Chart(water, {
-              type: 'bar',
+              type: "bar",
               data: {
                 labels: [
                   "มกราคม",
@@ -249,7 +248,6 @@ export default {
                 ],
                 datasets: [
                   {
-                    
                     label: "ส่วนกลาง",
                     data: [
                       data.result.billings.zone.Center.jan,
@@ -268,7 +266,6 @@ export default {
                     backgroundColor: "#8CFFD5",
                   },
                   {
-        
                     label: "สุรนารายณ์",
                     data: [
                       data.result.billings.zone.Suranarai.jan,
@@ -287,7 +284,6 @@ export default {
                     backgroundColor: "#F86D6D",
                   },
                   {
-                    
                     label: "อัษฎางค์",
                     data: [
                       data.result.billings.zone.Asadang.jan,
@@ -358,7 +354,7 @@ export default {
           let data = response.data;
           if (data.status == "success") {
             return new Chart(waterUnit, {
-              type: 'bar',
+              type: "bar",
               data: {
                 labels: [
                   "มกราคม",
@@ -376,7 +372,6 @@ export default {
                 ],
                 datasets: [
                   {
-                    
                     label: "ส่วนกลาง",
                     data: [
                       data.result.billings.zone.Center.jan,
@@ -395,7 +390,6 @@ export default {
                     backgroundColor: "#8CFFD5",
                   },
                   {
-        
                     label: "สุรนารายณ์",
                     data: [
                       data.result.billings.zone.Suranarai.jan,
@@ -414,7 +408,6 @@ export default {
                     backgroundColor: "#F86D6D",
                   },
                   {
-                    
                     label: "อัษฎางค์",
                     data: [
                       data.result.billings.zone.Asadang.jan,

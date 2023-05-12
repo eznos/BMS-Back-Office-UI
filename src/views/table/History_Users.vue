@@ -63,6 +63,18 @@
                   {{ item.unit }}
                 </v-chip>
               </template>
+              <template v-slot:[`item.status`]="{ item }">
+                <td v-if="item.status === 'un_paid'">
+                  <v-chip :color="getColorStatus(item.status)">
+                    {{ "ยังไม่จ่าย" }}
+                  </v-chip>
+                </td>
+                <td v-if="item.status === 'paid'">
+                  <v-chip :color="getColorStatus(item.status)">
+                    {{ "จ่ายแล้ว" }}
+                  </v-chip>
+                </td>
+              </template>
             </v-data-table>
           </v-col>
         </v-row>
@@ -145,6 +157,11 @@ export default {
         {
           text: "ค่าใช้จ่ายรวม",
           value: "total_pay",
+          align: "left",
+        },
+        {
+          text: "สถานะ",
+          value: "status",
           align: "left",
         },
       ];
@@ -293,6 +310,10 @@ export default {
     // sort by name
     toggleOrder() {
       this.sortDesc = !this.sortDesc;
+    },
+    getColorStatus(status) {
+      if (status == "un_paid") return "error";
+      else return "agree";
     },
   },
 };
