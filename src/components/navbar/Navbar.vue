@@ -192,7 +192,7 @@
       <template v-slot:append>
         <div class="pa-2">
           <v-btn
-            href="https://forms.gle/pMfAwXNhktJNUu4SA"
+            href="https://forms.gle/kBqXn6jiQiAtiQHY8"
             target="_blank"
             color="#262A56"
             block
@@ -266,11 +266,6 @@ export default {
       },
     ],
     linksUser: [
-      {
-        icon: "mdi-chart-arc",
-        text: "ภาพรวม",
-        route: "/overview",
-      },
       {
         icon: "mdi-history",
         text: "ประวัติค่าใช้จ่าย",

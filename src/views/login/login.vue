@@ -143,7 +143,7 @@ export default {
               localStorage.setItem("id", this.user_id);
               sessionStorage.setItem("refreshToken", this.refreshToken);
               this.$router.push({
-                name: "overview",
+                name: "History_user",
               });
             } else {
               this.rank = data.result.rank;

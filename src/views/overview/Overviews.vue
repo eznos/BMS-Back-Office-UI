@@ -130,94 +130,13 @@ export default {
       },
     };
   },
-  watch: {
-    zone: function () {
-      this.getSumZone();
-      this.getWaterZonesdata();
-    },
-    waterZone: function () {
-      this.getSumWaterZone();
-      this.getBuildingsdatas();
-      this.chartWaterZoneChart();
-    },
-    building: function () {
-      this.getSumBuilding();
-    },
-  },
+  watch: {},
   created() {
     this.getZonesdata();
     this.chartWaterUnit();
     this.getRole();
   },
   methods: {
-    getSumZone() {
-      var config = {
-        method: "get",
-        url: apiUrl + "/v1/overviews/sum-zone" + "?id=" + this.zoneId,
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      axios(config)
-        .then((response) => {
-          console.log(response);
-          this.sumOfZones = response.data.result.sum;
-          this.snackbar = true;
-          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
-          this.colorSnackbar = "agree";
-        })
-        .catch(function (error) {
-          console.log(error);
-          this.snackbar = true;
-          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
-          this.colorSnackbar = "red";
-        });
-    },
-    getSumWaterZone() {
-      var config = {
-        method: "get",
-        url:
-          apiUrl + "/v1/overviews/sum-water-zone" + "?id=" + this.waterZoneIds,
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      axios(config)
-        .then((response) => {
-          this.sumOfwaterZone = response.data.result.sum;
-          this.snackbar = true;
-          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
-          this.colorSnackbar = "agree";
-        })
-        .catch(function (error) {
-          console.log(error);
-          this.snackbar = true;
-          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
-          this.colorSnackbar = "red";
-        });
-    },
-    getSumBuilding() {
-      var config = {
-        method: "get",
-        url: apiUrl + "/v1/overviews/sum-building" + "?id=" + this.buildingId,
-        headers: {
-          "x-api-key": process.env.apiKey,
-        },
-      };
-      axios(config)
-        .then((response) => {
-          this.sumOfBuilding = response.data.result.sum;
-          this.snackbar = true;
-          this.statusAction = "ค้นหาสำเร็จ สำเร็จ";
-          this.colorSnackbar = "agree";
-        })
-        .catch(function (error) {
-          console.log(error);
-          this.snackbar = true;
-          this.statusAction = "ค้นหา ไม่สำเร็จกรุณาติดต่อเจ้าหน้าที่";
-          this.colorSnackbar = "red";
-        });
-    },
     chartWater() {
       var config = {
         headers: {

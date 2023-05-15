@@ -35,7 +35,7 @@
               v-model="selected"
               :headers="headersWater"
               :items="waterHistoryTable"
-              item-key="first_name"
+              item-key="created_at"
               :items-per-page="itemsPerPage"
               class="elevation-1 pa-6"
               :loading="loadTable"
@@ -47,9 +47,9 @@
               <template v-slot:top>
                 <h3>ตารางประวัติค่าน้ำประปา</h3>
               </template>
-              <template v-slot:item.created_at="{ item }">
+              <template v-slot:item.createdAt="{ item }">
                 <span>{{
-                  new Date(item.created_at).toISOString().substr(0, 7)
+                  new Date(item.createdAt).toISOString().substr(0, 7)
                 }}</span>
               </template>
               <!-- color of price on datatable  -->
@@ -70,12 +70,50 @@
                   </v-chip>
                 </td>
                 <td v-if="item.status === 'paid'">
-                  <v-chip :color="getColorStatus(item.status)">
+                  <v-chip dark :color="getColorStatus(item.status)">
                     {{ "จ่ายแล้ว" }}
                   </v-chip>
                 </td>
               </template>
             </v-data-table>
+          </v-col>
+          <v-col cols="12">
+            <v-card elevation="6" class="card-chart rounded-lg">
+              <v-card-title>
+                <v-row>
+                  <v-col cols="6">
+                    <div class="mx-auto">
+                      <v-icon size="35px" color="#29DEFF"
+                        >mdi-water-circle</v-icon
+                      >
+                      ค่าใช้จ่าย
+                    </div>
+                  </v-col>
+                  <v-col cols="6">
+                    <div class="mx-auto">
+                      <v-icon size="35px" color="#ed473b"
+                        >mdi-water-circle</v-icon
+                      >
+                      จำนวนหน่วย
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-card-title>
+              <v-card-actions>
+                <v-row>
+                  <v-col cols="6">
+                    <div class="chart-responsive" :style="{ padding: -20 }">
+                      <canvas id="water" width="600" height="350"></canvas>
+                    </div>
+                  </v-col>
+                  <v-col cols="6">
+                    <div class="chart-responsive" :style="{ padding: -20 }">
+                      <canvas id="Unit" width="600" height="350"></canvas>
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-card-actions>
+            </v-card>
           </v-col>
         </v-row>
       </v-card-text>
@@ -87,7 +125,9 @@
     </v-card>
   </v-app>
 </template>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+import Chart from "chart.js";
 import axios from "axios";
 import { apiUrl } from "../../utils/url";
 import FileDownload from "js-file-download";
@@ -95,6 +135,7 @@ export default {
   data: () => ({
     id: "",
     datenow: new Date().toISOString().substr(0, 4),
+    chartData: [],
     firstName: "",
     lastName: "",
     rank: "",
@@ -105,7 +146,7 @@ export default {
     timeout: 2000,
     valid: true,
     loadTable: true,
-    sortBy: "first_name",
+    sortBy: "created_at",
     sortDesc: false,
     modalAddDate: false,
     modalfilter: false,
@@ -137,7 +178,7 @@ export default {
         {
           text: "เดือน",
           align: "left",
-          value: "created_at",
+          value: "createdAt",
         },
         {
           text: "หน่วย",
@@ -151,12 +192,12 @@ export default {
         },
         {
           text: "ค่าน้ำส่วนต่าง",
-          value: "price_diff",
+          value: "priceDiff",
           align: "left",
         },
         {
           text: "ค่าใช้จ่ายรวม",
-          value: "total_pay",
+          value: "totalPay",
           align: "left",
         },
         {
@@ -171,6 +212,8 @@ export default {
   created() {
     this.getUserData();
     this.getUserHistory();
+    // this.getUserHistoryAgain();
+    // this.chartUser();
   },
   mounted() {},
   methods: {
@@ -206,12 +249,136 @@ export default {
           if (data.status == "success") {
             // this.electricHistoryTable =
             //   data.result.electric.accommodations[0].billings;
-            this.waterHistoryTable =
-              data.result.water.accommodations[0].billings;
+            this.waterHistoryTable = data.result.water;
+            this.chartData = data.result.water;
             this.loadTable = false;
             this.snackbar = true;
             this.statusAction = "ค้นหาเรียบร้อย";
             this.colorSnackbar = "agree";
+            const unit = [];
+            for (let i = 0; i < data.result.water.length; i++) {
+              unit.push(data.result.water[i].totalPay);
+            }
+            const units = [];
+            for (let i = 0; i < data.result.water.length; i++) {
+              units.push(data.result.water[i].unit);
+            }
+            new Chart(water, {
+              type: "bar",
+              data: {
+                labels: [
+                  "มกราคม",
+                  "กุมภาพันธ์",
+                  "มีนาคม",
+                  "เมษายน",
+                  "พฤษภาคม ",
+                  "มิถุนายน ",
+                  "กรกฎาคม",
+                  "สิงหาคม",
+                  "กันยายน",
+                  "ตุลาคม",
+                  "พฤศจิกายน",
+                  "ธันวาคม",
+                ],
+                datasets: [
+                  {
+                    label: "ค่าน้ำประปา",
+                    data: unit,
+                    backgroundColor: "#8CFFD5",
+                  },
+                ],
+              },
+
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "th-TH",
+                layout: {
+                  padding: 15,
+                },
+                legend: {
+                  position: "top", // place legend on the right side of chart
+                  plugins: {
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Sarabun",
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  xAxes: [
+                    {
+                      stacked: false, // this should be set to make the bars stacked
+                    },
+                  ],
+                  yAxes: [
+                    {
+                      stacked: false, // this also..
+                    },
+                  ],
+                },
+              },
+            });
+            new Chart(Unit, {
+              type: "line",
+              data: {
+                labels: [
+                  "มกราคม",
+                  "กุมภาพันธ์",
+                  "มีนาคม",
+                  "เมษายน",
+                  "พฤษภาคม ",
+                  "มิถุนายน ",
+                  "กรกฎาคม",
+                  "สิงหาคม",
+                  "กันยายน",
+                  "ตุลาคม",
+                  "พฤศจิกายน",
+                  "ธันวาคม",
+                ],
+                datasets: [
+                  {
+                    label: "ค่าน้ำประปา",
+                    data: units,
+                    borderColor: "#ed473b",
+                  },
+                ],
+              },
+
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                locale: "th-TH",
+                layout: {
+                  padding: 15,
+                },
+                legend: {
+                  position: "top", // place legend on the right side of chart
+                  plugins: {
+                    labels: {
+                      font: {
+                        size: 20,
+                        family: "Sarabun",
+                      },
+                    },
+                  },
+                },
+                scales: {
+                  xAxes: [
+                    {
+                      stacked: false, // this should be set to make the bars stacked
+                    },
+                  ],
+                  yAxes: [
+                    {
+                      stacked: false, // this also..
+                    },
+                  ],
+                },
+              },
+            });
           }
           if (data.status == "success no data") {
             this.loadTable = false;
@@ -237,6 +404,165 @@ export default {
             console.log(error);
           }
         });
+    },
+    // getUserHistoryAgain() {
+    //   let config = {
+    //     headers: {
+    //       "x-api-key": process.env.apiKey,
+    //     },
+    //   };
+    //   return axios
+    //     .get(`${apiUrl}/v1/billings/history?id=${this.id}`, config)
+    //     .then((response) => {
+    //       let data = response.data;
+    //       if (data.status == "success") {
+    //         const units = [];
+    //         for (let i = 0; i < data.result.water.length; i++) {
+    //           units.push(data.result.water[i].unit);
+    //         }
+    //         return new Chart(unit, {
+    //           type: "line",
+    //           data: {
+    //             labels: [
+    //               "มกราคม",
+    //               "กุมภาพันธ์",
+    //               "มีนาคม",
+    //               "เมษายน",
+    //               "พฤษภาคม ",
+    //               "มิถุนายน ",
+    //               "กรกฎาคม",
+    //               "สิงหาคม",
+    //               "กันยายน",
+    //               "ตุลาคม",
+    //               "พฤศจิกายน",
+    //               "ธันวาคม",
+    //             ],
+    //             datasets: [
+    //               {
+    //                 label: "ค่าน้ำประปา",
+    //                 data: units,
+    //                 backgroundColor: "#ed473b",
+    //               },
+    //             ],
+    //           },
+
+    //           options: {
+    //             responsive: true,
+    //             maintainAspectRatio: false,
+    //             locale: "th-TH",
+    //             layout: {
+    //               padding: 15,
+    //             },
+    //             legend: {
+    //               position: "top", // place legend on the right side of chart
+    //               plugins: {
+    //                 labels: {
+    //                   font: {
+    //                     size: 20,
+    //                     family: "Sarabun",
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //             scales: {
+    //               xAxes: [
+    //                 {
+    //                   stacked: false, // this should be set to make the bars stacked
+    //                 },
+    //               ],
+    //               yAxes: [
+    //                 {
+    //                   stacked: false, // this also..
+    //                 },
+    //               ],
+    //             },
+    //           },
+    //         });
+    //       }
+    //       if (data.status == "success no data") {
+    //         this.loadTable = false;
+    //         this.snackbar = true;
+    //         this.statusAction = "ไม่พบผู้อยู่อาศัย กรุณาค้นหาใหม่";
+    //         this.colorSnackbar = "warning";
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       if (
+    //         error ==
+    //         "TypeError: Cannot read properties of null (reading 'accommodations')"
+    //       ) {
+    //         this.loadTable = false;
+    //         this.snackbar = true;
+    //         this.statusAction = "ไม่พบบิล";
+    //         this.colorSnackbar = "warning";
+    //       } else {
+    //         this.loadTable = false;
+    //         this.snackbar = true;
+    //         this.statusAction = "ค้นหาไม่สำเร็จ กรุณาติดต่อเจ้าหน้าที่";
+    //         this.colorSnackbar = "red";
+    //         console.log(error);
+    //       }
+    //     });
+    // },
+    chartUser() {
+      data = this.chartData;
+      new Chart(chartUsers, {
+        type: "bar",
+        data: {
+          labels: [
+            "มกราคม",
+            "กุมภาพันธ์",
+            "มีนาคม",
+            "เมษายน",
+            "พฤษภาคม ",
+            "มิถุนายน ",
+            "กรกฎาคม",
+            "สิงหาคม",
+            "กันยายน",
+            "ตุลาคม",
+            "พฤศจิกายน",
+            "ธันวาคม",
+          ],
+          datasets: [
+            {
+              label: "ส่วนกลาง",
+              data: [data],
+              backgroundColor: "#8CFFD5",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          locale: "th-TH",
+          layout: {
+            padding: 15,
+          },
+          legend: {
+            position: "top", // place legend on the right side of chart
+            plugins: {
+              labels: {
+                font: {
+                  size: 20,
+                  family: "Sarabun",
+                },
+              },
+            },
+          },
+          scales: {
+            xAxes: [
+              {
+                stacked: false, // this should be set to make the bars stacked
+              },
+            ],
+            yAxes: [
+              {
+                stacked: false, // this also..
+              },
+            ],
+          },
+        },
+      });
     },
     // get selected id
     getbillingsID() {
