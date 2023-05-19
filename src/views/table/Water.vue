@@ -684,16 +684,6 @@
           <template #item.full_name="{ item }"
             >{{ item.rank }} {{ item.firstName }} {{ item.lastName }}</template
           >
-          <!-- price color -->
-          <template
-            v-slot:[`item.accommodations[0].billings[0].total_pay`]="{ item }"
-          >
-            <v-chip
-              :color="getColor(item.accommodations[0].billings[0].total_pay)"
-            >
-              {{ item.accommodations[0].billings[0].total_pay }}
-            </v-chip>
-          </template>
           <!-- date format -->
           <template
             v-slot:[`item.accommodations[0].billings[0].created_at`]="{ item }"

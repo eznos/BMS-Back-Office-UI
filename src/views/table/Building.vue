@@ -158,6 +158,386 @@
             </v-btn>
             <v-spacer></v-spacer>
             <div>
+              <!-- edit zone building water zone -->
+              <v-dialog v-model="editZoneBuildings" persistent max-width="45%">
+                <template v-slot:activator="{ on: attrs }">
+                  <v-btn
+                    color="#482121"
+                    dark
+                    v-on="{ ...attrs }"
+                    class="button-filter pt-5 pb-5"
+                  >
+                    <v-icon> mdi-notebook-edit-outline </v-icon>
+                    &nbsp; แก้ไขพื้นที่และอิ่น ๆ
+                  </v-btn>
+                </template>
+                <v-card>
+                  <v-card-title> แก้ไขพื้นที่และอื่น ๆ </v-card-title>
+                  <v-card-text>
+                    <div>
+                      <v-expansion-panels variant="popout" class="my-4">
+                        <!-- zone -->
+                        <v-expansion-panel>
+                          <v-expansion-panel-header>
+                            แก้ไขหรือลบพื้นที่
+                          </v-expansion-panel-header>
+                          <!-- content -->
+                          <v-expansion-panel-content>
+                            <!-- edit -->
+                            <v-dialog
+                              v-model="editZoneTableData"
+                              persistent
+                              max-width="45%"
+                            >
+                              <v-card>
+                                <v-card-title> แก้ไขพื้นที่ </v-card-title>
+                                <v-card-text>
+                                  <v-container>
+                                    <v-form
+                                      ref="formEditZones"
+                                      v-model="valid"
+                                      lazy-validation
+                                    >
+                                      <v-row>
+                                        <!-- zone -->
+                                        <v-text-field
+                                          v-model="editZones.zone"
+                                          label="เขตพื้นที่"
+                                          required
+                                          clearable
+                                          autofocus
+                                          :rules="rules.zonesBuildingsRoom"
+                                        ></v-text-field>
+                                      </v-row>
+                                    </v-form>
+                                  </v-container>
+                                </v-card-text>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-form
+                                    ref="form"
+                                    v-model="valid"
+                                    lazy-validation
+                                  >
+                                    <v-btn
+                                      large
+                                      color="error"
+                                      text
+                                      @click="editZoneTableData = false"
+                                    >
+                                      ยกเลิก
+                                    </v-btn>
+                                    <v-btn
+                                      large
+                                      color="agree"
+                                      :disabled="!valid"
+                                      text
+                                      @click="editZonesSubmit"
+                                    >
+                                      ยืนยัน
+                                    </v-btn>
+                                  </v-form>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <!-- delete -->
+                            <v-dialog
+                              v-model="deleteZoneDialog"
+                              persistent
+                              max-width="45%"
+                            >
+                              <v-card>
+                                <v-card-title> ลบพื้นที่ </v-card-title>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-form
+                                    ref="form"
+                                    v-model="valid"
+                                    lazy-validation
+                                  >
+                                    <v-btn
+                                      large
+                                      color="error"
+                                      text
+                                      @click="deleteZoneDialog = false"
+                                    >
+                                      ยกเลิก
+                                    </v-btn>
+                                    <v-btn
+                                      large
+                                      color="agree"
+                                      :disabled="!valid"
+                                      text
+                                      @click="deleteZonesSubmit"
+                                    >
+                                      ยืนยัน
+                                    </v-btn>
+                                  </v-form>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <!-- data table -->
+                            <v-data-table
+                              :headers="zonesDataTable"
+                              :items="zonesDataTables"
+                              class="elevation-1"
+                            >
+                              <template v-slot:[`item.actions`]="{ item }">
+                                <v-icon @click="editZones(item)">
+                                  mdi-pencil
+                                </v-icon>
+                                <v-icon @click="deleteZone(item)">
+                                  mdi-delete
+                                </v-icon>
+                              </template>
+                            </v-data-table>
+                          </v-expansion-panel-content>
+                        </v-expansion-panel>
+                        <!-- water zone -->
+                        <v-expansion-panel>
+                          <v-expansion-panel-header>
+                            แก้ไขหรือลบพื้นที่น้ำ
+                          </v-expansion-panel-header>
+                          <!-- content -->
+                          <v-expansion-panel-content>
+                            <!--  -->
+                            <!-- edit -->
+                            <v-dialog
+                              v-model="editWaterZoneDialog"
+                              persistent
+                              max-width="45%"
+                            >
+                              <v-card>
+                                <v-card-title>
+                                  แก้ไขสายมิเตอร์น้ำ
+                                </v-card-title>
+                                <v-card-text>
+                                  <v-container>
+                                    <v-form
+                                      ref="formEditZones"
+                                      v-model="valid"
+                                      lazy-validation
+                                    >
+                                      <v-row>
+                                        <!-- zone -->
+                                        <v-text-field
+                                          v-model="editWaterZone.waterZone"
+                                          label="สายมิเตอร์น้ำ"
+                                          required
+                                          clearable
+                                          autofocus
+                                          :rules="rules.zonesBuildingsRoom"
+                                        ></v-text-field>
+                                      </v-row>
+                                    </v-form>
+                                  </v-container>
+                                </v-card-text>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-form
+                                    ref="form"
+                                    v-model="valid"
+                                    lazy-validation
+                                  >
+                                    <v-btn
+                                      large
+                                      color="error"
+                                      text
+                                      @click="editWaterZoneDialog = false"
+                                    >
+                                      ยกเลิก
+                                    </v-btn>
+                                    <v-btn
+                                      large
+                                      color="agree"
+                                      :disabled="!valid"
+                                      text
+                                      @click="editWaterZoneSubmit"
+                                    >
+                                      ยืนยัน
+                                    </v-btn>
+                                  </v-form>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <!-- delete -->
+                            <v-dialog
+                              v-model="deleteWaterZoneDialog"
+                              persistent
+                              max-width="45%"
+                            >
+                              <v-card>
+                                <v-card-title> ลบสายมิเตอร์น้ำ </v-card-title>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-form
+                                    ref="form"
+                                    v-model="valid"
+                                    lazy-validation
+                                  >
+                                    <v-btn
+                                      large
+                                      color="error"
+                                      text
+                                      @click="deleteWaterZoneDialog = false"
+                                    >
+                                      ยกเลิก
+                                    </v-btn>
+                                    <v-btn
+                                      large
+                                      color="agree"
+                                      text
+                                      @click="deleteWaterZoneSubmit"
+                                    >
+                                      ยืนยัน
+                                    </v-btn>
+                                  </v-form>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <v-data-table
+                              :headers="waterZonesDataTable"
+                              :items="waterZonesDataTables"
+                              class="elevation-1"
+                            >
+                              <template v-slot:[`item.actions`]="{ item }">
+                                <v-icon @click="editWaterZone(item)">
+                                  mdi-pencil
+                                </v-icon>
+                                <v-icon @click="deleteWaterZone(item)">
+                                  mdi-delete
+                                </v-icon>
+                              </template>
+                            </v-data-table>
+                          </v-expansion-panel-content>
+                        </v-expansion-panel>
+                        <!-- building -->
+                        <v-expansion-panel>
+                          <v-expansion-panel-header>
+                            แก้ไขหรือลบอาคาร
+                          </v-expansion-panel-header>
+                          <!-- content -->
+                          <v-expansion-panel-content>
+                            <!-- edit -->
+                            <v-dialog
+                              v-model="buildingTableEdit"
+                              persistent
+                              max-width="75%"
+                            >
+                              <v-card>
+                                <v-card-title> แก้ไขอาคาร </v-card-title>
+                                <v-card-text>
+                                  <v-container>
+                                    <v-form
+                                      ref="formEditZones"
+                                      v-model="valid"
+                                      lazy-validation
+                                    >
+                                      <v-row>
+                                        <!-- zone -->
+                                        <v-text-field
+                                          v-model="editBuildingZone.building"
+                                          label="อาคาร"
+                                          required
+                                          clearable
+                                          autofocus
+                                          :rules="rules.zonesBuildingsRoom"
+                                        ></v-text-field>
+                                      </v-row>
+                                    </v-form>
+                                  </v-container>
+                                </v-card-text>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-form
+                                    ref="form"
+                                    v-model="valid"
+                                    lazy-validation
+                                  >
+                                    <v-btn
+                                      large
+                                      color="error"
+                                      text
+                                      @click="editWaterZoneDialog = false"
+                                    >
+                                      ยกเลิก
+                                    </v-btn>
+                                    <v-btn
+                                      large
+                                      color="agree"
+                                      :disabled="!valid"
+                                      text
+                                      @click="editBuildingSubmit"
+                                    >
+                                      ยืนยัน
+                                    </v-btn>
+                                  </v-form>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <!-- delete -->
+                            <v-dialog
+                              v-model="deleteBuildingDialog"
+                              persistent
+                              max-width="45%"
+                            >
+                              <v-card>
+                                <v-card-title> ลบอาคาร </v-card-title>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-btn
+                                    large
+                                    color="error"
+                                    text
+                                    @click="deleteWaterZoneDialog = false"
+                                  >
+                                    ยกเลิก
+                                  </v-btn>
+                                  <v-btn
+                                    large
+                                    color="agree"
+                                    text
+                                    @click="deleteBuildingSubmit"
+                                  >
+                                    ยืนยัน
+                                  </v-btn>
+                                </v-card-actions>
+                              </v-card>
+                            </v-dialog>
+                            <v-data-table
+                              :headers="buildingsDataTable"
+                              :items="buildingsDataTables"
+                              class="elevation-1"
+                            >
+                              <template v-slot:[`item.actions`]="{ item }">
+                                <v-icon @click="editBuildingZone(item)">
+                                  mdi-pencil
+                                </v-icon>
+                                <v-icon @click="deleteBuilding(item)">
+                                  mdi-delete
+                                </v-icon>
+                              </template>
+                            </v-data-table>
+                          </v-expansion-panel-content>
+                        </v-expansion-panel>
+                      </v-expansion-panels>
+                    </div>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-form ref="form" v-model="valid" lazy-validation>
+                      <v-btn
+                        large
+                        color="error"
+                        text
+                        @click="editZoneBuildings = false"
+                      >
+                        ยกเลิก
+                      </v-btn>
+                    </v-form>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
               <!-- add zone -->
               <v-dialog v-model="dialogAddZone" persistent max-width="40%">
                 <template v-slot:activator="{ on: attrs }">
@@ -636,6 +1016,19 @@ import FileDownload from "js-file-download";
 export default {
   components: { NotFound },
   data: () => ({
+    zoneIdEdit: "",
+    waterZoneIdEdit: "",
+    buildingIdEdit: "",
+    deleteBuildingDialog: false,
+    buildingTableEdit: false,
+    editWaterZoneDialog: false,
+    deleteWaterZoneDialog: false,
+    deleteZoneDialog: false,
+    editZoneTableData: false,
+    editZoneBuildings: false,
+    zonesDataTables: [],
+    waterZonesDataTables: [],
+    buildingsDataTables: [],
     search1: "",
     search2: "",
     search3: "",
@@ -817,6 +1210,49 @@ export default {
         },
       ];
     },
+    zonesDataTable() {
+      return [
+        {
+          text: "เขตพื้นที่",
+          value: "name",
+          filter: this.zoneFilter,
+        },
+        {
+          text: "จัดการ",
+          value: "actions",
+          align: "center",
+          sortable: false,
+        },
+      ];
+    },
+    waterZonesDataTable() {
+      return [
+        {
+          text: "เขตพื้นที่น้ำ",
+          value: "name",
+        },
+        {
+          text: "แก้ไข",
+          value: "actions",
+          align: "center",
+          sortable: false,
+        },
+      ];
+    },
+    buildingsDataTable() {
+      return [
+        {
+          text: "อาคาร",
+          value: "name",
+        },
+        {
+          text: "แก้ไข",
+          value: "actions",
+          align: "center",
+          sortable: false,
+        },
+      ];
+    },
     startHeight() {
       return this.start * this.rowHeight - 32;
     },
@@ -853,6 +1289,8 @@ export default {
     this.getZonesdata();
     this.getWaterZonesdata();
     this.getBuildingsdatas();
+    this.getWaterZonesdataTable();
+    this.getBuildingdataTable();
   },
   methods: {
     createZone() {
@@ -919,6 +1357,7 @@ export default {
           this.snackbar = true;
           this.getWaterZonesdata();
           this.addWaterZone = null;
+          this.getWaterZonesdataTable();
         })
         .catch((error) => {
           console.log(error);
@@ -953,6 +1392,7 @@ export default {
           this.snackbar = true;
           this.getBuildingsdatas();
           this.addBuilding = null;
+          this.getBuildingdataTable();
         })
         .catch((error) => {
           console.log(error);
@@ -976,7 +1416,7 @@ export default {
           let data = response.data;
           const dataZones = data.result;
           this.zonesData = dataZones;
-          return this.zonesData;
+          this.zonesDataTables = dataZones;
         })
         .catch((error) => {
           console.log(error);
@@ -1024,6 +1464,227 @@ export default {
         })
         .catch((error) => {
           console.log(error);
+        });
+    },
+
+    getWaterZonesdataTable() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/water-zone-table", config)
+        .then((response) => {
+          let data = response.data;
+          this.waterZonesDataTables = data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getBuildingdataTable() {
+      var config = {
+        headers: {
+          "x-api-key": process.env.apiKey,
+        },
+      };
+      return axios
+        .get(apiUrl + "/v1/building/data/building-table", config)
+        .then((response) => {
+          let data = response.data;
+          this.buildingsDataTables = data.result;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    //edit zone
+    editZonesSubmit() {
+      let data = JSON.stringify({
+        name: this.editZones.zone,
+      });
+      let config = {
+        method: "patch",
+        url:
+          apiUrl +
+          "/v1/building/buildings/edit-zone" +
+          "?id=" +
+          this.zoneIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+      return axios(config)
+        .then(() => {
+          this.getZonesdata();
+          this.editZoneTableData = false;
+          this.statusAction = "แก้ไขพื้นที่สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.statusAction = "แก้ไขพื่นที่ไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
+        });
+    },
+    // delete zone
+    deleteZonesSubmit() {
+      let config = {
+        method: "delete",
+        url:
+          apiUrl +
+          "/v1/building/buildings/delete-zone" +
+          "?id=" +
+          this.zoneIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+      };
+      return axios(config)
+        .then(() => {
+          this.getZonesdata();
+          this.deleteZoneDialog = false;
+          this.statusAction = "ลบพื่นที่สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.statusAction = "ลบพื่นที่ไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
+        });
+    },
+    //  edit water zone
+    editWaterZoneSubmit() {
+      let data = JSON.stringify({
+        name: this.editWaterZone.waterZone,
+      });
+      let config = {
+        method: "patch",
+        url:
+          apiUrl +
+          "/v1/building/buildings/edit-water-zone" +
+          "?id=" +
+          this.waterZoneIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+      return axios(config)
+        .then(() => {
+          this.getWaterZonesdataTable();
+          this.editWaterZoneDialog = false;
+          this.statusAction = "แก้ไขสายมิเตอร์สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.editWaterZoneDialog = false;
+          this.statusAction = "แก้ไขสายมิเตอร์ไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
+        });
+    },
+    deleteWaterZoneSubmit() {
+      let config = {
+        method: "delete",
+        url:
+          apiUrl +
+          "/v1/building/buildings/delete-water-zone" +
+          "?id=" +
+          this.waterZoneIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+      };
+      return axios(config)
+        .then(() => {
+          this.getWaterZonesdataTable();
+          this.deleteWaterZoneDialog = false;
+          this.statusAction = "ลบสายมิเตอร์สำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.deleteWaterZoneDialog = false;
+          this.statusAction = "ลบสายมิเตอร์ไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
+        });
+    },
+    // edit building
+    editBuildingSubmit() {
+      let data = JSON.stringify({
+        name: this.editBuildingZone.building,
+      });
+      let config = {
+        method: "patch",
+        url:
+          apiUrl +
+          "/v1/building/buildings/edit-building" +
+          "?id=" +
+          this.buildingIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+        data: data,
+      };
+      return axios(config)
+        .then(() => {
+          this.getBuildingdataTable();
+          this.buildingTableEdit = false;
+          this.statusAction = "แก้ไขอาคารสำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          this.buildingTableEdit = false;
+          this.statusAction = "แก้ไขอาคารไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
+          console.log(error);
+        });
+    },
+    deleteBuildingSubmit() {
+      let config = {
+        method: "delete",
+        url:
+          apiUrl +
+          "/v1/building/buildings/delete-building" +
+          "?id=" +
+          this.buildingIdEdit,
+        headers: {
+          "x-api-key": process.env.apiKey,
+          "Content-Type": "application/json",
+        },
+      };
+      return axios(config)
+        .then(() => {
+          this.getBuildingdataTable();
+          this.deleteBuildingDialog = false;
+          this.statusAction = "ลบอาคารสำเร็จ";
+          this.colorSnackbar = "agree";
+          this.snackbar = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.deleteBuildingDialog = false;
+          this.statusAction = "ลบอาคารไม่สำเร็จ";
+          this.colorSnackbar = "red";
+          this.snackbar = true;
         });
     },
     // get refreshToken
@@ -1293,6 +1954,31 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
+    editZones(item) {
+      this.zoneIdEdit = item.id;
+      this.editZoneTableData = true;
+    },
+    deleteZone(item) {
+      this.zoneIdEdit = item.id;
+      this.deleteZoneDialog = true;
+    },
+    editWaterZone(item) {
+      this.waterZoneIdEdit = item.id;
+      this.editWaterZoneDialog = true;
+    },
+    deleteWaterZone(item) {
+      this.waterZoneIdEdit = item.id;
+      this.deleteWaterZoneDialog = true;
+    },
+    editBuildingZone(item) {
+      this.buildingIdEdit = item.id;
+      this.buildingTableEdit = true;
+    },
+    deleteBuilding(item) {
+      this.buildingIdEdit = item.id;
+      console.log(item.id);
+      this.deleteBuildingDialog = true;
+    },
     deleteItemConfirm() {
       this.buildingTable.splice(this.editedIndex, 1);
       this.closeDelete();
@@ -1318,7 +2004,6 @@ export default {
         this.save();
       }
     },
-    // create room or update room
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.buildingTable[this.editedIndex], this.editedItem);
@@ -1353,7 +2038,6 @@ export default {
         this.colorSnackbar = "agree";
         this.$refs.formNewdata.resetValidation();
       }
-
       this.close();
     },
     // clear input filter

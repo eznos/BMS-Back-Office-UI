@@ -322,7 +322,7 @@ export default {
               },
             });
             new Chart(Unit, {
-              type: "line",
+              type: "bar",
               data: {
                 labels: [
                   "มกราคม",
@@ -342,7 +342,7 @@ export default {
                   {
                     label: "ค่าน้ำประปา",
                     data: units,
-                    borderColor: "#ed473b",
+                    backgroundColor: "#ed473b",
                   },
                 ],
               },
