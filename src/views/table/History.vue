@@ -175,7 +175,7 @@
                   </v-chip>
                 </td>
                 <td v-if="item.status === 'paid'">
-                  <v-chip :color="getColorStatus(item.status)">
+                  <v-chip dark :color="getColorStatus(item.status)">
                     {{ "จ่ายแล้ว" }}
                   </v-chip>
                 </td>
@@ -200,6 +200,7 @@ import { apiUrl } from "../../utils/url";
 import FileDownload from "js-file-download";
 export default {
   data: () => ({
+    id: "",
     firstNameList: [],
     lastNameList: [],
     findFirstName: "",
@@ -370,16 +371,21 @@ export default {
     },
     // export with api
     exportHistory() {
+      let data = {
+        rank: this.rank,
+        id: this.firstName,
+        lastName: this.lastName,
+      };
       var config = {
         headers: {
-          "x-api-key": process.env.apiKey,
+          "x-api-key": "339ea1bdb4c96a94b5291cec559b50e2",
         },
+        data: data,
       };
       return axios
-        .post(apiUrl + "/v1/billings/history/export", config)
+        .post(apiUrl + "/v1/billings/history/export",data, config)
         .then((response) => {
           FileDownload(response.data, "ข้อมูลผู้อยู่อาศัย.xlsx");
-
           this.exportExcelElectric = false;
           this.statusAction = "Export สำเร็จ";
           this.colorSnackbar = "agree";

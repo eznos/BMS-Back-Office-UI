@@ -296,7 +296,7 @@
                         <!-- water zone -->
                         <v-expansion-panel>
                           <v-expansion-panel-header>
-                            แก้ไขหรือลบพื้นที่น้ำ
+                            แก้ไขหรือลบสายมิเตอร์น้ำ
                           </v-expansion-panel-header>
                           <!-- content -->
                           <v-expansion-panel-content>

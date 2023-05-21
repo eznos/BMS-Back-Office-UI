@@ -255,6 +255,7 @@ export default {
             this.snackbar = true;
             this.statusAction = "ค้นหาเรียบร้อย";
             this.colorSnackbar = "agree";
+
             const unit = [];
             for (let i = 0; i < data.result.water.length; i++) {
               unit.push(data.result.water[i].totalPay);
@@ -263,23 +264,20 @@ export default {
             for (let i = 0; i < data.result.water.length; i++) {
               units.push(data.result.water[i].unit);
             }
+            const dateChart = [];
+            for (let i = 0; i < data.result.water.length; i++) {
+              dateChart.push(
+                new Date(data.result.water[i].createdAt)
+                  .toISOString()
+                  .substr(0, 7)
+              );
+            }
+
+            console.log(dateChart);
             new Chart(water, {
               type: "bar",
               data: {
-                labels: [
-                  "มกราคม",
-                  "กุมภาพันธ์",
-                  "มีนาคม",
-                  "เมษายน",
-                  "พฤษภาคม ",
-                  "มิถุนายน ",
-                  "กรกฎาคม",
-                  "สิงหาคม",
-                  "กันยายน",
-                  "ตุลาคม",
-                  "พฤศจิกายน",
-                  "ธันวาคม",
-                ],
+                labels: dateChart,
                 datasets: [
                   {
                     label: "ค่าน้ำประปา",
@@ -324,23 +322,10 @@ export default {
             new Chart(Unit, {
               type: "bar",
               data: {
-                labels: [
-                  "มกราคม",
-                  "กุมภาพันธ์",
-                  "มีนาคม",
-                  "เมษายน",
-                  "พฤษภาคม ",
-                  "มิถุนายน ",
-                  "กรกฎาคม",
-                  "สิงหาคม",
-                  "กันยายน",
-                  "ตุลาคม",
-                  "พฤศจิกายน",
-                  "ธันวาคม",
-                ],
+                labels: dateChart,
                 datasets: [
                   {
-                    label: "ค่าน้ำประปา",
+                    label: "จำนวนหน่วย",
                     data: units,
                     backgroundColor: "#ed473b",
                   },
