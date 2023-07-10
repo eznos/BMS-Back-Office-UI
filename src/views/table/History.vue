@@ -372,21 +372,21 @@ export default {
     // export with api
     exportHistory() {
       let data = {
-        rank: this.rank,
         id: this.firstName,
-        lastName: this.lastName,
       };
+      
       var config = {
         headers: {
           "x-api-key": "339ea1bdb4c96a94b5291cec559b50e2",
         },
+        responseType: "blob",
         data: data,
       };
       return axios
         .post(apiUrl + "/v1/billings/history/export",data, config)
         .then((response) => {
           FileDownload(response.data, "ข้อมูลผู้อยู่อาศัย.xlsx");
-          this.exportExcelElectric = false;
+          this.dialogExport = false;
           this.statusAction = "Export สำเร็จ";
           this.colorSnackbar = "agree";
           this.snackbar = true;
@@ -400,7 +400,7 @@ export default {
             this.statusAction = "Export ไม่สำเร็จ กรุณาเลือกข้อมูลใหม่";
             this.colorSnackbar = "warning";
             this.snackbar = true;
-            this.exportExcelElectric = false;
+            this.dialogExport = false;
           } else {
             this.statusAction = "Export ไม่สำเร็จ กรุณาติดต่อผู้จัดทำ";
             this.colorSnackbar = "red";
